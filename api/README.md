@@ -12,7 +12,7 @@ To set up the Talkify API, follow these steps:
 
 ## Usage
 
-To start the Talkify API server, run `pythonapp.py` in the `api` folder.
+To start the Talkify API server, run `python3 -m app.py` in the `api` folder.
 
 ## Documentation
 
