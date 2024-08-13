@@ -1,10 +1,5 @@
 function App() {
-
-  return (
-    <div>
-      Talkify
-    </div>
-  )
+  return <div>Talkify</div>;
 }
 
-export default App
+export default App;
