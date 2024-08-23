@@ -17,6 +17,7 @@ class Status:
     requested = "requested"
     blocked = "blocked"
     accepted = "accepted"
+    pending = "pending"
 
 
 class Contact(BaseModel, Base):
