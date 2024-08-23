@@ -22,7 +22,7 @@ const Register = () => {
               <Input placeholder="Last name"/>
               <Input placeholder="Email"/>
             </div>
-            <Button className="mb-12 text-gray-800 border-gray-400 w-fit mx-auto px-10" icon={googleLogo} text="Sign up with Google" type="outline" rounded/>
+            <Button className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto px-10" icon={googleLogo} text="Sign up with Google" type="outline" rounded/>
             <Button text="Sign Up"/>
           </form>
         </div>

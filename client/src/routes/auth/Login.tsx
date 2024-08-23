@@ -16,7 +16,7 @@ const Login = () => {
             <div className="flex flex-col space-y-4 mb-12">
               <Input placeholder="Email" />
             </div>
-            <Button className="mb-12 text-gray-800 border-gray-400 w-fit mx-auto px-10" icon={googleLogo} text="Sign in with Google" type="outline" rounded />
+            <Button className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto px-10" icon={googleLogo} text="Sign in with Google" type="outline" rounded />
             <Button text="Sign In" />
           </form>
         </div>
