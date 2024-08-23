@@ -14,6 +14,7 @@ from models.base_model import BaseModel, Base
 from models.conversation import Conversation
 from models.message import Message
 from models.user import User
+from models.contact import Contact
 
 
 class DBStorage:
@@ -47,7 +48,7 @@ class DBStorage:
         tables = []
         obj_dict = {}
         if cls is None:
-            tables = [Users, Messages, Conversations]
+            tables = [User, Message, Conversation, Contact]
         else:
             tables.append(cls)
 

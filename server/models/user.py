@@ -38,6 +38,7 @@ class User(BaseModel, Base):
     last_login= Column(DateTime, nullable=False)
     conversations = relationship('Conversation', secondary=user_conversation, viewonly=False)
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
+    contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
 
     def __init__(self, *args, **kwargs):
         """initializes city"""
