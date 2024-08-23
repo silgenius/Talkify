@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import "./chatlist.css"
-const chatlist = () => {
+const Chatlist = () => {
   const [addMode,setAddMode]= useState(false)
   return (
     <div className='chatList'>
@@ -56,4 +56,4 @@ const chatlist = () => {
   )
 }
 
-export default chatlist
+export default Chatlist
