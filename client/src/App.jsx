@@ -1,5 +1,16 @@
+import { Link } from "react-router-dom";
+
 function App() {
-  return <div>Talkify</div>;
+  return (
+    <>
+      <h1 className="text-3xl font-semibold text-primary-purple">Welcome to Talkify</h1>
+      <div className="flex space-x-4">
+        <Link className="border border-secondary-purple p-2 w-fit rounded-lg" to="/register">Register page</Link>
+        <Link className="border border-secondary-purple p-2 w-fit rounded-lg" to="/login">Login page</Link>
+      </div>
+
+    </>
+  )
 }
 
 export default App;
