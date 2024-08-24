@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import "./chat.css"
 import EmojiPicker from 'emoji-picker-react'
 
-const chat = () => {
+const Chat = () => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
 
@@ -101,4 +101,4 @@ const chat = () => {
   )
 }
 
-export default chat;
+export default Chat;
