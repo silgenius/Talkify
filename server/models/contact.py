@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
 
 """

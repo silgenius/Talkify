@@ -10,12 +10,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
-from models.base_model import BaseModel, Base
-from models.conversation import Conversation
-from models.message import Message
-from models.user import User
-from models.contact import Contact
-
+from server.models.base_model import BaseModel, Base
+from server.models.conversation import Conversation
+from server.models.message import Message
+from server.models.user import User
+from server.models.contact import Contact
+from server.models.notification import Notification
 
 class DBStorage:
     __session = None
@@ -48,7 +48,7 @@ class DBStorage:
         tables = []
         obj_dict = {}
         if cls is None:
-            tables = [User, Message, Conversation, Contact]
+            tables = [User, Message, Conversation, Contact, Notification]
         else:
             tables.append(cls)
 

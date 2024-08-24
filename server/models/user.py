@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Table, ForeignKey
 from sqlalchemy.orm import relationship
@@ -39,6 +39,7 @@ class User(BaseModel, Base):
     conversations = relationship('Conversation', secondary=user_conversation, viewonly=False)
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
     contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
+    notifications = relationship('Notification', backref='user', cascade='all, delete, delete-orphan')
 
     def __init__(self, *args, **kwargs):
         """initializes city"""
