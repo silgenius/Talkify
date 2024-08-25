@@ -8,12 +8,9 @@ import Login from "./routes/auth/Login";
 import Dashboard from "./routes/dashboard/page";
 import App from "./App";
 import Register from "./routes/auth/Register";
-import Conversations from "./routes/conversations/page";
-import Conversation from "./routes/conversations/[id]";
+import Conversations from "./routes/conversations/Conversations";
+import Conversation from "./routes/conversations/components/Conversation";
 import Profile from "./routes/profile/page";
-
-
-
 
 const router = createBrowserRouter([
   {
