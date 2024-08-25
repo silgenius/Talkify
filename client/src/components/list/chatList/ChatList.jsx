@@ -7,6 +7,9 @@ const Chatlist = () => {
       <div className='header'>
         <div className='logoSection'>
             <img src='./talkify.png' alt='Talkify Logo' />
+            <div class="addSymbol">
+                <img src="./plus.png" alt="" />
+            </div>
             </div>
         <p className='chatTitle'>Chats</p>
         </div>
@@ -23,6 +26,14 @@ const Chatlist = () => {
             <p>Hey there</p>
       </div>
       </div>
+      <div className="item">
+          <img src="./user.png" alt=""/>
+          <div className="texts">
+            <span>Julie Li</span>
+            <p>Hey there</p>
+      </div>
+      </div>
+
       <div className="item">
           <img src="./user.png" alt=""/>
           <div className="texts">
