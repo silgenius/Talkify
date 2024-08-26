@@ -4,12 +4,12 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root";
 import ErrorPage from "./errorPage";
-import Login from "./routes/auth/login/page";
+import Login from "./routes/auth/Login";
 import Dashboard from "./routes/dashboard/page";
 import App from "./App";
-import Register from "./routes/auth/register/page";
-import Conversations from "./routes/conversations/page";
-import Conversation from "./routes/conversations/[id]";
+import Register from "./routes/auth/Register";
+import Conversations from "./routes/conversations/Conversations";
+import Conversation from "./routes/conversations/components/Conversation";
 import Profile from "./routes/profile/page";
 
 const router = createBrowserRouter([
@@ -23,11 +23,11 @@ const router = createBrowserRouter([
         element: <App />,
       },
       {
-        path: "/auth/login",
-        element: <Login />,
+        path: "/login",
+        element: <Login />
       },
       {
-        path: "/auth/register",
+        path: "/register",
         element: <Register />,
       },
       {
