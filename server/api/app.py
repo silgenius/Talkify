@@ -6,9 +6,11 @@
 
 from flask import Flask, make_response, jsonify
 from flask_cors import CORS
-from models import storage
-from api.v1.views import app_handler
+from server.models import storage
+from server.api.controller import app_handler
 from os import getenv
+
+
 app = Flask(__name__)
 app.register_blueprint(app_handler)
 
