@@ -14,7 +14,7 @@ from os import getenv
 app = Flask(__name__)
 app.register_blueprint(app_handler)
 
-CORS(app, resources={r"api/*": {
+CORS(app, resources={r"/api/*": {
     "origins": "*"
     }})
 
