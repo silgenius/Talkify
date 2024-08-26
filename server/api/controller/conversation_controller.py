@@ -27,6 +27,7 @@ def create_conversation():
        if user:
             user.conversations.append(new_conversation)
        else:
+            storage.delete(new_conversation)
             abort(404)
     storage.save()
 
@@ -37,11 +38,12 @@ def create_group():
     try:
         data = request.get_json()
     except Exception:
-         return jsonify({"error": "Missing name"}), 400
+         return jsonify({"error": "Invalid json"}), 400
 
     users = data.get("users")
-    if not users or len(users) >= 2:
-        return jsonify({"error": "user id missing"}), 400
+    if not users or len(users) < 2:
+        return jsonify({"error": "Invalid user list"}), 400
+
     group_name = data.get("name")
     if not group_name:
         return jsonify({"error": "Missing group name"}), 400
@@ -54,9 +56,10 @@ def create_group():
     for user_id in users:
         user = session.query(User).filter_by(id=user_id).one_or_none()
         if user:
-            user.conversations.append(new_conversation.id)
+            user.conversations.append(new_conversation)
         else:
-            return jsonify({"error": f"User with id {user_id} not found"}), 404
+            storage.delete(new_conversation)
+            abort(404)
     storage.save()
 
     return jsonify(new_conversation.to_dict()), 201
