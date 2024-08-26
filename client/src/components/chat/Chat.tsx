@@ -23,8 +23,8 @@ const Chat = () => {
           </div>
         </div>
         <div className="icons">
-          <img src="/phoneblack.png" alt="" />
-          <img src="/infoblack.png" alt="" />
+          <img src="/call.png" alt="" />
+          <img src="/info3.png" alt="" />
         </div>
       </div>
       <div className="center">
@@ -70,6 +70,17 @@ const Chat = () => {
             <span>1 min ago</span>
           </div>
         </div>
+        <div className="message">
+          <img src="/user.png" alt="" />
+          <div className="texts">
+            <p>
+              Lorem ipsum dolor sit amet consectetur
+              adipisicing elit, Voluptas provident
+              iste ratione aspernatur nemo quis.
+            </p>
+            <span>1 min ago</span>
+          </div>
+        </div>
 
         <div />
 
@@ -77,7 +88,7 @@ const Chat = () => {
           <div className='icons'>
             <img src="/plusblack.png"></img>
             <img src="/camera.png"></img>
-            <img src="/micblack.png"></img>
+            <img src="/microphone.png"></img>
           </div>
           <input type="text"
             placeholder="Type a message..."
@@ -94,7 +105,7 @@ const Chat = () => {
               <EmojiPicker open={open} onEmojiClick={EmojHandle} />
             </div>
           </div>
-          <button className="sendBotton">Send</button>
+          <button className="sendBotton">send</button>
         </div>
       </div>
     </div>

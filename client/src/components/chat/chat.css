@@ -1,10 +1,10 @@
 .chat{
-    flex: 3;
-    border-left: 1px solid #e8e2e2;
-    border-right: #e8e2e2;
+    flex: 2;
+    border-right: 1px solid #e8e2e2;
     height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     .top{
         padding: 10px;
@@ -46,22 +46,23 @@
             gap: 20px;
         
             img{
-                width: 16px;
-                height: 16px;
+                width: 20px;
+                height: 20px;
                 
             }
         }
 
     }
+
+
     .center{
         padding: 20px; 
-        flex: 1; 
-        overflow-y: scroll;
-        height: 100vh;;
+        flex: 1;
+        overflow: scroll;
         display: flex;
         flex-direction: column;
         gap: 20px;
-
+    
         .message{
             max-width: 70%;
             display: flex;
@@ -69,14 +70,14 @@
         
         &.own{
             align-self: flex-end;
-
+    
             .texts{
                 p{
                     background-color: #882A85;
-
+    
                 }
             }
-
+    
         }
         img{
             width: 30px;
@@ -89,25 +90,30 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-
+    
             p{
                 padding: 15px;
                 background-color:#1f163d08;
                 border-radius: 10px;
-
+    
             }
             span{
                 font-size: 12px;
             }
-
+    
             }
         }
     }
     
+    
     .bottom{
-        padding: 20px;
+        position:absolute;
+        bottom: 0;
+        left: 0;
+        width: calc(100% - 3px);
+        padding: 10px;
         display: flex;
-        position: static;
+        background-color: white;
         align-items: center;
         justify-content: space-between;
         border-top: 1px solid #e8e2e2;
@@ -141,7 +147,7 @@
         .emoji{
             position: relative;
 
-            .picket{
+            .picker{
                 position: absolute;
                 bottom: 50px;
                 left: 0;
@@ -150,7 +156,7 @@
         .sendBotton{
             background-color: #882A85;
             color: white;
-            padding: 10 px 20px;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             font-size: 15px;
