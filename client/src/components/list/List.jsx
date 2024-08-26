@@ -3,7 +3,7 @@ import List from './components/list/List'
 import Chat from './components/chat/Chat'
 
 
-const App = () => {
+const List = () => {
   return (
     <div className='container'>
     <List/>
@@ -11,4 +11,4 @@ const App = () => {
     </div>
 )};
 
-export default App;
+export default List;
