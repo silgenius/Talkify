@@ -20,11 +20,11 @@ const Chat = ({ name }: ChatProps) => {
   const { id } = useParams();
 
   const messages = useQuery({
-    queryKey: ["messages"],
+    queryKey: ["messages", id],
     queryFn: async () => {
-      const res = (await newRequest.get(`/messages/${id}`)).data;
+      const res = (await newRequest.get(`/${id}/messages`)).data;
       console.log(res);
-      return res;
+      return res.messages;
     },
   });
   const EmojHandle = (e: Emoji) => {
@@ -52,9 +52,16 @@ const Chat = ({ name }: ChatProps) => {
       </div>
       {/* Messages Container*/}
       <div className="p-5 flex-1 overflow-scroll flex flex-col gap-5 pb-16">
-        {messages?.data?.map((message: MessageType) => (
-          <Message key={message.id} message={message} />
-        ))}
+        {messages?.data
+          ?.sort((a: MessageType, b: MessageType) => {
+            return (
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
+            );
+          })
+          .map((message: MessageType) => (
+            <Message key={message.id} message={message} />
+          ))}
         <div />
       </div>
       {/* Footer */}
