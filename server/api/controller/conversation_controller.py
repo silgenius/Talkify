@@ -64,11 +64,15 @@ def create_group():
 
     return jsonify(new_conversation.to_dict()), 201
 
-@app_handler.route('/<string:user_id>/conversation', methods=['GET'])
+@app_handler.route('/<string:user_id>/conversations', methods=['GET'])
 def get_user_conversations(user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
-        conversations = [conv.to_dict() for conv in user.conversations]
+        user_conversations = user.conversations
+        if not user_conversations:
+            return jsonify({}), 200
+        conversations = [conv.to_dict() for conv in user_conversations]
+        conversations.sort(key=lambda x: x['updated_at'], reverse=True)
         return jsonify(conversations)
 
-    abort(404)
+    return jsonify({"error": "user not found"}), 400
