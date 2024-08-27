@@ -36,7 +36,7 @@ class User(BaseModel, Base):
     email = Column(String(60), nullable=False)
     profile_url = Column(String(60), nullable=True)
     last_login= Column(DateTime, nullable=False)
-    conversations = relationship('Conversation', secondary=user_conversation, viewonly=False)
+    conversations = relationship('Conversation', secondary=user_conversation, back_populates='users', viewonly=False)
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
     contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
     notifications = relationship('Notification', backref='user', cascade='all, delete, delete-orphan')
