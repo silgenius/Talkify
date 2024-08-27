@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, abort
 from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
-from server.models.user import User, user_conversation
+from server.models.user import User
 
 session = storage.get_session()
 
