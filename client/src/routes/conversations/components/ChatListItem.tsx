@@ -6,9 +6,10 @@ interface ChatListItemProps {
   name: string;
   lastMessageId: string;
   conversationId: string;
+  selected?: boolean;
 }
 
-const ChatListItem = ({ name, lastMessageId, conversationId }: ChatListItemProps) => {
+const ChatListItem = ({ name, lastMessageId, conversationId, selected }: ChatListItemProps) => {
   const navigate = useNavigate();
 
   const lastMessage = useQuery({
@@ -23,7 +24,7 @@ const ChatListItem = ({ name, lastMessageId, conversationId }: ChatListItemProps
   return (
     <div
       onClick={() => navigate(`/conversations/${conversationId}`)}
-      className="flex items-center gap-5 p-3 cursor-pointer border-b border-[#e8e2e2]"
+      className={`flex items-center gap-5 p-3 cursor-pointer border-l-[5px] border-b  border-[#e8e2e2] ${selected? " border-l-primary-purple" : "border-l-transparent"}`}
     >
       <img
         src="/user.png"

@@ -1,10 +1,12 @@
-import { Outlet, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ChatListItem from "./components/ChatListItem";
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "../../utils/localStorage";
 import newRequest from "../../utils/newRequest";
 import { talkifyLogo } from "../../assets";
+import Chat from "./Chat";
+import { useEffect } from "react";
 
 type Conversation = {
   id: string;
@@ -19,6 +21,17 @@ const Conversations = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const currentUser = getUser();
+
+  useEffect(() => {
+    if (currentUser === null) {
+      const timer = setTimeout(() => {
+        alert("Please login to continue");
+        navigate("/login");
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser, navigate]);
 
   const conversations = useQuery({
     queryKey: ["conversations"],
@@ -62,12 +75,19 @@ const Conversations = () => {
             name={conversation.name}
             lastMessageId={conversation.last_message_id}
             conversationId={conversation.id}
+            selected={id === conversation.id}
           />
         ))}
       </div>
       <div className="w-3/4">
         {id ? (
-          <Outlet />
+          <Chat
+            name={
+              conversations.data?.find(
+                (conversation: Conversation) => conversation.id == id
+              ).name
+            }
+          />
         ) : (
           <div className="flex items-center justify-center h-full">
             <h1 className="text-2xl text-gray-400">Select a conversation</h1>

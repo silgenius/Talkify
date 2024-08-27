@@ -1,15 +1,32 @@
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react"; // Replace with your actual emoji picker import
 import Message from "./components/Message";
+import { useQuery } from "@tanstack/react-query";
+import newRequest from "../../utils/newRequest";
+import { useParams } from "react-router-dom";
+import { MessageType } from "../../types";
 
 type Emoji = {
   emoji: string;
 };
 
-const Chat = () => {
+interface ChatProps {
+  name: string;
+}
+
+const Chat = ({ name }: ChatProps) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
+  const { id } = useParams();
 
+  const messages = useQuery({
+    queryKey: ["messages"],
+    queryFn: async () => {
+      const res = (await newRequest.get(`/messages/${id}`)).data;
+      console.log(res);
+      return res;
+    },
+  });
   const EmojHandle = (e: Emoji) => {
     setText(text + e.emoji);
   };
@@ -25,10 +42,7 @@ const Chat = () => {
             className="w-12 h-12 rounded-full object-cover"
           />
           <div className="flex flex-col gap-0.5">
-            <span className="text-lg font-bold">Julie Li</span>
-            <p className="text-sm font-light text-[#6a7087]">
-              Lorem ipsum dolor sit amet.
-            </p>
+            <span className="text-lg font-bold">{name || "Julie Li"}</span>
           </div>
         </div>
         <div className="flex gap-5">
@@ -38,29 +52,9 @@ const Chat = () => {
       </div>
       {/* Messages Container*/}
       <div className="p-5 flex-1 overflow-scroll flex flex-col gap-5 pb-16">
-        <Message
-          text="Lorem ipsum dolor sit amet consectetur adipisicing elit, Voluptas
-              provident iste ratione aspernatur nemo quis."
-        />
-        <Message
-          text="Lorem ipsum dolor sit amet consectetur adipisicing elit, Voluptas
-              provident iste ratione aspernatur nemo quis."
-          own
-        />
-        <Message
-          text="Lorem ipsum dolor sit amet consectetur adipisicing elit, Voluptas
-              provident iste ratione aspernatur nemo quis."
-          own
-        />
-        <Message
-          text="Lorem ipsum dolor sit amet consectetur adipisicing elit, Voluptas
-              provident iste ratione aspernatur nemo quis."
-        />
-        <Message
-          text="Lorem ipsum dolor sit amet consectetur adipisicing elit, Voluptas
-              provident iste ratione aspernatur nemo quis."
-          own
-        />
+        {messages?.data?.map((message: MessageType) => (
+          <Message key={message.id} message={message} />
+        ))}
         <div />
       </div>
       {/* Footer */}

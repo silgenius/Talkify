@@ -1,8 +1,13 @@
+import { MessageType } from "../../../types";
+import { getUser } from "../../../utils/localStorage";
+
 interface MessageProps {
-  text: string;
-  own?: boolean;
+  message: MessageType;
 }
-const Message = ({ text, own = false }: MessageProps) => {
+const Message = ({ message }: MessageProps) => {
+  const currentUser = getUser();
+  const own = message.sender_id === currentUser.id;
+
   return (
     <div className={`flex gap-4 max-w-[70%] ${own && 'self-end'}`}>
       {!own && (
@@ -14,7 +19,7 @@ const Message = ({ text, own = false }: MessageProps) => {
             own ? "bg-primary-purple text-white" : "bg-[#1f163d08] text-black"
           } p-3 rounded-xl`}
         >
-          {text}
+          {message.message_text}
         </p>
         <span className="text-xs">1 min ago</span>
       </div>

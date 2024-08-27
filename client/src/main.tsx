@@ -9,7 +9,6 @@ import Dashboard from "./routes/dashboard/page";
 import App from "./App";
 import Register from "./routes/auth/Register";
 import Conversations from "./routes/conversations/Conversations";
-import Chat from "./routes/conversations/Chat";
 import Profile from "./routes/profile/page";
 
 import {
@@ -44,12 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/conversations",
         element: <Conversations />,
-        children: [
-          {
-            path: "/conversations/:id",
-            element: <Chat />,
-          },
-        ],
+      },
+      {
+        path: "/conversations/:id",
+        element: <Conversations />,
       },
       {
         path: "/profile",
