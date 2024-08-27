@@ -18,11 +18,14 @@ def retrive_message_conv_id(conversation_id):
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
     message = session.query(Message).filter_by(conversation_id=conversation.id).order_by(Message.created_at).all()
+    msgs_dict = {}
+    msgs_dict["messages"] = []
     if not message:
-         return jsonify({}), 200
+         return jsonify(msgs_dict), 200
 
     messages = [mgs.to_dict() for mgs in message]
-    return jsonify(messages), 200
+    msgs_dict["messages"] = messages
+    return jsonify(msgs_dict), 200
 
 
 @app_handler.route('/message/<string:message_id>', methods=['GET'])

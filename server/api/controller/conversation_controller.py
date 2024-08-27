@@ -69,10 +69,14 @@ def get_user_conversations(user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
         user_conversations = user.conversations
+        convo_dict = {}
+        convo_dict["conversations"] = []
         if not user_conversations:
-            return jsonify({}), 200
+            return jsonify(convo_dict), 200
         conversations = [conv.to_dict() for conv in user_conversations]
         conversations.sort(key=lambda x: x['updated_at'], reverse=True)
-        return jsonify(conversations)
+
+        convo_dict["conversations"] = conversations
+        return jsonify(convo_dict)
 
     return jsonify({"error": "user not found"}), 400
