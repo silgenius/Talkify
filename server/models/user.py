@@ -50,3 +50,15 @@ class User(BaseModel, Base):
         Updates the last_login attribute to the current date and time.
         """
         self.last_login = datetime.now()
+
+    def mini_data(self):
+        """
+        Get user data
+        """
+        user_data = {}
+        user_data['id'] = self.id
+        user_data['username'] = self.username
+        user_data['last_login'] = self.last_login.isoformat()
+        user_data['profile_url'] = self.profile_url
+
+        return user_data

@@ -36,10 +36,10 @@ const Conversations = () => {
   const conversations = useQuery({
     queryKey: ["conversations"],
     queryFn: async () => {
-      const res = (await newRequest.get(`/${currentUser.id}/conversation`))
+      const res = (await newRequest.get(`/${currentUser.id}/conversations`))
         .data;
       console.log(res);
-      return res;
+      return res.conversations;
     },
   });
   return (
@@ -59,8 +59,8 @@ const Conversations = () => {
           </div>
           <p className="text-3xl font-bold text-[#333333] mt-0.5 px-4">Chats</p>
         </div>
-        <div className="flex items-center gap-5 p-5">
-          <div className="flex-1 bg-[#a0a2aa44] flex items-center gap-5 rounded-full px-1">
+        <div className="flex items-center gap-5 p-5 w-full">
+          <div className="flex-1 bg-[#a0a2aa44] flex items-center gap-5 rounded-full px-1 w-full">
             <img src="/searchblack.png" alt="" className="w-3 h-3" />
             <input
               type="text"
