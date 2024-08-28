@@ -52,9 +52,9 @@ class User(BaseModel, Base):
         self.last_login = datetime.now()
 
     def mini_data(self):
-	"""
-	Get user data
-	"""
+        """
+        Get user data
+        """
         user_data = {}
         user_data['id'] = self.id
         user_data['username'] = self.username
