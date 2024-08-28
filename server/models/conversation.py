@@ -31,6 +31,7 @@ class Conversation(BaseModel, Base):
 
     def update_last_message_id(self, message_id):
         self.last_message_id = message_id
+        self.save()
 
     def is_group(self):
         self.group = True
