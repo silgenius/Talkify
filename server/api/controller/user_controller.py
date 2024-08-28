@@ -36,5 +36,7 @@ def user_by_email():
 
     user = session.query(User).filter_by(email=user_email).one_or_none()
     if user:
+        user.update_last_login()
+        storage.save()
         return jsonify(user.to_dict())
     abort(404)
