@@ -47,10 +47,14 @@ class BaseModel:
        """
        new_dict = self.__dict__.copy()
        new_dict.update({"__class__": self.__class__.__name__})
+       new_dict['created_at'] = self.created_at.isoformat()
+       new_dict['updated_at'] = self.updated_at.isoformat()
+       if new_dict.get('last_login'):
+           new_dict['last_login'] = self.last_login.isoformat()
        if new_dict.get('_sa_instance_state'):
            new_dict.pop('_sa_instance_state')
        if new_dict.get('messages'):
-            new_dict.pop('messages')
+           new_dict.pop('messages')
        return new_dict
 
     def save(self):

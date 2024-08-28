@@ -58,7 +58,7 @@ class User(BaseModel, Base):
         user_data = {}
         user_data['id'] = self.id
         user_data['username'] = self.username
-        user_data['last_login'] = self.last_login
+        user_data['last_login'] = self.last_login.isoformat()
         user_data['profile_url'] = self.profile_url
 
         return user_data
