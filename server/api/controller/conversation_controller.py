@@ -73,10 +73,19 @@ def get_user_conversations(user_id):
         convo_dict["conversations"] = []
         if not user_conversations:
             return jsonify(convo_dict), 200
-        conversations = [conv.to_dict() for conv in user_conversations]
+        conversations = []
+        for conv in user_conversations:
+            cs = conv.users
+            conversation_data = conv.to_dict()
+            conversation_users = [user.mini_data() for user in cs if user.id != user_id]
+            if conversation_data['users']:
+                conversation_data.pop('users')
+            conversation_data['user'] = user.mini_data()
+            conversation_data['others'] = conversation_users
+            conversations.append(conversation_data)
         conversations.sort(key=lambda x: x['updated_at'], reverse=True)
 
         convo_dict["conversations"] = conversations
-        return jsonify(convo_dict)
+        return jsonify(convo_dict), 200
 
     return jsonify({"error": "user not found"}), 400
