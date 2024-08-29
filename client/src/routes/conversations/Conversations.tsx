@@ -6,12 +6,12 @@ import { getUser } from "../../utils/localStorage";
 import newRequest from "../../utils/newRequest";
 import { talkifyLogo } from "../../assets";
 import Chat from "./Chat";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ConversationType } from "../../types";
-
-
+import Detail from "../../components/detail/Detail";
 
 const Conversations = () => {
+  const [showDetail, setShowDetail] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -38,7 +38,7 @@ const Conversations = () => {
   });
   return (
     <div className="flex space-x-4">
-      <div className={`flex-1 h-screen overflow-y-scroll bg-[#F1F2F6]`}>
+      <div className={`flex-1 h-screen overflow-y-scroll bg-[#F1F2F6] w-1/4`}>
         <div className="flex flex-col items-start mb-1.5">
           <div className="flex items-center justify-between w-full px-4">
             <img
@@ -66,21 +66,24 @@ const Conversations = () => {
         {conversations?.data?.map((conversation: ConversationType) => (
           <ChatListItem
             key={conversation.id}
-            name={conversation.group? conversation.name : conversation.others[0].username}
+            name={
+              conversation.group
+                ? conversation.name
+                : conversation.others[0].username
+            }
             lastMessageId={conversation.last_message_id}
             conversationId={conversation.id}
             selected={id === conversation.id}
           />
         ))}
       </div>
-      <div className={` ${id? 'w-full' : 'hidden'} lg:w-3/4 lg:block`}>
+      <div className={` ${id ? "w-full" : "hidden"} ${showDetail? 'lg:w-2/4' : 'lg:w-3/4'} lg:block`}>
         {id ? (
           <Chat
-            conversation={
-              conversations.data?.find(
-                (conversation: ConversationType) => conversation.id == id
-              )
-            }
+            setShowDetail={setShowDetail}
+            conversation={conversations.data?.find(
+              (conversation: ConversationType) => conversation.id == id
+            )}
           />
         ) : (
           <div className={`lg:flex items-center justify-center h-full`}>
@@ -88,6 +91,11 @@ const Conversations = () => {
           </div>
         )}
       </div>
+      {showDetail && (
+        <div className="w-1/4">
+          <Detail />
+        </div>
+      )}
     </div>
   );
 };

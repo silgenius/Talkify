@@ -25,6 +25,12 @@ function App() {
         >
           Conversations page
         </Link>
+        <Link
+          className="border border-secondary-purple p-2 w-fit rounded-lg"
+          to="/conversations/id"
+        >
+          Chat page
+        </Link>
       </div>
     </>
   );

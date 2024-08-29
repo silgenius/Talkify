@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import EmojiPicker from "emoji-picker-react"; // Replace with your actual emoji picker import
 import Message from "./components/Message";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -12,9 +12,10 @@ type Emoji = {
 
 interface ChatProps {
   conversation: ConversationType;
+  setShowDetail: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Chat = ({ conversation }: ChatProps) => {
+const Chat = ({ conversation, setShowDetail }: ChatProps) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const { id } = useParams();
@@ -72,7 +73,9 @@ const Chat = ({ conversation }: ChatProps) => {
         </div>
         <div className="flex gap-5">
           <img src="/call.png" alt="" className="w-5 h-5" />
+          <button onClick={() => setShowDetail(prev => !prev)}>
           <img src="/info3.png" alt="" className="w-5 h-5" />
+          </button>
         </div>
       </div>
       {/* Messages Container*/}
