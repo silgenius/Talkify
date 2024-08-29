@@ -7,15 +7,9 @@ import newRequest from "../../utils/newRequest";
 import { talkifyLogo } from "../../assets";
 import Chat from "./Chat";
 import { useEffect } from "react";
+import { ConversationType } from "../../types";
 
-type Conversation = {
-  id: string;
-  name: string;
-  last_message_id: string;
-  group: boolean;
-  create_at: string;
-  updated_at: string;
-};
+
 
 const Conversations = () => {
   const { id } = useParams();
@@ -38,7 +32,7 @@ const Conversations = () => {
     queryFn: async () => {
       const res = (await newRequest.get(`/${currentUser.id}/conversations`))
         .data;
-      console.log(res);
+      //console.log(res);
       return res.conversations;
     },
   });
@@ -69,10 +63,10 @@ const Conversations = () => {
             />
           </div>
         </div>
-        {conversations?.data?.map((conversation: Conversation) => (
+        {conversations?.data?.map((conversation: ConversationType) => (
           <ChatListItem
             key={conversation.id}
-            name={conversation.name}
+            name={conversation.group? conversation.name : conversation.others[0].username}
             lastMessageId={conversation.last_message_id}
             conversationId={conversation.id}
             selected={id === conversation.id}
@@ -82,10 +76,10 @@ const Conversations = () => {
       <div className="w-3/4">
         {id ? (
           <Chat
-            name={
+            conversation={
               conversations.data?.find(
-                (conversation: Conversation) => conversation.id == id
-              ).name
+                (conversation: ConversationType) => conversation.id == id
+              )
             }
           />
         ) : (

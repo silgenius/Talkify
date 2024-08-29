@@ -4,17 +4,17 @@ import Message from "./components/Message";
 import { useQuery } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useParams } from "react-router-dom";
-import { MessageType } from "../../types";
+import { ConversationType, MessageType } from "../../types";
 
 type Emoji = {
   emoji: string;
 };
 
 interface ChatProps {
-  name: string;
+  conversation: ConversationType;
 }
 
-const Chat = ({ name }: ChatProps) => {
+const Chat = ({ conversation }: ChatProps) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const { id } = useParams();
@@ -23,14 +23,14 @@ const Chat = ({ name }: ChatProps) => {
     queryKey: ["messages", id],
     queryFn: async () => {
       const res = (await newRequest.get(`/${id}/messages`)).data;
-      console.log(res);
+      //console.log(res);
       return res.messages;
     },
   });
   const EmojHandle = (e: Emoji) => {
     setText(text + e.emoji);
   };
-
+  const name = conversation?.group? conversation.name : conversation?.others[0].username
   return (
     <div className="flex-2 border-r border-[#e8e2e2] h-screen flex flex-col relative">
       {/* Header */}
