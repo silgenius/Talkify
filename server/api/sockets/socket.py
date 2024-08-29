@@ -4,7 +4,6 @@
  a script that starts a Flask web application
 """
 
-from flask_cors import CORS
 from server.api.sockets.events import app, socketio
 import os
 
