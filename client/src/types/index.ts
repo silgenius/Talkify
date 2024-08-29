@@ -1,13 +1,3 @@
-type MessageType = {
-  id: string;
-  message_text: string;
-  message_type: string;
-  sender_id: string;
-  conversation_id: string;
-  created_at: string;
-  updated_at: string;
-};
-
 type UserType = {
   id: string;
   username: string;
@@ -20,4 +10,24 @@ type UserType = {
   updated_at: Date;
 };
 
-export type { UserType, MessageType };
+type ConversationType = {
+  id: string;
+  name: string;
+  last_message_id: string;
+  group: boolean;
+  create_at: string;
+  updated_at: string;
+  others: [{ id: string; username: string; profile_url: string, last_login: string}];
+};
+
+type MessageType = {
+  id: string;
+  message_text: string;
+  message_type: string;
+  sender_id: string;
+  conversation_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type { UserType, ConversationType, MessageType };

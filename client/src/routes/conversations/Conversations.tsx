@@ -7,15 +7,9 @@ import newRequest from "../../utils/newRequest";
 import { talkifyLogo } from "../../assets";
 import Chat from "./Chat";
 import { useEffect } from "react";
+import { ConversationType } from "../../types";
 
-type Conversation = {
-  id: string;
-  name: string;
-  last_message_id: string;
-  group: boolean;
-  create_at: string;
-  updated_at: string;
-};
+
 
 const Conversations = () => {
   const { id } = useParams();
@@ -38,13 +32,13 @@ const Conversations = () => {
     queryFn: async () => {
       const res = (await newRequest.get(`/${currentUser.id}/conversations`))
         .data;
-      console.log(res);
+      //console.log(res);
       return res.conversations;
     },
   });
   return (
     <div className="flex space-x-4">
-      <div className="flex-1 h-screen overflow-y-scroll bg-[#F1F2F6] w-1/4">
+      <div className={`flex-1 h-screen overflow-y-scroll bg-[#F1F2F6]`}>
         <div className="flex flex-col items-start mb-1.5">
           <div className="flex items-center justify-between w-full px-4">
             <img
@@ -69,27 +63,27 @@ const Conversations = () => {
             />
           </div>
         </div>
-        {conversations?.data?.map((conversation: Conversation) => (
+        {conversations?.data?.map((conversation: ConversationType) => (
           <ChatListItem
             key={conversation.id}
-            name={conversation.name}
+            name={conversation.group? conversation.name : conversation.others[0].username}
             lastMessageId={conversation.last_message_id}
             conversationId={conversation.id}
             selected={id === conversation.id}
           />
         ))}
       </div>
-      <div className="w-3/4">
+      <div className={` ${id? 'w-full' : 'hidden'} lg:w-3/4 lg:block`}>
         {id ? (
           <Chat
-            name={
+            conversation={
               conversations.data?.find(
-                (conversation: Conversation) => conversation.id == id
-              ).name
+                (conversation: ConversationType) => conversation.id == id
+              )
             }
           />
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className={`lg:flex items-center justify-center h-full`}>
             <h1 className="text-2xl text-gray-400">Select a conversation</h1>
           </div>
         )}
