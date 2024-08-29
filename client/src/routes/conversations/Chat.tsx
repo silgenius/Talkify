@@ -3,7 +3,7 @@ import EmojiPicker from "emoji-picker-react"; // Replace with your actual emoji 
 import Message from "./components/Message";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ConversationType, MessageType } from "../../types";
 
 type Emoji = {
@@ -19,6 +19,7 @@ const Chat = ({ conversation }: ChatProps) => {
   const [open, setOpen] = useState(false);
   const { id } = useParams();
 
+  const navigate = useNavigate();
   const messages = useQuery({
     queryKey: ["messages", id],
     queryFn: async () => {
@@ -59,6 +60,7 @@ const Chat = ({ conversation }: ChatProps) => {
       {/* Header */}
       <div className="p-2.5 flex items-center justify-between border-b border-[#e8e2e2]">
         <div className="flex items-center gap-5">
+          <button className="lg:hidden" onClick={() => navigate('/conversations')} >{'<<'}</button>
           <img
             src="/user.png"
             alt=""
@@ -91,15 +93,15 @@ const Chat = ({ conversation }: ChatProps) => {
       <div className="absolute bottom-0 left-0 w-full p-2.5 flex bg-white items-center justify-between border-t border-[#e8e2e2] gap-5 mt-auto">
         <div className="flex gap-5">
           <img src="/plusblack.png" className="w-5 h-5 cursor-pointer" />
-          <img src="/camera.png" className="w-5 h-5 cursor-pointer" />
-          <img src="/microphone.png" className="w-5 h-5 cursor-pointer" />
+          <img src="/camera.png" className="w-5 h-5 cursor-pointer hidden md:block" />
+          <img src="/microphone.png" className="w-5 h-5 cursor-pointer hidden md:block" />
         </div>
         <input
           type="text"
           placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="flex-1 bg-transparent border-none outline-none text-black p-5 rounded-xl text-lg"
+          className="flex-1 bg-transparent w-full border-none outline-none text-black p-5 rounded-xl text-lg"
         />
         <div className="relative">
           <img

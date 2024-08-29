@@ -38,7 +38,7 @@ const Conversations = () => {
   });
   return (
     <div className="flex space-x-4">
-      <div className="flex-1 h-screen overflow-y-scroll bg-[#F1F2F6] w-1/4">
+      <div className={`flex-1 h-screen overflow-y-scroll bg-[#F1F2F6]`}>
         <div className="flex flex-col items-start mb-1.5">
           <div className="flex items-center justify-between w-full px-4">
             <img
@@ -73,7 +73,7 @@ const Conversations = () => {
           />
         ))}
       </div>
-      <div className="w-3/4">
+      <div className={` ${id? 'w-full' : 'hidden'} lg:w-3/4 lg:block`}>
         {id ? (
           <Chat
             conversation={
@@ -83,7 +83,7 @@ const Conversations = () => {
             }
           />
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className={`lg:flex items-center justify-center h-full`}>
             <h1 className="text-2xl text-gray-400">Select a conversation</h1>
           </div>
         )}

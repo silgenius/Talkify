@@ -9,7 +9,7 @@ const Message = ({ message }: MessageProps) => {
   const own = message.sender_id === currentUser.id;
 
   return (
-    <div className={`flex gap-4 max-w-[70%] ${own && 'self-end'}`}>
+    <div className={`flex gap-4 w-fit max-w-[70%] ${own && 'self-end'}`}>
       {!own && (
         <img src="/user.png" alt="" className="w-8 h-8 rounded-full" />
       )}
