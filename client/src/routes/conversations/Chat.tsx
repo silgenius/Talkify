@@ -1,7 +1,7 @@
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react"; // Replace with your actual emoji picker import
 import Message from "./components/Message";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useParams } from "react-router-dom";
 import { ConversationType, MessageType } from "../../types";
@@ -30,7 +30,30 @@ const Chat = ({ conversation }: ChatProps) => {
   const EmojHandle = (e: Emoji) => {
     setText(text + e.emoji);
   };
-  const name = conversation?.group? conversation.name : conversation?.others[0].username
+
+  const createMessage = useMutation({
+    mutationFn: async (text: string) => {
+      const res = await newRequest.post(`/${id}/messages`, {
+        text,
+      });
+      console.log(res.data);
+      return res.data;
+    },
+    onSuccess: () => {
+      setText("");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const handleSendMessage = async () => {
+    if (text.trim() === "") return;
+    createMessage.mutate(text);
+  };
+  const name = conversation?.group
+    ? conversation.name
+    : conversation?.others[0].username;
   return (
     <div className="flex-2 border-r border-[#e8e2e2] h-screen flex flex-col relative">
       {/* Header */}
@@ -93,7 +116,10 @@ const Chat = ({ conversation }: ChatProps) => {
             <EmojiPicker open={open} onEmojiClick={EmojHandle} />
           </div>
         </div>
-        <button className="bg-[#882A85] text-white py-2 px-5 rounded-md text-lg ">
+        <button
+          onClick={handleSendMessage}
+          className="bg-[#882A85] text-white py-2 px-5 rounded-md text-lg "
+        >
           Send
         </button>
       </div>
