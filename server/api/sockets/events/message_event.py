@@ -7,6 +7,9 @@ from server.models.message import Message
 from server.models import storage
 from server.models.user import User
 
+
+session = storage.get_session()
+
 @socketio.on('send_message')
 def handle_message(data):
     if not isinstance(data, dict):
@@ -23,7 +26,9 @@ def handle_message(data):
         emit('error', {'error': 'message missing'})
         return
 
+    print('received signal')
     emit('message_sent', message.to_dict(), broadcast=True)
+    print('signal sent')
 
 @socketio.on('start_typing')
 def handle_typing(data):
