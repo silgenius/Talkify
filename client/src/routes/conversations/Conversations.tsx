@@ -1,20 +1,23 @@
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ChatListItem from "./components/ChatListItem";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUser } from "../../utils/localStorage";
 import newRequest from "../../utils/newRequest";
 import { talkifyLogo } from "../../assets";
 import Chat from "./Chat";
 import { useEffect, useState } from "react";
-import { ConversationType } from "../../types";
+import { ConversationType, MessageType } from "../../types";
 import Detail from "../../components/detail/Detail";
+import socket from "../../utils/socket";
+import { SocketEvent } from "../../utils/socketEvents";
 
 const Conversations = () => {
   const [showDetail, setShowDetail] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const currentUser = getUser();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (currentUser === null) {
@@ -36,6 +39,27 @@ const Conversations = () => {
       return res.conversations;
     },
   });
+
+  useEffect(() => {
+    socket.on(SocketEvent.MESSAGE_SENT, (message: MessageType) => {
+      
+
+      const inConversation = conversations.data.find(
+        (conversation: ConversationType) =>
+          conversation.id === message.conversation_id
+      );
+      if (inConversation) {
+        console.log("recieves message", message);
+        queryClient.invalidateQueries({ queryKey: ['messages', message.conversation_id] });
+        queryClient.invalidateQueries({queryKey: ['conversations']});
+      }
+    });
+
+    return () => {
+      socket.off(SocketEvent.MESSAGE_SENT);
+    };
+  }, [conversations, queryClient]);
+
   return (
     <div className="flex space-x-4">
       <div className={`flex-1 h-screen overflow-y-scroll bg-[#F1F2F6] w-1/4`}>
@@ -47,11 +71,21 @@ const Conversations = () => {
               className="w-20 h-20 object-contain cursor-pointer"
               onClick={() => navigate("/")}
             />
+            <div>
+              <img
+                src="/setting.png"
+                alt="Settings"
+                className="w-5 h-5 cursor-pointer"
+                onClick={() => navigate("/settings")}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between w-full px-4">
+            <p className="text-3xl font-bold text-[#333333] mt-0.5">Chats</p>
             <div className="flex items-center justify-center w-6 h-6 ml-30 bg-[#882A85] rounded-full cursor-pointer">
               <img src="/plus.png" alt="" className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#333333] mt-0.5 px-4">Chats</p>
         </div>
         <div className="flex items-center gap-5 p-5 w-full">
           <div className="flex-1 bg-[#a0a2aa44] flex items-center gap-5 rounded-full px-1 w-full">
@@ -77,7 +111,11 @@ const Conversations = () => {
           />
         ))}
       </div>
-      <div className={` ${id ? "w-full" : "hidden"} ${showDetail? 'lg:w-2/4' : 'lg:w-3/4'} lg:block`}>
+      <div
+        className={` ${id ? "w-full" : "hidden"} ${
+          showDetail ? "lg:w-2/4" : "lg:w-3/4"
+        } lg:block`}
+      >
         {id ? (
           <Chat
             setShowDetail={setShowDetail}

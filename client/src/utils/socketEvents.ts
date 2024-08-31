@@ -1,6 +1,6 @@
 export enum SocketEvent {
     // Triggered when a new connection is established with the server
-    CONNECTION = 'connection', 
+    CONNECT = 'connect', 
 
     // Triggered when a client disconnects from the server
     DISCONNECT = 'disconnect',
