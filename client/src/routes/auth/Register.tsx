@@ -7,6 +7,7 @@ import SideBar from "./components/SideBar";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -22,9 +23,9 @@ const Register = () => {
   useEffect(() => {
     if (currentUser) {
       const timer = setTimeout(() => {
-        alert("You are already logged in");
+        toast.error("You are already logged in");
         navigate("/conversations");
-      }, 200);
+      }, 0);
 
       return () => clearTimeout(timer);
     }
