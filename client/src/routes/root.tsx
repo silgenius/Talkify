@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import socket from "../utils/socket";
+import socket from "../socket";
 import { SocketEvent } from "../utils/socketEvents";
 import { MessageType } from "../types";
+import { ToastContainer } from "react-toastify";
 
 export default function Root() {
   useEffect(() => {
@@ -56,8 +57,9 @@ export default function Root() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen">
       <Outlet />
+      <ToastContainer />
     </div>
   );
 }
