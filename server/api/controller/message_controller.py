@@ -5,6 +5,8 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
 from server.models.message import Message
+from server.models.user import User
+
 
 session = storage.get_session()
 
@@ -56,7 +58,7 @@ def create_message():
     convo_id = data.get("conversation_id")
     if not convo_id:
         return jsonify({"error": "conversation id missing"}), 400
-    conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
+    conversation = session.query(Conversation).filter_by(id=convo_id).one_or_none()
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
 

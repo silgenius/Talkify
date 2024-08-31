@@ -89,3 +89,15 @@ def get_user_conversations(user_id):
         return jsonify(convo_dict), 200
 
     return jsonify({"error": "user not found"}), 400
+
+@app_handler.route('conversation/<string:conversation_id>', methods=['GET'])
+def get_conversation_by_id(conversation_id):
+    conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
+    
+    conversation_users = conversation.users
+    conversation_users = [user.mini_data() for user in conversation_users]
+    conversation_data = conversation.to_dict()
+    conversation_data['users'] = conversation_users
+    return jsonify(conversation_data)
