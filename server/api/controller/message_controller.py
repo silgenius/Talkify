@@ -5,6 +5,8 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
 from server.models.message import Message
+from server.models.user import User
+
 
 session = storage.get_session()
 
@@ -37,3 +39,36 @@ def retrieve_message_id(message_id):
     if not message:
         return jsonify({"error": "message not found"}), 400
     return jsonify(message.to_dict()), 200
+
+
+@app_handler.route('/message/create', methods=['POST'])
+def create_message():
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({"error": "Not a JSON"}), 400
+
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user id missing"}), 400
+    user = session.query(User).filter_by(id=user_id).one_or_none()
+    if not user:
+        return jsonify({"error": "user not found"}), 400
+
+    convo_id = data.get("conversation_id")
+    if not convo_id:
+        return jsonify({"error": "conversation id missing"}), 400
+    conversation = session.query(Conversation).filter_by(id=convo_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
+
+    text = data.get("message_text")
+    if not text:
+        return jsonify({"error": "message cannot be null"}), 400
+
+    message = Message(conversation_id=conversation.id, message_text=text, sender_id=user.id)
+    storage.new(message)
+    storage.save()
+    conversation.update_last_message_id(message.id)
+
+    return jsonify(message.to_dict()), 201
