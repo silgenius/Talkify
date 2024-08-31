@@ -1,15 +1,17 @@
 import { MessageType } from "../../../types";
 import { getUser } from "../../../utils/localStorage";
+import TimeAgo from 'react-timeago';
 
 interface MessageProps {
   message: MessageType;
+  lastMessageRef:  React.RefObject<HTMLDivElement> | null;
 }
-const Message = ({ message }: MessageProps) => {
+const Message = ({ message, lastMessageRef }: MessageProps) => {
   const currentUser = getUser();
   const own = message.sender_id === currentUser.id;
 
   return (
-    <div className={`flex gap-4 w-fit max-w-[70%] ${own && 'self-end'}`}>
+    <div ref={lastMessageRef} className={`flex gap-4 w-fit max-w-[70%] ${own && 'self-end'}`}>
       {!own && (
         <img src="/user.png" alt="" className="w-8 h-8 rounded-full" />
       )}
@@ -21,7 +23,7 @@ const Message = ({ message }: MessageProps) => {
         >
           {message.message_text}
         </p>
-        <span className="text-xs">1 min ago</span>
+        <span className="text-xs"><TimeAgo date={message.created_at} /></span>
       </div>
     </div>
   );

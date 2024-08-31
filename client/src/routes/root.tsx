@@ -2,17 +2,18 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import socket from "../utils/socket";
 import { SocketEvent } from "../utils/socketEvents";
+import { MessageType } from "../types";
 
 export default function Root() {
   useEffect(() => {
     // Connect to the socket server
     socket.connect();
 
-    socket.on(SocketEvent.CONNECTION, () => {
+    socket.on(SocketEvent.CONNECT, () => {
       console.log("Connected to the server with socket ID:", socket.id);
     });
 
-    socket.on(SocketEvent.MESSAGE_SENT, (message: string) => {
+    socket.on(SocketEvent.MESSAGE_SENT, (message: MessageType) => {
       console.log("New message from server:", message);
     });
 
@@ -42,7 +43,7 @@ export default function Root() {
 
     // Cleanup on component unmount
     return () => {
-      socket.off(SocketEvent.CONNECTION);
+      socket.off(SocketEvent.CONNECT);
       socket.off(SocketEvent.MESSAGE_SENT);
       socket.off(SocketEvent.TYPING_STARTED);
       socket.off(SocketEvent.TYPING_STOPPED);
