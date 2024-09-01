@@ -55,13 +55,13 @@ const ConversationItem = ({
         />
         <div className="flex flex-col w-full">
           <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center justify-center space-x-1.5">
-              {!isRead && (
-                <div className="w-2 h-2 rounded-full bg-primary-purple" />
-              )}
+            <div className="flex items-center justify-center space-x-3">
               <span className={`text-lg ${!isRead ? "font-semibold" : ""}`}>
                 {name || "Julie Li"}
               </span>
+              {!isRead && (
+                <div className="w-2 h-2 rounded-full bg-primary-purple" />
+              )}
             </div>
             {!isHovered &&
               (isLoading ? (

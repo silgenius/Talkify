@@ -11,6 +11,7 @@ import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 import SideNav from "./components/SideNav";
 import EmptyChat from "./components/EmptyChat";
+import { toast } from "react-toastify";
 
 const Conversations = () => {
   const [showDetail, setShowDetail] = useState(false);
@@ -23,9 +24,9 @@ const Conversations = () => {
   useEffect(() => {
     if (currentUser === null) {
       const timer = setTimeout(() => {
-        alert("Please login to continue");
+        toast.error("Please login to continue");
         navigate("/login");
-      }, 200);
+      }, 0);
 
       return () => clearTimeout(timer);
     }
@@ -70,11 +71,7 @@ const Conversations = () => {
           showDetail ? "lg:w-2/4" : "lg:w-3/4"
         } lg:block`}
       >
-        {id ? (
-          <Chat setShowDetail={setShowDetail} />
-        ) : (
-          <EmptyChat />
-        )}
+        {id ? <Chat setShowDetail={setShowDetail} /> : <EmptyChat />}
       </div>
       {showDetail && (
         <div className="w-1/4">
