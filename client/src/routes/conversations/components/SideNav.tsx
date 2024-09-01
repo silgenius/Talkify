@@ -7,6 +7,8 @@ import Skeleton from "../../../components/common/Skeleton";
 import Error from "../../../components/common/Error";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
+import { removeUser } from "../../../utils/localStorage";
 
 const SideNav = ({
   conversations,
@@ -33,12 +35,30 @@ const SideNav = ({
             onClick={() => navigate("/")}
           />
           <div>
-            <img
-              src="/setting.png"
-              alt="Settings"
-              className="w-5 h-5 cursor-pointer"
-              onClick={() => navigate("/settings")}
-            />
+            <Menu
+              menuButton={
+                <img
+                  src="/setting.png"
+                  alt="Settings"
+                  className="w-5 h-5 cursor-pointer"
+                />
+              }
+              transition
+            >
+              <MenuItem>Profile</MenuItem>
+              <MenuItem>Settings</MenuItem>
+              <MenuDivider />
+              <MenuItem
+                onClick={() => {
+                  removeUser();
+                  navigate("/");
+                }}
+                className="space-x-4"
+              >
+                <img src="/logout.png" alt="Logout" className="w-4 h-4" />
+                <p>Logout</p>
+              </MenuItem>
+            </Menu>
           </div>
         </div>
         <div className="flex items-center justify-between w-full px-4 py-2">
