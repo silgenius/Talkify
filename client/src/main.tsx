@@ -1,6 +1,9 @@
+import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+import "@szhsin/react-menu/dist/transitions/zoom.css";
+import "@szhsin/react-menu/dist/index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root";
 import ErrorPage from "./errorPage";
@@ -11,10 +14,7 @@ import Register from "./routes/auth/Register";
 import Conversations from "./routes/conversations/Conversations";
 import Profile from "./routes/profile/page";
 
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 

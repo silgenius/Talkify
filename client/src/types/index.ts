@@ -18,6 +18,7 @@ type ConversationType = {
   create_at: string;
   updated_at: string;
   others: [{ id: string; username: string; profile_url: string, last_login: string}];
+  users: [{ id: string; username: string; profile_url: string, last_login: string}];
 };
 
 type MessageType = {

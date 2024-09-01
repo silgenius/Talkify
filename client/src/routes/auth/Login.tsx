@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,9 +19,9 @@ const Login = () => {
   useEffect(() => {
     if (currentUser) {
       const timer = setTimeout(() => {
-        alert("You are already logged in");
+        toast.error("You are already logged in");
         navigate("/conversations");
-      }, 200);
+      }, 0);
 
       return () => clearTimeout(timer);
     }
