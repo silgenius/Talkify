@@ -1,7 +1,20 @@
 import { Link } from "react-router-dom";
 import './index.css'; // Update to the correct path for the CSS file
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getUser } from "./utils/localStorage";
+
 
 function App() {
+  const navigate = useNavigate();
+  const currentUser = getUser();
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/conversations");
+    }
+  }, [currentUser, navigate]);
+
   return (
     <div className="app-background">
       <div className="header">

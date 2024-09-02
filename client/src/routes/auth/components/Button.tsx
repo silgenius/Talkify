@@ -4,14 +4,16 @@ interface ButtonProps {
   rounded?: boolean;
   text?: string;
   icon?: string;
-  onClick?: () => void; 
+  htmlType?: 'button' | 'submit' | 'reset';
+  onClick?: () => void;
 }
-const Button = ({ className, type = 'filled', rounded = false, text, icon, onClick }: ButtonProps) => {
+const Button = ({ className, type = 'filled', rounded = false, text, icon, onClick, htmlType='button' }: ButtonProps) => {
   return (
     <>
       <button
         className={`${className} flex items-center justify-center text-white p-2 px-20 ${rounded ? 'rounded-full' : 'rounded-lg'} ${type == 'filled' ? 'bg-primary-purple' : 'border border-white'}`}
         onClick={onClick}
+        type={htmlType}
       >
         {
           icon &&

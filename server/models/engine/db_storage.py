@@ -30,7 +30,7 @@ class DBStorage:
         database = getenv('DATABASE_NAME')
         host = getenv('HOST')
 
-        db_url = 'mysql+mysqldb://{}:{}@{}/{}'.format(username, password, host, database)
+        db_url = 'mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(username, password, host, database)
         self.__engine = create_engine(db_url, pool_pre_ping=True)
     
     def reload(self):

@@ -64,11 +64,40 @@ def create_group():
 
     return jsonify(new_conversation.to_dict()), 201
 
-@app_handler.route('/<string:user_id>/conversation', methods=['GET'])
+@app_handler.route('/<string:user_id>/conversations', methods=['GET'])
 def get_user_conversations(user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
-        conversations = [conv.to_dict() for conv in user.conversations]
-        return jsonify(conversations)
+        user_conversations = user.conversations
+        convo_dict = {}
+        convo_dict["conversations"] = []
+        if not user_conversations:
+            return jsonify(convo_dict), 200
+        conversations = []
+        for conv in user_conversations:
+            cs = conv.users
+            conversation_data = conv.to_dict()
+            conversation_users = [user.mini_data() for user in cs if user.id != user_id]
+            if conversation_data['users']:
+                conversation_data.pop('users')
+            conversation_data['user'] = user.mini_data()
+            conversation_data['others'] = conversation_users
+            conversations.append(conversation_data)
+        conversations.sort(key=lambda x: x['updated_at'], reverse=True)
 
-    abort(404)
+        convo_dict["conversations"] = conversations
+        return jsonify(convo_dict), 200
+
+    return jsonify({"error": "user not found"}), 400
+
+@app_handler.route('conversation/<string:conversation_id>', methods=['GET'])
+def get_conversation_by_id(conversation_id):
+    conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
+    
+    conversation_users = conversation.users
+    conversation_users = [user.mini_data() for user in conversation_users]
+    conversation_data = conversation.to_dict()
+    conversation_data['users'] = conversation_users
+    return jsonify(conversation_data)
