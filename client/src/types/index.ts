@@ -30,5 +30,10 @@ type MessageType = {
   created_at: string;
   updated_at: string;
 };
-
+export interface SettingType {
+  id: number; // Unique identifier for the setting
+  name: string; // Name of the setting
+  description: string; // Description or additional details about the setting
+  value: string | number | boolean; // The value of the setting, assuming it can be a string, number, or boolean
+}
 export type { UserType, ConversationType, MessageType };

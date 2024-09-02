@@ -31,7 +31,7 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
   const currentUser = getUser();
 
   const EmojHandle = (e: Emoji) => {
-    setText(text + e.emoji);
+    setText(prev => prev + e.emoji);
   };
 
   // Create a new message

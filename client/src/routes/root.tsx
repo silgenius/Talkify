@@ -1,11 +1,14 @@
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import socket from "../socket";
 import { SocketEvent } from "../utils/socketEvents";
 import { MessageType } from "../types";
-import { ToastContainer } from "react-toastify";
+import { getUser } from "../utils/localStorage";
+import SideNav from "../components/common/SideNav";
 
 export default function Root() {
+  const { id } = useParams();
+  const currentUser = getUser();
   useEffect(() => {
     // Connect to the socket server
     socket.connect();
@@ -57,9 +60,19 @@ export default function Root() {
   }, []);
 
   return (
-    <div className="h-screen">
-      <Outlet />
-      <ToastContainer />
+    <div className="h-screen flex">
+      {currentUser && (
+        <div
+          className={`lg:flex flex-col bg-[#882A8508] lg:w-1/4 ${
+            id ? "hidden" : "flex w-full"
+          } h-screen shadow-xl`}
+        >
+          <SideNav />
+        </div>
+      )}
+      <div className={`flex-1 ${id ? "w-full" : "hidden"} lg:block`}>
+        <Outlet />
+      </div>
     </div>
   );
 }
