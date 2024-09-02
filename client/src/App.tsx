@@ -1,17 +1,27 @@
 import { Link } from "react-router-dom";
+import './index.css'; // Update to the correct path for the CSS file
 
 function App() {
   return (
-    <>
-      <h1 className="text-3xl font-semibold text-primary-purple">Welcome to Talkify</h1>
-      <div className="flex space-x-4">
-        <Link className="border border-secondary-purple p-2 w-fit rounded-lg" to="/register">Register page</Link>
-        <Link className="border border-secondary-purple p-2 w-fit rounded-lg" to="/login">Login page</Link>
-        <Link className="border border-secondary-purple p-2 w-fit rounded-lg" to="/conversations">Conversations page</Link>        
+    <div className="app-background">
+      <div className="header">
+      <img src="./talkify-logo-01.png" alt="Logo" className="logo" />
+        <div className="nav-links">
+          <Link className="nav-button" to="/register">Register</Link>
+          <Link className="nav-button" to="/login">Login</Link>
+          <Link className="nav-button" to="/conversations">Conversations</Link>        
+        </div>
       </div>
 
-    </>
-  )
+      <div className="content">
+        <div className="text-container">
+          <h1 className="heading-1">Welcome to <br /> Talkify!</h1>
+          <h2 className="heading-2">Effortless connections ,<br /> meaningful conversations</h2>
+
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default App;
