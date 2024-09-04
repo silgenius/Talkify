@@ -14,14 +14,18 @@ interface ConversationsProps {
 
 const Conversations = ({ conversations }: ConversationsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { id } = useParams();
 
   // Filter conversations based on the search query
-  const filteredConversations = conversations.data?.filter((conversation: ConversationType) => {
-    const name = conversation.group ? conversation.name : conversation.others[0].username;
-    return name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  const filteredConversations = conversations.data?.filter(
+    (conversation: ConversationType) => {
+      const name = conversation.group
+        ? conversation.name
+        : conversation.others[0].username;
+      return name.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+  );
 
   return (
     <div className="flex flex-col h-full py-2">
@@ -33,6 +37,10 @@ const Conversations = ({ conversations }: ConversationsProps) => {
         >
           <img src="/plus.png" alt="New Chat" className="w-4 h-4" />
         </button>
+        <SearchModal
+          isModalOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </header>
       <div className="px-4">
         <SearchInput
@@ -64,12 +72,6 @@ const Conversations = ({ conversations }: ConversationsProps) => {
               />
             ))}
           </>
-        )}
-        {isModalOpen && (
-          <SearchModal
-            isModalOpen={isModalOpen}
-            onClose={() => setIsModalOpen((prev) => !prev)}
-          />
         )}
       </div>
     </div>

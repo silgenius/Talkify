@@ -26,13 +26,10 @@ const EmptyChat = () => {
       >
         Start a New Conversation
       </button>
-
-      {isModalOpen && (
-        <SearchModal
-          isModalOpen={isModalOpen}
-          onClose={() => setIsModalOpen((prev) => !prev)}
-        />
-      )}
+      <SearchModal
+        isModalOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
