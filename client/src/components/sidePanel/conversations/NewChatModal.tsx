@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Modal from "../../../components/common/Modal";
+import Modal from "../../common/Modal";
 import { toast } from "react-toastify";
 import { BiUserPlus, BiSearch, BiTrash } from "react-icons/bi";
 
@@ -17,7 +17,7 @@ interface SearchModalProps {
   onClose: () => void;
 }
 
-const SearchModal = ({ isModalOpen, onClose }: SearchModalProps) => {
+const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [groupName, setGroupName] = useState("");
   const [results, setResults] = useState<typeof contacts>(contacts);
@@ -141,4 +141,4 @@ const SearchModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   );
 };
 
-export default SearchModal;
+export default NewChatModal;

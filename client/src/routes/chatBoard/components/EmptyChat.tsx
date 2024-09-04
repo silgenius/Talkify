@@ -1,5 +1,6 @@
 import { useState } from "react";
-import SearchModal from "./SearchModal";
+import NewChatModal from "../../../components/sideNav/conversations/NewChatModal";
+
 
 const EmptyChat = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,7 @@ const EmptyChat = () => {
       >
         Start a New Conversation
       </button>
-      <SearchModal
+      <NewChatModal
         isModalOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

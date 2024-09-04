@@ -7,13 +7,13 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root";
 import ErrorPage from "./errorPage";
-import Login from "./routes/auth/Login";
 import App from "./App";
-import Register from "./routes/auth/Register";
+import Login from "./routes/(auth)/Login";
+import Register from "./routes/(auth)/Register";
+import ChatBoard from "./routes/chatBoard/ChatBoard";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
-import Chat from "./routes/conversations/Chat";
 
 const queryClient = new QueryClient();
 
@@ -36,8 +36,8 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
-        path: "/conversations/:id",
-        element: <Chat />,
+        path: "/conversation/:id",
+        element: <ChatBoard />,
       },
     ],
   },

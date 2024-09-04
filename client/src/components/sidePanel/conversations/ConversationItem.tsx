@@ -39,7 +39,7 @@ const ConversationItem = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        onClick={() => navigate(`/conversations/${conversationId}`)}
+        onClick={() => navigate(`/conversation/${conversationId}`)}
         className={`flex items-center gap-4 p-4 cursor-pointer  transition-all duration-300 ease-in-out ${
           selected
             ? "bg-gray-100 rounded-l-lg border-l-[5px] border-l-primary-purple"

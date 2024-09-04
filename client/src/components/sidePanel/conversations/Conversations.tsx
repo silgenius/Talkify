@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { ConversationType } from "../../../types";
-import Skeleton from "../../../components/common/Skeleton";
-import Error from "../../../components/common/Error";
+import Skeleton from "../../common/Skeleton";
+import Error from "../../common/Error";
 import ConversationItem from "./ConversationItem";
-import SearchModal from "./SearchModal";
 import { UseQueryResult } from "@tanstack/react-query";
-import SearchInput from "../../../components/common/SearchInput";
+import SearchInput from "../../common/SearchInput";
+import NewChatModal from "./NewChatModal";
 
 interface ConversationsProps {
   conversations: UseQueryResult<ConversationType[], Error>;
@@ -37,7 +37,7 @@ const Conversations = ({ conversations }: ConversationsProps) => {
         >
           <img src="/plus.png" alt="New Chat" className="w-4 h-4" />
         </button>
-        <SearchModal
+        <NewChatModal
           isModalOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />

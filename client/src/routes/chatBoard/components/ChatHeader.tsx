@@ -19,7 +19,7 @@ const ChatHeader = ({ setShowDetail, conversation, startCall }: ChatHeaderProps)
       <div className="flex items-center gap-5">
         <button
           className="lg:hidden"
-          onClick={() => navigate("/conversations")}
+          onClick={() => navigate("/")}
         >
           {"<<"}
         </button>

@@ -1,25 +1,25 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import { talkifyLogo } from "../../assets";
+import { talkifyLogo } from "../assets";
 import { MdContacts, MdOutlineContacts } from "react-icons/md";
-import Conversations from "../../routes/conversations/components/Conversations";
-import Contacts from "../../routes/contacts/Contacts";
 import {
   IoChatbox,
   IoChatboxOutline,
   IoSettingsOutline,
   IoSettingsSharp,
 } from "react-icons/io5";
-import newRequest from "../../utils/newRequest";
-import { getUser } from "../../utils/localStorage";
-import socket from "../../socket";
-import { SocketEvent } from "../../utils/socketEvents";
+import newRequest from "../utils/newRequest";
+import { getUser } from "../utils/localStorage";
+import socket from "../socket";
+import { SocketEvent } from "../utils/socketEvents";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ConversationType, MessageType } from "../../types";
-import Settings from "../../routes/settings/Settings";
+import { ConversationType, MessageType } from "../types";
+import Conversations from "../components/sidePanel/conversations/Conversations";
+import Contacts from "../components/sidePanel/contacts/Contacts";
+import Settings from "../components/sidePanel/settings/Settings";
 
-const SideNav = () => {
+const SidePanel = () => {
   const navigate = useNavigate();
   const { hash } = useLocation();
   const queryClient = useQueryClient();
@@ -161,4 +161,4 @@ const SideNav = () => {
   );
 };
 
-export default SideNav;
+export default SidePanel;

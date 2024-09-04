@@ -22,7 +22,7 @@ type typingSocketData = {
   conversation_id: string;
 };
 
-const Chat = () => {
+const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
@@ -206,4 +206,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default ChatBoard;

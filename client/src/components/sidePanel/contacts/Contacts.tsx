@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaUserCheck, FaUserPlus } from "react-icons/fa";
-import SearchInput from "../../components/common/SearchInput";
-import AddContactModal from "../conversations/components/AddContactModal";
+import SearchInput from "../../../components/common/SearchInput";
+import NewContactModal from "./NewContactModal";
 
 const Contacts: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -38,7 +38,7 @@ const Contacts: React.FC = () => {
           <FaUserPlus size={20} />
           New Contact
         </button>
-        {<AddContactModal isOpen={showModal} onClose={() => setShowModal(false)}/>}
+        {<NewContactModal isOpen={showModal} onClose={() => setShowModal(false)}/>}
       </header>
       <div className="px-4">
         <SearchInput

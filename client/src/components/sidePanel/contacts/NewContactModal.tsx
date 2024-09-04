@@ -48,7 +48,7 @@ interface AddContactModalProps {
   onClose: () => void;
 }
 
-const AddContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
+const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<typeof allUsers>(allUsers);
   const [addedContacts, setAddedContacts] = useState<typeof allUsers>([]);
@@ -135,4 +135,4 @@ const AddContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   );
 };
 
-export default AddContactModal;
+export default NewContactModal;

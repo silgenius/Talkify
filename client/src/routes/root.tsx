@@ -4,7 +4,7 @@ import socket from "../socket";
 import { SocketEvent } from "../utils/socketEvents";
 import { MessageType } from "../types";
 import { getUser } from "../utils/localStorage";
-import SideNav from "../components/common/SideNav";
+import SidePanel from "./SidePanel";
 
 export default function Root() {
   const { id } = useParams();
@@ -67,7 +67,7 @@ export default function Root() {
             id ? "hidden" : "flex w-full"
           } h-screen shadow-xl`}
         >
-          <SideNav />
+          <SidePanel />
         </div>
       )}
       <div className={`flex-1 ${id ? "w-full" : "hidden"} lg:block`}>
