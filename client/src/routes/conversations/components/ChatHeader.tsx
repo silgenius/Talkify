@@ -4,9 +4,10 @@ import { ConversationType } from "../../../types";
 interface ChatHeaderProps {
   setShowDetail: React.Dispatch<React.SetStateAction<boolean>>;
   conversation: ConversationType;
+  startCall: () => void;
 }
 
-const ChatHeader = ({ setShowDetail, conversation }: ChatHeaderProps) => {
+const ChatHeader = ({ setShowDetail, conversation, startCall }: ChatHeaderProps) => {
   const navigate = useNavigate();
 
   const name = conversation.group
@@ -32,7 +33,9 @@ const ChatHeader = ({ setShowDetail, conversation }: ChatHeaderProps) => {
         </div>
       </div>
       <div className="flex gap-5">
-        <img src="/call.png" alt="" className="w-5 h-5" />
+        <button onClick={startCall}>
+          <img src="/call.png" alt="Call" className="w-5 h-5" />
+        </button>
         <button onClick={() => setShowDetail((prev) => !prev)}>
           <img src="/info3.png" alt="" className="w-5 h-5" />
         </button>
