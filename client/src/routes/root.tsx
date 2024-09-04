@@ -4,7 +4,7 @@ import socket from "../socket";
 import { SocketEvent } from "../utils/socketEvents";
 import { MessageType } from "../types";
 import { getUser } from "../utils/localStorage";
-import SidePanel from "./SidePanel";
+import SidePanel from "./_layout/SidePanel";
 
 export default function Root() {
   const { id } = useParams();

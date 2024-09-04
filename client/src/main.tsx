@@ -10,7 +10,7 @@ import ErrorPage from "./errorPage";
 import App from "./App";
 import Login from "./routes/(auth)/Login";
 import Register from "./routes/(auth)/Register";
-import ChatBoard from "./routes/chatBoard/ChatBoard";
+import Conversation from "./routes/conversation/[id]";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/conversation/:id",
-        element: <ChatBoard />,
+        element: <Conversation />,
       },
     ],
   },

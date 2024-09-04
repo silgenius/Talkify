@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Message from "./components/Message";
+
 import { useQuery } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,15 +7,16 @@ import { ConversationType, MessageType } from "../../types";
 import { getUser } from "../../utils/localStorage";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
-import ChatHeader from "./components/ChatHeader";
-import ChatFooter from "./components/ChatFooter";
-import TypingIndicator from "./components/TypingIndicator";
+import Message from "../../components/chatBoard/Message";
+import ChatHeader from "../../components/chatBoard/ChatHeader";
+import ChatFooter from "../../components/chatBoard/ChatFooter";
+import TypingIndicator from "../../components/chatBoard/TypingIndicator";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "react-toastify";
 import Detail from "../../components/detail/Detail";
-import EmptyChat from "./components/EmptyChat";
+import EmptyChat from "../../components/chatBoard/EmptyChat";
 import { AxiosError } from "axios";
-import VoiceCall from "./components/VoiceCall";
+import VoiceCall from "../../components/chatBoard/VoiceCall";
 
 type typingSocketData = {
   username: string;

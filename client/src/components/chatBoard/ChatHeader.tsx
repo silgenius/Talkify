@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ConversationType } from "../../../types";
+import { ConversationType } from "../../types";
 
 interface ChatHeaderProps {
   setShowDetail: React.Dispatch<React.SetStateAction<boolean>>;

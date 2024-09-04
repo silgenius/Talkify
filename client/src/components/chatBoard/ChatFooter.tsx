@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EmojiPicker from "emoji-picker-react";
 import { useState } from "react";
-import newRequest from "../../../utils/newRequest";
-import { MessageType } from "../../../types";
-import socket from "../../../socket";
-import { SocketEvent } from "../../../utils/socketEvents";
+import newRequest from "../../utils/newRequest";
+import { MessageType } from "../../types";
+import socket from "../../socket";
+import { SocketEvent } from "../../utils/socketEvents";
 import { useParams } from "react-router-dom";
-import { getUser } from "../../../utils/localStorage";
+import { getUser } from "../../utils/localStorage";
 
 type Emoji = {
   emoji: string;

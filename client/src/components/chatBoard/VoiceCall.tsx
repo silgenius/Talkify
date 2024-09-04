@@ -4,7 +4,7 @@ import { FiMic, FiMicOff, FiPhoneOff } from "react-icons/fi";
 import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ConversationType } from "../../../types";
+import { ConversationType } from "../../types";
 
 interface VoiceCallProps {
   conversation: ConversationType;

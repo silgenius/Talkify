@@ -1,5 +1,5 @@
 import { useState } from "react";
-import NewChatModal from "../../../components/sideNav/conversations/NewChatModal";
+import NewChatModal from "../sidePanel/conversations/NewChatModal";
 
 
 const EmptyChat = () => {

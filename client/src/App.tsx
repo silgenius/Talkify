@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { getUser } from "./utils/localStorage";
-import EmptyChat from "./routes/chatBoard/components/EmptyChat";
+import EmptyChat from "./components/chatBoard/EmptyChat";
 
 function App() {
   const currentUser = getUser();

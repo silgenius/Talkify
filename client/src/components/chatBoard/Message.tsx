@@ -1,5 +1,5 @@
-import { getUser } from "../../../utils/localStorage";
-import { MessageType } from "../../../types";
+import { getUser } from "../../utils/localStorage";
+import { MessageType } from "../../types";
 import emojiRegex from "emoji-regex";
 
 interface MessageProps {
