@@ -16,6 +16,9 @@ from server.models.message import Message
 from server.models.user import User
 from server.models.contact import Contact
 from server.models.notification import Notification
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class DBStorage:
     __session = None

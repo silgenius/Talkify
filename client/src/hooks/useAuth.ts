@@ -1,26 +1,29 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../utils/newRequest";
-import { setUser } from "../utils/localStorage";
+import { removeUser, setUser } from "../utils/localStorage";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { UserType } from "../types";
+import { toast } from "react-toastify";
+import { welcomeMessage } from "../utils/welcomeMessage";
 
 const useAuth = () => {
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const singIn = useMutation({
     mutationFn: async (data: string) => {
-      const res = (await newRequest.post("/user/email", {email: data})).data;
+      const res = (await newRequest.post("/user/email", { email: data })).data;
       console.log(res);
       return res as UserType;
     },
     onSuccess: (data) => {
-        setUser(data);
-        navigate("/conversations");
+      setUser(data);
+      toast(welcomeMessage(data.username));
+      navigate("/");
     },
-    onError: (error: AxiosError<{error: string}>) => {
-      alert(error.response?.data.error);
-    }
+    onError: (error: AxiosError<{ error: string }>) => {
+      alert(error.response?.data);
+    },
   });
 
   const signUp = useMutation({
@@ -38,7 +41,18 @@ const useAuth = () => {
     },
   });
 
-  return { singIn, signUp };
+  const logout = () => {
+    removeUser();
+    queryClient.clear(); 
+    toast("See you soon!");
+    navigate("/login");
+    setTimeout(() => {
+      
+      navigate("/");
+    }, 0);
+  }
+
+  return { singIn, signUp, logout };
 };
 
 export default useAuth;

@@ -12,17 +12,18 @@ import ChatFooter from "./components/ChatFooter";
 import TypingIndicator from "./components/TypingIndicator";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "react-toastify";
+import Detail from "../../components/detail/Detail";
+import EmptyChat from "./components/EmptyChat";
+import { AxiosError } from "axios";
 
 type typingSocketData = {
   username: string;
   conversation_id: string;
 };
-interface ChatProps {
-  setShowDetail: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
-const Chat = ({ setShowDetail }: ChatProps) => {
+const Chat = () => {
   const [text, setText] = useState("");
+  const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
 
   const { id } = useParams();
@@ -31,6 +32,17 @@ const Chat = ({ setShowDetail }: ChatProps) => {
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<number | null>(null);
 
+  //Redirect to login page if user is not logged in
+  useEffect(() => {
+    if (currentUser === null) {
+      const timer = setTimeout(() => {
+        toast.error("Please login to continue");
+        navigate("/login");
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser, navigate]);
   // Fetch conversation data
   const conversation = useQuery<ConversationType>({
     queryKey: ["conversation", id],
@@ -64,7 +76,9 @@ const Chat = ({ setShowDetail }: ChatProps) => {
       ({ username, conversation_id }: typingSocketData) => {
         // Show typing indicator in other conversation members' screens
         if (conversation_id === id && username !== currentUser.username) {
-          setIsTyping((prev) => [...prev, username]);
+          setIsTyping((prev) =>
+            !prev.includes(username) ? [...prev, username] : [...prev]
+          );
         }
       }
     );
@@ -86,8 +100,8 @@ const Chat = ({ setShowDetail }: ChatProps) => {
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
-
-    socket.emit("start_typing", {
+    console.log("emit start typing");
+    socket.emit(SocketEvent.START_TYPING, {
       conversation_id: id,
       sender_id: currentUser.id,
     });
@@ -98,7 +112,7 @@ const Chat = ({ setShowDetail }: ChatProps) => {
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit("stop_typing", {
+      socket.emit(SocketEvent.STOP_TYPING, {
         conversation_id: id,
         sender_id: currentUser.id,
       });
@@ -107,14 +121,22 @@ const Chat = ({ setShowDetail }: ChatProps) => {
 
   useEffect(() => {
     if (conversation.error) {
-      toast.error("Could not load conversation");
-      navigate("/conversations");
+      if (conversation.isPlaceholderData) {
+        toast.error("Could not load messages");
+      } else {
+        const error = conversation.error as AxiosError;
+        if (error.response?.status === 404) toast.error("Conversation not found");
+        else toast.error("Could not load conversation");
+        navigate("/");
+      }
     }
-  }, [conversation.error, navigate]);
+  }, [conversation.error, conversation.isPlaceholderData, navigate]);
 
   return (
-    <>
-      {conversation.isLoading ? (
+    <div className="w-full">
+      {!id ? (
+        <EmptyChat />
+      ) : conversation.isLoading ? (
         <LoadingSpinner />
       ) : (
         conversation.data && (
@@ -151,7 +173,12 @@ const Chat = ({ setShowDetail }: ChatProps) => {
           </div>
         )
       )}
-    </>
+      {showDetail && (
+        <div className="w-1/4">
+          <Detail />
+        </div>
+      )}
+    </div>
   );
 };
 

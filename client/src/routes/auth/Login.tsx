@@ -20,7 +20,7 @@ const Login = () => {
     if (currentUser) {
       const timer = setTimeout(() => {
         toast.error("You are already logged in");
-        navigate("/conversations");
+        navigate("/");
       }, 0);
 
       return () => clearTimeout(timer);
