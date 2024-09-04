@@ -7,14 +7,14 @@ from server.models.user import User
 from server.api.controller import auth_handler
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "Change to a real secret key"
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Set up OAuth
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id="920202821222-enfe8o0kl50f2t6o1ouvp53mfu57dk56.apps.googleusercontent.com",
-    client_secret="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",
+    client_id=os.getenv('CLIENT_ID'),
+    client_secret=os.getenv('CLIENT_SECRET'),
     authorize_params=None,
     access_token_params=None,
     refresh_token_url=None,
