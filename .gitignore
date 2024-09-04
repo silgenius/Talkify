@@ -5,3 +5,5 @@
 set_up.sql
 .env
 .dev
+venv/*
+server/api/controller/venv/*
