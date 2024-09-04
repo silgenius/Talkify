@@ -8,13 +8,15 @@ from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from server.models import storage
 from server.api.controller import app_handler
+from server.api.controller import auth_handler
 from os import getenv
 
 
 app = Flask(__name__)
 app.register_blueprint(app_handler)
+app.register_blueprint(auth_handler)
 
-CORS(app, resources={r"/api/*": {
+CORS(app, resources={r"/*": {
     "origins": "*"
     }})
 
