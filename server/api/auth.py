@@ -1,28 +1,19 @@
 from flask import Flask, redirect, url_for, session, jsonify
-from authlib.integrations.flask_client import OAuth
 import jwt
 import os
 from server.models import storage
 from server.models.user import User
-from server.api.controller import auth_handler
+from dotenv import load_dotenv
+from flask import Blueprint
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# Set up OAuth
-oauth = OAuth(app)
-google = oauth.register(
-    name='google',
-    client_id=os.getenv('CLIENT_ID'),
-    client_secret=os.getenv('CLIENT_SECRET'),
-    authorize_params=None,
-    access_token_params=None,
-    refresh_token_url=None,
-    redirect_uri='http://localhost:5000/authorized',
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'openid profile email'},
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
-)
+auth_handler = Blueprint('auth', __name__, url_prefix='/auth')
+
+load_dotenv()
+
+
+print(os.getenv('CLIENT_ID'))
+print(os.getenv('CLIENT_SECRET'))
 
 def required(f):
     def wrapper(*args, **kwargs):
@@ -38,17 +29,19 @@ def required(f):
         return f(user, *args, **kwargs)
     return wrapper
 
-@app.route('/login')
+@auth_handler.route('/login', methods=['GET'])
 def login():
-    redirect_uri = url_for('login_callback', _external=True)
-    return google.authorize_redirect(redirect_uri)
+    from server.api.app import oauth
+    redirect_uri = url_for('auth.login_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
 
-@app.route('/signup')
+@auth_handler.route('/signup')
 def signup():
-    redirect_uri = url_for('signup_callback', _external=True)
-    return google.authorize_redirect(redirect_uri)
+    from server.api.app import oauth
+    redirect_uri = url_for('auth.signup_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
 
-@app.route('/login-callback')
+@auth_handler.route('/login/google-callback')
 def login_callback():
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
@@ -69,7 +62,7 @@ def login_callback():
     user_details["token"] = user_token
     return jsonify(user_details), 200
 
-@app.route('/signup-callback')
+@auth_handler.route('/signup//google-callback')
 def signup_callback():
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
