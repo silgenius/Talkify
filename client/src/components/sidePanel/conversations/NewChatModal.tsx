@@ -1,16 +1,26 @@
 import { useState, useEffect } from "react";
 import Modal from "../../common/Modal";
 import { toast } from "react-toastify";
-import { BiUserPlus, BiSearch, BiTrash } from "react-icons/bi";
+import { BsArrowLeft, BsArrowRightShort } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import ContactCard from "./ContactCard";
+import SearchInput from "../../common/SearchInput";
+import NewChatDetails from "./GroupDetails";
+import GroupMemberChip from "./GroupMemberChip";
+import { getUser } from "../../../utils/localStorage";
 
 const contacts = [
-  { id: "1", username: "John Doe", status: "online" },
-  { id: "2", username: "Jane Smith", status: "pending" },
-  { id: "3", username: "Alice Johnson", status: "blocked" },
-  { id: "4", username: "Bob Brown", status: "online" },
-  { id: "5", username: "Bob Smith", status: "offline" },
-  // Add more contacts here
-].filter(contact => contact.status !== "blocked" && contact.status !== "pending");
+  { id: "1", username: "John Doe", bio: "Software Engineer" },
+  { id: "2", username: "Jane Smith", bio: "Frontend Developer" },
+  { id: "3", username: "Alice Johnson", bio: "Product Manager" },
+  { id: "4", username: "Bob Brown", bio: "UI/UX Designer" },
+  { id: "5", username: "Bob Smith", bio: "Full Stack Developer" },
+  { id: "6", username: "Sarah Johnson", bio: "Backend Developer" },
+  { id: "7", username: "Michael Smith", bio: "Data Scientist" },
+  { id: "8", username: "Emily Davis", bio: "Mobile App Developer" },
+  { id: "9", username: "David Wilson", bio: "DevOps Engineer" },
+  { id: "10", username: "Olivia Brown", bio: "Software Tester" },
+];
 
 interface SearchModalProps {
   isModalOpen: boolean;
@@ -19,32 +29,55 @@ interface SearchModalProps {
 
 const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [groupName, setGroupName] = useState("");
   const [results, setResults] = useState<typeof contacts>(contacts);
   const [addedMembers, setAddedMembers] = useState<typeof contacts>([]);
-
+  const [isGroup, setIsGroup] = useState(false);
+  const [groupDetails, setGroupDetails] = useState<{
+    name: string;
+    photo?: string;
+  }>({
+    name: "",
+    photo: "",
+  });
+  const [currentStep, setCurrentStep] = useState<"members" | "details">(
+    "members"
+  );
+  const navigate = useNavigate();
   useEffect(() => {
-    const filteredContacts = contacts.filter(contact =>
-      contact.username.toLowerCase().includes(searchQuery.toLowerCase()) && !addedMembers.find(member => member.id === contact.id)
+    const filteredContacts = contacts.filter(
+      (contact) =>
+        contact.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !addedMembers.find((member) => member.id === contact.id)
     );
     setResults(filteredContacts);
   }, [searchQuery, addedMembers]);
 
   const handleAdd = (contact: (typeof contacts)[number]) => {
-    if (addedMembers.find(member => member.id === contact.id)) {
-      toast.warn("Already Added");
-      return;
-    }
+    if (isGroup) {
+      if (addedMembers.find((member) => member.id === contact.id)) {
+        toast.warn("Already Added");
+        return;
+      }
 
-    setAddedMembers(prev => [...prev, contact]);
-    setResults(prev => prev.filter(member => member.id !== contact.id));
-    setSearchQuery("");
-    toast.success(`${contact.username} added`);
+      setAddedMembers((prev) => [...prev, contact]);
+      setResults((prev) => prev.filter((member) => member.id !== contact.id));
+      setSearchQuery("");
+      toast.success(`${contact.username} added`);
+    } else {
+      // Here you would call your API to create a new chat
+      // newRequest.post("/create-chat", { user: contact });
+      const conversation = { id: "someid" };
+      toast.success(`Chat with ${contact.username} created successfully!`);
+      onClose();
+      navigate(`/conversation/${conversation.id}`);
+    }
   };
 
   const handleRemove = (contact: (typeof contacts)[number]) => {
-    setAddedMembers(prev => prev.filter(member => member.id !== contact.id));
-    setResults(prev => [...prev, contact]);
+    setAddedMembers((prev) =>
+      prev.filter((member) => member.id !== contact.id)
+    );
+    setResults((prev) => [...prev, contact]);
     toast.info(`${contact.username} removed`);
   };
 
@@ -54,88 +87,134 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return;
     }
 
-    const newGroupName = groupName.trim()
-      ? groupName
-      : `Group: ${addedMembers.map(user => user.username).join(", ")}`;
-    setGroupName(newGroupName);
-
     // Here you would call your API to create the group
     // newRequest.post("/create-group", { groupName: newGroupName, members: addedMembers });
 
-    toast.success(`Group "${newGroupName}" created successfully!`);
+    toast.success(`Group "${groupDetails.name}" created successfully!`);
+    setTimeout(() => {
+      setAddedMembers([]);
+      setGroupDetails({ name: "", photo: "" });
+      setCurrentStep("members");
+    }, 300);
     onClose();
   };
-
+  const handleNext = () => {
+    if (addedMembers.length === 0) {
+      toast.error("Please add at least one member to the group");
+      return;
+    }
+    const newGroupName = `${getUser().username}, ${
+      addedMembers.length > 2
+        ? addedMembers
+            .splice(0, 2)
+            .map((user) => user.username)
+            .join(", ") + ", and others"
+        : addedMembers.map((user) => user.username).join(", ")
+    }`;
+    setGroupDetails((prev) => ({ ...prev, name: newGroupName }));
+    setCurrentStep("details");
+  };
   return (
     <Modal isOpen={isModalOpen} onClose={onClose}>
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-        Create a Conversation
-      </h2>
-      {/* <div className="mb-4">
-        <input
-          type="text"
-          value={groupName}
-          onChange={e => setGroupName(e.target.value)}
-          placeholder="Enter group name"
-          className="px-4 py-2 bg-gray-100 rounded-lg shadow-inner outline-none text-gray-800 w-full"
-        />
-      </div> */}
-      <div className="flex flex-wrap items-center mb-4 bg-gray-100 rounded-xl px-4 py-2 shadow-inner">
-        {addedMembers.map(member => (
-          <span
-            key={member.id}
-            className="flex items-center bg-primary-purple text-white text-sm font-semibold mr-2 mb-2 px-3 py-1 rounded-full"
+      <div className="h-full flex flex-col items-stretch">
+        <div className="relative flex items-center justify-center mb-4">
+          {currentStep === "details" && (
+            <button
+              onClick={() => setCurrentStep("members")}
+              className="absolute left-0 text-2xl"
+            >
+              <BsArrowLeft />
+            </button>
+          )}
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            {!isGroup ? "New Chat" : "New Group"}
+          </h2>
+        </div>
+
+        <div className="flex items-center justify-start mb-4 space-x-4">
+          <button
+            onClick={() => {
+              setIsGroup(false);
+              setAddedMembers([]);
+              setCurrentStep("members");
+            }}
+            className={`font-bold py-2 px-4 rounded transition-colors ${
+              isGroup
+                ? "text-gray-500 bg-gray-100 hover:bg-gray-200"
+                : "text-primary-purple bg-primary-purple/35"
+            }`}
           >
-            {member.username}
-            <BiTrash
-              className="ml-2 cursor-pointer text-red-300 hover:text-red-600"
-              onClick={() => handleRemove(member)}
-            />
-          </span>
-        ))}
-        <div className="flex-grow">
-          <div className="flex items-center">
-            <BiSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
+            Direct
+          </button>
+          <button
+            onClick={() => setIsGroup(true)}
+            className={`font-bold py-2 px-4 rounded transition-colors ${
+              !isGroup
+                ? "text-gray-500 bg-gray-100 hover:bg-gray-200"
+                : "text-primary-purple bg-primary-purple/35"
+            }`}
+          >
+            Group
+          </button>
+        </div>
+        {currentStep === "members" ? (
+          <>
+            <SearchInput
               placeholder="Search for contacts..."
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="bg-transparent outline-none text-gray-800 w-full"
+              onInputChange={setSearchQuery}
+              chips={addedMembers.map((member) => (
+                <GroupMemberChip
+                  key={member.id}
+                  member={member}
+                  onClick={handleRemove}
+                />
+              ))}
+              isMulti={isGroup}
             />
-          </div>
-        </div>
-      </div>
+            <label className="text-gray-600 text-sm font-medium">
+              {isGroup ? "Add members" : "Select a contact to start a chat"}
+            </label>
+            <div className=" flex-1 overflow-y-auto -mx-6">
+              {results.length > 0 ? (
+                <ul className="mt-2  ">
+                  {results.map((contact) => (
+                    <ContactCard
+                      contact={contact}
+                      handleAdd={() => handleAdd(contact)}
+                      isGroup={isGroup}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-gray-500 mt-4">
+                  No contacts found
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <NewChatDetails
+            groupDetails={groupDetails}
+            setGroupDetails={setGroupDetails}
+          />
+        )}
 
-      {results.length > 0 ? (
-        <ul className="space-y-4 mt-2">
-          {results.map(contact => (
-            <li
-              key={contact.id}
-              className="px-4 py-2 bg-gray-100 rounded-lg shadow-md flex items-center justify-between cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg"
-            >
-              <span className="text-gray-700 font-semibold">
-                {contact.username}
-              </span>
-              <button
-                onClick={() => handleAdd(contact)}
-                className="bg-gray-300 p-2 rounded-md"
-              >
-                <BiUserPlus className="text-xl text-primary-purple" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-center text-gray-500 mt-4">No contacts found</p>
-      )}
-      <div className="flex flex-col space-y-4 mt-6">
-        <button
-          onClick={handleCreateGroup}
-          className="w-full px-4 py-2 bg-primary-purple text-white font-semibold rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:bg-fuchsia-900"
+        <div
+          className={`flex-col space-y-4 mt-4 transition-all duration-300 ease-in-out overflow-hidden ${
+            isGroup ? "flex max-h-40 opacity-100" : "max-h-0 opacity-0"
+          }`}
         >
-          Create Conversation
-        </button>
+          <button
+            onClick={currentStep === "members" ? handleNext : handleCreateGroup}
+            className="w-full flex justify-center items-center px-4 py-2 space-x-2 bg-primary-purple text-white font-semibold rounded-lg shadow-lg transition-colors hover:bg-fuchsia-900"
+            disabled={!isGroup}
+          >
+            <p>{currentStep === "members" ? "Next" : "Create Group"}</p>
+            <BsArrowRightShort className="text-xl" />
+          </button>
+        </div>
       </div>
     </Modal>
   );

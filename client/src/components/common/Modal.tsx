@@ -29,13 +29,13 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
       }`}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl w-full max-w-md p-6 relative transform transition-transform duration-300 ${
+        className={`bg-white rounded-lg shadow-2xl w-full h-[90%] max-w-md p-6 relative transform transition-transform duration-300 ${
           animateModal ? "translate-y-0" : "translate-y-4"
         }`}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-20"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

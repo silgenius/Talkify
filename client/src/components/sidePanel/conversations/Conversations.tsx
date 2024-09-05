@@ -45,7 +45,7 @@ const Conversations = ({ conversations }: ConversationsProps) => {
       <div className="px-4">
         <SearchInput
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onInputChange={setSearchQuery}
         />
       </div>
       <div className="flex-1 overflow-y-auto">
