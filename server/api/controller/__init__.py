@@ -9,3 +9,4 @@ from server.api.controller.conversation_controller import *
 from server.api.controller.user_controller import *
 from server.api.controller.message_controller import *
 from server.api.controller.contact_controller import *
+from server.api.controller.request_controller import *

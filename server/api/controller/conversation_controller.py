@@ -32,13 +32,14 @@ def create_conversation():
     else:
         storage.delete(new_conversation)
         abort(404)
-    
-    contact1 = Contact(user_id=user1.id, contact_id=user2.id, contact_name=user_2.username)
-    storage.new(contact1)
-    contact2 = Contact(user_id=user2.id, contact_id=user1.id, contact_name=user_1.username)
-    storage.new(contact1)
 
-    storage.save()
+    verify = session.query(Contact).filter(and_(user_id=receiver.id, contact_id=sender.id)).one_or_none()
+    if not verify:
+        contact1 = Contact(user_id=user1.id, contact_id=user2.id, contact_name=user_2.username)
+        storage.new(contact1)
+        contact2 = Contact(user_id=user2.id, contact_id=user1.id, contact_name=user_1.username)
+        storage.new(contact1)
+        storage.save()
 
     return jsonify(new_conversation.to_dict()), 201
 
