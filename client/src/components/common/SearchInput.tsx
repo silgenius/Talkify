@@ -1,22 +1,35 @@
-import React, { ChangeEvent } from "react";
-import { AiOutlineSearch } from "react-icons/ai";
+import { BiSearch } from "react-icons/bi";
 
 interface SearchInputProps {
   value: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onInputChange: (value: string) => void;
+  chips?: React.JSX.Element[];
+  isMulti?: boolean;
+  placeholder?: string;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({ value, onChange }) => {
+const SearchInput = ({
+  value,
+  onInputChange,
+  chips,
+  isMulti = false,
+  placeholder,
+}: SearchInputProps) => {
   return (
-    <div className="flex items-center bg-[#F1F2F6] rounded-lg shadow-d mb-4">
-      <AiOutlineSearch className="text-gray-500 ml-4" size={20} />
-      <input
-        type="text"
-        value={value}
-        onChange={onChange}
-        placeholder="Search"
-        className="flex-1 p-2 bg-transparent border-none outline-none text-gray-700"
-      />
+    <div className="flex flex-wrap items-center mb-4 bg-gray-100 rounded-xl px-4 py-2 shadow-inner">
+      {isMulti && chips}
+      <div className="flex-grow">
+        <div className="flex items-center">
+          <BiSearch className="text-gray-500 mr-2" size={20} />
+          <input
+            type="text"
+            placeholder={placeholder || "Search..."}
+            value={value}
+            onChange={(e) => onInputChange(e.target.value)}
+            className="bg-transparent outline-none text-gray-800 w-full"
+          />
+        </div>
+      </div>
     </div>
   );
 };
