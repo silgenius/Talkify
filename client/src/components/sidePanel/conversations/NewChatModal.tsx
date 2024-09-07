@@ -181,6 +181,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
                 <ul className="mt-2  ">
                   {results.map((contact) => (
                     <ContactCard
+                      key={contact.id}
                       contact={contact}
                       handleAdd={() => handleAdd(contact)}
                       isGroup={isGroup}

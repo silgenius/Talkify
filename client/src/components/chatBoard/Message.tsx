@@ -1,14 +1,23 @@
 import { getUser } from "../../utils/localStorage";
 import { MessageType } from "../../types";
 import emojiRegex from "emoji-regex";
+import ReactTimeago from "react-timeago";
+import { GoDotFill } from "react-icons/go";
 
 interface MessageProps {
   message: MessageType;
-  lastMessageRef: React.RefObject<HTMLDivElement> | null;
   isFirst: boolean;
   isLast: boolean;
+  username: string;
+  photoUrl: string;
 }
-const Message = ({ message, isFirst, isLast }: MessageProps) => {
+const Message = ({
+  message,
+  isFirst,
+  isLast,
+  username,
+  photoUrl,
+}: MessageProps) => {
   const currentUser = getUser();
   const isSender = message.sender_id === currentUser.id;
 
@@ -23,7 +32,11 @@ const Message = ({ message, isFirst, isLast }: MessageProps) => {
     <div className={`relative ${isSender ? "self-end" : "self-start"}`}>
       <div className=" absolute -left-10 top-0">
         {!isSender && isFirst && (
-          <img src="/user.png" alt="" className="w-8 h-8 rounded-full" />
+          <img
+            src={photoUrl || "/user.png"}
+            alt=""
+            className="w-8 h-8 rounded-full object-contain object-center"
+          />
         )}
       </div>
       {!containsOnlyEmojis(message.message_text) ? (
@@ -70,9 +83,15 @@ const Message = ({ message, isFirst, isLast }: MessageProps) => {
           ))}
         </div>
       )}
-      {/* <span className="text-xs">
-        <TimeAgo date={message.created_at} />
-      </span> */}
+      {isLast && (
+        <div className="flex items-center space-x-1 text-xs text-gray-500 p-0.5">
+          <span>{isSender ? "you" : username}</span>
+          <GoDotFill size={5} />
+          <span>
+            <ReactTimeago date={message.created_at} />
+          </span>
+        </div>
+      )}
     </div>
   );
 };

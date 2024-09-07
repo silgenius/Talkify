@@ -11,6 +11,7 @@ interface ChatListItemProps {
   conversationId: string;
   isGroup?: boolean;
   selected?: boolean;
+  photoUrl?: string;
 }
 
 const ConversationItem = ({
@@ -19,6 +20,7 @@ const ConversationItem = ({
   conversationId,
   selected,
   isGroup = false,
+  photoUrl,
 }: ChatListItemProps) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -49,9 +51,9 @@ const ConversationItem = ({
         }`}
       >
         <img
-          src="/user.png"
+          src={photoUrl || "/user.png"}
           alt="User Avatar"
-          className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
+          className="w-12 h-12 rounded-full object-contain object-center"
         />
         <div className="flex flex-col w-full">
           <div className="flex items-center justify-between mb-1">

@@ -173,17 +173,23 @@ const ChatBoard = () => {
             <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-24 pl-16 items-start">
               {messages?.data?.map(
                 (
-                  message: MessageType & { isFirst: boolean; isLast: boolean },
-                  index: number
+                  message: MessageType & { isFirst: boolean; isLast: boolean }
                 ) => (
                   <Message
-                    lastMessageRef={
-                      index === messages.data.length - 1 ? lastMessageRef : null
-                    }
                     key={message.id}
                     message={message}
                     isFirst={message.isFirst}
                     isLast={message.isLast}
+                    username={
+                      conversation.data.users.filter(
+                        (user) => user.id !== currentUser.id
+                      )[0].username
+                    }
+                    photoUrl={
+                      conversation.data.users.filter(
+                        (user) => user.id !== currentUser.id
+                      )[0].profile_url
+                    }
                   />
                 )
               )}

@@ -63,7 +63,7 @@ export default function Root() {
     <div className="h-screen flex">
       {currentUser && (
         <div
-          className={`lg:flex flex-col bg-[#882A8508] lg:w-1/4 ${
+          className={`flex-col bg-[#882A8508] lg:flex lg:w-1/2 xl:w-1/3 ${
             id ? "hidden" : "flex w-full"
           } h-screen shadow-xl`}
         >

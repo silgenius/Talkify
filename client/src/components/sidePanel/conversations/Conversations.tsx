@@ -43,10 +43,7 @@ const Conversations = ({ conversations }: ConversationsProps) => {
         />
       </header>
       <div className="px-4">
-        <SearchInput
-          value={searchQuery}
-          onInputChange={setSearchQuery}
-        />
+        <SearchInput value={searchQuery} onInputChange={setSearchQuery} />
       </div>
       <div className="flex-1 overflow-y-auto">
         {conversations.isLoading ? (
@@ -69,6 +66,11 @@ const Conversations = ({ conversations }: ConversationsProps) => {
                 conversationId={conversation.id}
                 selected={id === conversation.id}
                 isGroup={conversation.group}
+                photoUrl={
+                  !conversation.group
+                    ? conversation.others[0].profile_url
+                    : undefined
+                }
               />
             ))}
           </>

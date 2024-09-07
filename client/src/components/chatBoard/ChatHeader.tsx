@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ConversationType } from "../../types";
+import { getUser } from "../../utils/localStorage";
 
 interface ChatHeaderProps {
   setShowDetail: React.Dispatch<React.SetStateAction<boolean>>;
@@ -7,26 +8,33 @@ interface ChatHeaderProps {
   startCall: () => void;
 }
 
-const ChatHeader = ({ setShowDetail, conversation, startCall }: ChatHeaderProps) => {
+const ChatHeader = ({
+  setShowDetail,
+  conversation,
+  startCall,
+}: ChatHeaderProps) => {
   const navigate = useNavigate();
 
-  const name = conversation.group
-    ? conversation.name
-    : conversation.users[0].username;
+  const { name, photoUrl } = conversation.group
+    ? { name: conversation.name, photoUrl: null }
+    : {
+        name: conversation.users.filter((user) => user.id !== getUser().id)[0]
+          .username,
+        photoUrl: conversation.users.filter(
+          (user) => user.id !== getUser().id
+        )[0].profile_url,
+      };
 
   return (
     <div className="p-2.5 flex items-center justify-between border-b border-[#e8e2e2]">
       <div className="flex items-center gap-5">
-        <button
-          className="lg:hidden"
-          onClick={() => navigate("/")}
-        >
+        <button className="lg:hidden" onClick={() => navigate("/")}>
           {"<<"}
         </button>
         <img
-          src="/user.png"
+          src={photoUrl || "/user.png"}
           alt=""
-          className="w-12 h-12 rounded-full object-cover"
+          className="w-12 h-12 rounded-full object-contain object-center"
         />
         <div className="flex flex-col gap-0.5">
           <span className="text-lg font-bold">{name}</span>
