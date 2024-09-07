@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
-import { ContactType } from "../../../types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ContactAction, ContactType } from "../../../types";
 import { BiUserCheck, BiX, BiBlock } from "react-icons/bi";
 import { FaCircle } from "react-icons/fa";
 import newRequest from "../../../utils/newRequest";
@@ -10,23 +10,22 @@ interface ContactCardProps {
   contact: ContactType;
 }
 
-type ContactAction = {
-  sender_id: string;
-  receiver_id: string;
-};
-
 const ContactCard = ({ contact }: ContactCardProps) => {
   const currentUser = getUser();
   const isOnline = true;
+  const queryClient = useQueryClient();
+
   const acceptRequest = useMutation({
     mutationFn: async (data: ContactAction) => {
       console.log(data);
 
       const res = await newRequest.post("/accept", data);
+      console.log(res.data);
       return res.data;
     },
     onSuccess: () => {
       toast.success("Friend request accepted");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
     },
     onError: () => {
       toast.error("Failed to accept friend request");
