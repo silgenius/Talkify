@@ -93,7 +93,7 @@ const SidePanel = () => {
         <div className="flex flex-col items-start mb-1.5">
           {/* Navigation to Contacts Page */}
           <div className="w-full flex flex-col items-center">
-            <div className="flex items-center justify-between px-4 w-full py-2 shadow-xl shadow-primary-purple/5 relative">
+            <div className="flex items-center justify-between px-4 w-full py-2 shadow-xl shadow-primary-purple/5 relative min-h-16 ">
               <img
                 src={talkifyLogo}
                 alt="Talkify Logo"

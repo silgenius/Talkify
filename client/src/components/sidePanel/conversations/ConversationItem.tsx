@@ -2,8 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { MessageType } from "../../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
+import { getUser } from "../../../utils/localStorage";
 
 interface ChatListItemProps {
   name: string;
@@ -26,7 +29,11 @@ const ConversationItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isRead, setIsRead] = useState(true);
 
-  const { data: lastMessage, isLoading } = useQuery<MessageType>({
+  const {
+    data: lastMessage,
+    isLoading,
+    error,
+  } = useQuery<MessageType>({
     queryKey: ["message", lastMessageId],
     queryFn: async () => {
       const res = (await newRequest.get(`/message/${lastMessageId}`)).data;
@@ -34,6 +41,12 @@ const ConversationItem = ({
     },
   });
 
+  useEffect(() => {
+    if (!error && lastMessage && getUser().id !== lastMessage.sender_id) {
+      console.log("message delivered", lastMessage);
+      socket.emit(SocketEvent.DELIVER_MESSAGE, lastMessage.id);
+    }
+  }, [lastMessage, error]);
   return (
     <div
       className="relative"

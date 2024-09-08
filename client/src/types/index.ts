@@ -17,8 +17,18 @@ type ConversationType = {
   group: boolean;
   create_at: string;
   updated_at: string;
-  others: [{ id: string; username: string; profile_url: string, last_login: string}];
-  users: [{ id: string; username: string; profile_url: string, last_login: string}];
+  others: {
+    id: string;
+    username: string;
+    profile_url: string;
+    last_login: string;
+  }[];
+  users: {
+    id: string;
+    username: string;
+    profile_url: string;
+    last_login: string;
+  }[];
 };
 
 type MessageType = {
@@ -29,6 +39,7 @@ type MessageType = {
   conversation_id: string;
   created_at: string;
   updated_at: string;
+  status: string;
 };
 export interface SettingType {
   id: number; // Unique identifier for the setting
@@ -36,4 +47,21 @@ export interface SettingType {
   description: string; // Description or additional details about the setting
   value: string | number | boolean; // The value of the setting, assuming it can be a string, number, or boolean
 }
-export type { UserType, ConversationType, MessageType };
+
+type ContactType = {
+  contact: {
+    id: string;
+    username: string;
+    last_login: string;
+    profile_url: string;
+  };
+  status: string;
+  created_at: string;
+};
+
+type ContactAction = {
+  sender_id: string;
+  receiver_id: string;
+};
+
+export type { UserType, ConversationType, MessageType, ContactType, ContactAction };

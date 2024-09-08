@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
 import { ConversationType, MessageType } from "../../types";
@@ -34,6 +34,8 @@ const ChatBoard = () => {
   const currentUser = getUser();
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<number | null>(null);
+
+  const queryClient = useQueryClient();
 
   //Redirect to login page if user is not logged in
   useEffect(() => {
@@ -99,12 +101,29 @@ const ChatBoard = () => {
         }
       }
     );
+
+    socket.on(SocketEvent.MESSAGE_DELIVERED, (message: MessageType) => {
+      if (message.conversation_id === id) {
+        console.log("message delivered", message);
+        queryClient.invalidateQueries({ queryKey: ["messages", id] });
+      }
+    });
+
+    socket.on(SocketEvent.MESSAGE_READ, (message: MessageType) => {
+      if (message.conversation_id === id) {
+        console.log("message seen", message);
+        queryClient.invalidateQueries({ queryKey: ["messages", id] });
+      }
+    });
+
     // Cleanup on component unmount
     return () => {
       socket.off(SocketEvent.TYPING_STARTED);
       socket.off(SocketEvent.TYPING_STOPPED);
+      socket.off(SocketEvent.MESSAGE_DELIVERED);
+      socket.off(SocketEvent.MESSAGE_READ);
     };
-  }, [currentUser, id]);
+  }, [currentUser, id, queryClient]);
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
