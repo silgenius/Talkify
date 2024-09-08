@@ -62,7 +62,7 @@ export default function Root() {
   }, []);
 
   return (
-    <div className="h-screen flex">
+    <div className="h-screen flex bg-white">
       {currentUser && pathname !== "/settings" && (
         <div
           className={`flex-col bg-[#882A8508] lg:flex lg:w-1/2 xl:w-1/3 ${
