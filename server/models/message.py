@@ -21,7 +21,7 @@ class Message(BaseModel, Base):
     __tablename__ = 'messages'
     
     conversation_id = Column(String(60), ForeignKey('conversations.id'), nullable=False)
-    messsge_type = Column(String(60), default='Text', nullable=False)
+    message_type = Column(String(60), default='Text', nullable=False)
     message_text = Column(Text, nullable=False)
     sender_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     status = Column(String(60), default=MessageStatus.sent, nullable=False)
