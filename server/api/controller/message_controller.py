@@ -7,7 +7,7 @@ from server.models.conversation import Conversation
 from server.models.message import Message
 from server.models.user import User
 from sqlalchemy import and_
-
+from server.models.contact import Contact, Status
 
 session = storage.get_session()
 
@@ -78,7 +78,7 @@ def create_message():
     if not text:
         return jsonify({"error": "message cannot be null"}), 400
 
-    message = Message(conversation_id=conversation.id, message_text=text, sender_id=user.id)
+    message = Message(conversation_id=conversation.id, message_text=text, sender_id=user_id)
     storage.new(message)
     storage.save()
     conversation.update_last_message_id(message.id)
