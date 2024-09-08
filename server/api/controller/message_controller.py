@@ -6,6 +6,7 @@ from server.models import storage
 from server.models.conversation import Conversation
 from server.models.message import Message
 from server.models.user import User
+from sqlalchemy import and_
 
 
 session = storage.get_session()
@@ -61,6 +62,17 @@ def create_message():
     conversation = session.query(Conversation).filter_by(id=convo_id).one_or_none()
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
+
+    #check if user is not blocked
+    if not conversation.group:
+        cs = conversation.users
+        for user in cs:
+            if user.id != user_id:
+                user2_id = user.id
+                break
+        contact = session.query(Contact).filter(and_(Contact.user_id == user2_id, Contact.contact_id == user_id)).one_or_none()
+        if contact.status == Status.blocked:
+            return jsonify({"error": "message cannot be sent"}), 403
 
     text = data.get("message_text")
     if not text:
