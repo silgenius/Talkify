@@ -72,7 +72,7 @@ def accept_request():
     return jsonify({"success": "reqeust accepted"}), 200
 
 
-@app_handler.route('block', methods=['POST'])
+@app_handler.route('/block', methods=['POST'])
 def block_contact():
     try:
         data = request.get_json()
