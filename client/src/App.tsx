@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import './index.css'; // Update to the correct path for the CSS file
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import './index.css';
+import { useNavigate } from "react-router-dom";  
 import { getUser } from "./utils/localStorage";
 
 
