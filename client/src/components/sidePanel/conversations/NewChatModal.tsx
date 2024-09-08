@@ -173,7 +173,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
               ))}
               isMulti={isGroup}
             />
-            <label className="text-gray-600 text-sm font-medium">
+            <label className="text-gray-600 text-sm font-medium text-start">
               {isGroup ? "Add members" : "Select a contact to start a chat"}
             </label>
             <div className=" flex-1 overflow-y-auto -mx-6">

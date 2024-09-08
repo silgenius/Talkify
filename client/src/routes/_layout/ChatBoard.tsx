@@ -106,6 +106,7 @@ const ChatBoard = () => {
       if (message.conversation_id === id) {
         console.log("message delivered", message);
         queryClient.invalidateQueries({ queryKey: ["messages", id] });
+        queryClient.invalidateQueries({ queryKey: ["message", message.id] });
       }
     });
 
@@ -113,6 +114,7 @@ const ChatBoard = () => {
       if (message.conversation_id === id) {
         console.log("message seen", message);
         queryClient.invalidateQueries({ queryKey: ["messages", id] });
+        queryClient.invalidateQueries({ queryKey: ["message", message.id] });
       }
     });
 
