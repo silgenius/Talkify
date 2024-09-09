@@ -1,9 +1,12 @@
-import ChatBoard from '../_layout/ChatBoard'
+import { CallProvider } from "../../contexts/CallContext";
+import ChatBoard from "../_layout/ChatBoard";
 
 const Conversation = () => {
   return (
-    <ChatBoard />
-  )
-}
+    <CallProvider>
+      <ChatBoard />
+    </CallProvider>
+  );
+};
 
-export default Conversation
+export default Conversation;

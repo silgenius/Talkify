@@ -64,4 +64,20 @@ type ContactAction = {
   receiver_id: string;
 };
 
-export type { UserType, ConversationType, MessageType, ContactType, ContactAction };
+type CallDataType =
+  | {
+      dialing: boolean;
+      endStatus?: "rejected" | "busy" | "unavailable" | "failed" | "missed";
+      caller?: { userId: string; peerId?: string };
+      callee?: { userId: string; peerId?: string };
+    }
+  | undefined;
+
+export type {
+  UserType,
+  ConversationType,
+  MessageType,
+  ContactType,
+  ContactAction,
+  CallDataType,
+};
