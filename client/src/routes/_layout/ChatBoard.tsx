@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
-import { ConversationType, MessageType } from "../../types";
+import { CallDataType, ConversationType, MessageType } from "../../types";
 import { getUser } from "../../utils/localStorage";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
@@ -15,8 +15,9 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "react-toastify";
 import Detail from "../../components/detail/Detail";
 import EmptyChat from "../../components/chatBoard/EmptyChat";
-import { AxiosError } from "axios";
 import VoiceCall from "../../components/chatBoard/VoiceCall";
+import Modal from "../../components/common/Modal";
+import { useCall } from "../../hooks/useCall";
 
 type typingSocketData = {
   username: string;
@@ -27,7 +28,6 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
-  const [isCalling, setIsCalling] = useState(false);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -57,6 +57,9 @@ const ChatBoard = () => {
       return res;
     },
   });
+  const other = conversation?.data?.users.filter(
+    (user) => user.id !== currentUser.id
+  )[0];
 
   const messages = useQuery({
     queryKey: ["messages", id],
@@ -147,35 +150,134 @@ const ChatBoard = () => {
     }, 3000);
   };
 
+  // useEffect(() => {
+  //   if (conversation.error) {
+  //     if (conversation.isPlaceholderData) {
+  //       toast.error("Could not load messages");
+  //     } else {
+  //       const error = conversation.error as AxiosError;
+  //       if (error.response?.status === 404)
+  //         toast.error("Conversation not found");
+  //       else toast.error("Could not load conversation");
+  //       //navigate("/");
+  //     }
+  //   }
+  // }, [conversation.error, conversation.isPlaceholderData, navigate]);
+
+  const {
+    startCall,
+    initiateCall,
+    peer,
+    remoteAudioRef,
+    myStream,
+    setMyStream,
+  } = useCall();
+  const [callData, setCallData] = useState<CallDataType>();
+  const [isCall, setIsCall] = useState(false);
+  const isCalling = useRef(false);
+
   useEffect(() => {
-    if (conversation.error) {
-      if (conversation.isPlaceholderData) {
-        toast.error("Could not load messages");
-      } else {
-        const error = conversation.error as AxiosError;
-        if (error.response?.status === 404)
-          toast.error("Conversation not found");
-        else toast.error("Could not load conversation");
-        navigate("/");
+    if (peer) {
+      socket.on("call_initiated", (data: CallDataType) => {
+        if (currentUser.id === data?.callee?.userId) {
+          console.log(data);
+          setCallData(data);
+        }
+        if (
+          currentUser.id === data?.caller?.userId ||
+          currentUser.id === data?.callee?.userId
+        )
+          setIsCall(true);
+      });
+
+      if (myStream) {
+        socket.on("call_accepted", (data: CallDataType) => {
+          if (
+            !data ||
+            !data.caller ||
+            !data.callee ||
+            !data.callee.peerId ||
+            !data.caller.peerId
+          )
+            return;
+
+          if (currentUser.id === data.caller?.userId) {
+            console.log(data.callee.peerId);
+            startCall(data.callee.peerId, peer, myStream);
+            setCallData(data);
+          }
+          if (currentUser.id === data.callee.userId) {
+            console.log(data.caller.peerId);
+            startCall(data.caller.peerId, peer, myStream);
+            setCallData(data);
+          }
+        });
       }
     }
-  }, [conversation.error, conversation.isPlaceholderData, navigate]);
 
-  const startCall = () => {
-    setIsCalling(true);
-  };
+    socket.on("call_ended", (data: CallDataType) => {
+      if (currentUser.id === data?.caller?.userId) {
+        setCallData(data);
+        setMyStream(undefined);
+        myStream?.getTracks().forEach((track) => {
+          track.stop();
+        });
+        peer?.off("call");
+      }
+      if (currentUser.id === data?.callee?.userId) {
+        setIsCall(false);
+        setCallData(undefined);
+        peer?.off("call");
+      }
+    });
 
-  const endCall = () => {
-    setIsCalling(false);
+    return () => {
+      socket.off("call_initiated");
+      socket.off("call_accepted");
+      socket.off("call_ended");
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peer, myStream]);
+
+  useEffect(() => {
+    if (myStream && isCalling.current && other) {
+      initiateCall(setCallData, currentUser.id, other.id);
+      isCalling.current = false;
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myStream]);
+
+  const handleCall = () => {
+    setCallData((prev) => ({ ...prev, dialing: true }));
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        setMyStream(stream);
+      })
+      .catch((error) => {
+        console.error("Error accessing microphone:", error);
+      });
+    isCalling.current = true;
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative flex-1 w-full h-full">
       {/* Conditionally render VoiceCall component */}
-      {isCalling && conversation.data && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 z-50">
-          <VoiceCall onCallEnd={endCall} conversation={conversation.data} />
-        </div>
+      {conversation.data && (
+        <Modal isOpen={isCall} height="fit">
+          <audio ref={remoteAudioRef} autoPlay />
+          <VoiceCall
+            setIsCall={setIsCall}
+            contactId={
+              currentUser.id === callData?.caller?.userId
+                ? callData?.callee?.userId
+                : callData?.caller?.userId
+            }
+            callData={callData}
+          />
+        </Modal>
       )}
 
       {!id ? (
@@ -188,10 +290,10 @@ const ChatBoard = () => {
             <ChatHeader
               conversation={conversation.data}
               setShowDetail={setShowDetail}
-              startCall={startCall}
+              startCall={handleCall}
             />
             {/* Messages Container*/}
-            <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-24 pl-16 items-start">
+            <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-20 pl-16 items-start">
               {messages?.data?.map(
                 (
                   message: MessageType & { isFirst: boolean; isLast: boolean }

@@ -1,107 +1,65 @@
-import { useState, useEffect, useRef } from "react";
-import Draggable from "react-draggable";
-import { FiMic, FiMicOff, FiPhoneOff } from "react-icons/fi";
-import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
-import { toast } from "react-toastify";
-import { ConversationType } from "../../types";
+import { useQuery } from "@tanstack/react-query";
+import { useCall } from "../../hooks/useCall";
+import socket from "../../socket";
+import { CallDataType } from "../../types";
+import { getUser } from "../../utils/localStorage";
+import ActiveCall from "./voiceCall/ActiveCall";
+import CallEnded from "./voiceCall/CallEnded";
+import IncomingCall from "./voiceCall/IncomingCall";
+import OutgoingCall from "./voiceCall/OutgoingCall";
+import newRequest from "../../utils/newRequest";
 
-interface VoiceCallProps {
-  conversation: ConversationType;
-  onCallEnd: () => void;
-}
+const VoiceCall = ({
+  contactId,
+  callData,
+  setIsCall,
+}: {
+  contactId?: string;
+  callData: CallDataType;
+  setIsCall: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const { activeCall } = useCall();
+  const userId = getUser().id;
 
-const VoiceCall = ({ conversation, onCallEnd }: VoiceCallProps) => {
-  const [isMuted, setIsMuted] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const timerRef = useRef<number | null>(null);
+  const { data: contact } = useQuery({
+    queryKey: ["user", contactId],
+    queryFn: async () => {
+      const res = (await newRequest(`user/id/${contactId}`)).data;
+      console.log("user", res);
+      return res;
+    },
+  });
 
-  const toggleMute = () => {
-    setIsMuted((prev) => !prev);
-    toast.info(isMuted ? "Microphone unmuted" : "Microphone muted");
+  const handleClose = () => {
+    setIsCall(false);
   };
 
-  const toggleSpeaker = () => {
-    setIsSpeakerOn((prev) => !prev);
-    toast.info(isSpeakerOn ? "Speaker turned off" : "Speaker turned on");
+  const handleCancel = () => {
+    socket.emit("end_call", { ...callData, dialing: false });
+    setIsCall(false);
   };
-
-  const endCall = () => {
-    onCallEnd();
-    toast.success("Call ended");
-    // Emit an event to notify the server that the call has ended
-    //socket.emit(SocketEvent.END_CALL, { conversation_id: conversation.id });
-  };
-
-  useEffect(() => {
-    // Start call timer
-    timerRef.current = setInterval(() => {
-      setTimeElapsed((prev) => prev + 1);
-    }, 1000);
-
-    // Clean up the timer on component unmount
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
-  const name = conversation.group
-    ? conversation.name
-    : conversation.users[0].username;
-
   return (
-    <Draggable handle=".handle" bounds="parent">
-      <div className="fixed z-50 p-5 bg-gray-800 text-white rounded-lg shadow-lg max-w-sm w-full">
-        <div className="handle cursor-move text-center mb-5">
-          <FaUserCircle className="text-6xl text-gray-400" />
-          <h2 className="text-xl font-semibold">{name}</h2>
-          <p className="text-lg mt-2">{formatTime(timeElapsed)}</p>
-        </div>
-        <div className="flex justify-around mb-5">
-          <button
-            onClick={toggleMute}
-            className={`p-4 rounded-full transition-colors ${
-              isMuted ? "bg-red-500" : "bg-green-500"
-            }`}
-          >
-            {isMuted ? (
-              <FiMicOff className="text-2xl text-white" />
-            ) : (
-              <FiMic className="text-2xl text-white" />
-            )}
-          </button>
-          <button
-            onClick={toggleSpeaker}
-            className={`p-4 rounded-full transition-colors ${
-              isSpeakerOn ? "bg-blue-500" : "bg-yellow-500"
-            }`}
-          >
-            {isSpeakerOn ? (
-              <MdVolumeUp className="text-2xl text-white" />
-            ) : (
-              <MdVolumeOff className="text-2xl text-white" />
-            )}
-          </button>
-          <button
-            onClick={endCall}
-            className="p-4 bg-red-600 rounded-full animate-pulse"
-          >
-            <FiPhoneOff className="text-2xl text-white" />
-          </button>
-        </div>
-      </div>
-    </Draggable>
+    <div>
+      {callData?.dialing ? (
+        callData?.callee?.userId === userId ? (
+          <IncomingCall
+            contact={contact}
+            callData={callData}
+            onCallEnd={handleClose}
+          />
+        ) : (
+          <OutgoingCall contact={contact} onCallEnd={handleCancel} />
+        )
+      ) : !activeCall ? (
+        <CallEnded
+          onCallEnd={() => setIsCall(false)}
+          contact={contact}
+          status={callData?.endStatus}
+        />
+      ) : (
+        <ActiveCall contact={contact} onCallEnd={() => activeCall.close()} />
+      )}
+    </div>
   );
 };
 
