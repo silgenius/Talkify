@@ -26,7 +26,7 @@ const ChatHeader = ({
       };
 
   return (
-    <div className="p-2 shadow-xl shadow-primary-purple/5 bg-[#882A8508] flex items-center justify-between min-h-16">
+    <div className="p-2 px-4 shadow-xl shadow-primary-purple/5 bg-[#882A8508] flex items-center justify-between min-h-16">
       <div className="flex items-center gap-5">
         <button className="lg:hidden" onClick={() => navigate("/")}>
           {"<<"}

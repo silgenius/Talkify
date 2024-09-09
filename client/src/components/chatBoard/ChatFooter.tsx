@@ -8,6 +8,9 @@ import { SocketEvent } from "../../utils/socketEvents";
 import { useParams } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
 
+// Importing icons from react-icons
+import { BsPlus, BsCameraVideo, BsMic, BsSend } from "react-icons/bs";
+
 type Emoji = {
   emoji: string;
 };
@@ -30,21 +33,16 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
   const { id } = useParams();
   const currentUser = getUser();
 
-  const EmojHandle = (e: Emoji) => {
-    setText(prev => prev + e.emoji);
+  const handleEmojiSelect = (e: Emoji) => {
+    setText((prev) => prev + e.emoji);
   };
 
-  // Create a new message
   const createMessage = useMutation({
     mutationFn: async (data: MessageDataType) => {
-      console.log(data);
-
       const res = await newRequest.post(`/message/create`, data);
-      //console.log(res.data);
       return res.data;
     },
     onSuccess: (message: MessageType) => {
-      // Clear the input field and refetch messages
       setText("");
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: message.id });
       queryClient.invalidateQueries({
@@ -56,56 +54,66 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
     },
   });
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (text.trim() === "") return;
+
     const messageData: MessageDataType = {
       conversation_id: id,
       user_id: currentUser.id,
       message_text: text,
     };
+
     createMessage.mutate(messageData);
   };
 
+  // Handler to detect Enter key press and send message
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevents the default action of Enter (like form submission)
+      handleSendMessage();
+    }
+  };
+
   return (
-    <div className="absolute bottom-0 left-0 w-full p-2.5 flex bg-white items-center justify-between border-t border-[#e8e2e2] gap-5 mt-auto">
-      <div className="flex gap-5">
-        <img src="/plusblack.png" className="w-5 h-5 cursor-pointer" />
-        <img
-          src="/camera.png"
-          className="w-5 h-5 cursor-pointer hidden md:block"
-        />
-        <img
-          src="/microphone.png"
-          className="w-5 h-5 cursor-pointer hidden md:block"
-        />
+    <div className="absolute bottom-0 left-0 w-full p-3 flex bg-white items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
+      {/* Action Icons */}
+      <div className="flex gap-4 text-gray-500">
+        <BsPlus className="w-6 h-6 cursor-pointer" />
+        <BsCameraVideo className="w-6 h-6 cursor-pointer hidden md:block" />
+        <BsMic className="w-6 h-6 cursor-pointer hidden md:block" />
       </div>
+
+      {/* Text Input */}
       <input
         type="text"
         placeholder="Type a message..."
         value={text}
         onChange={handleTyping}
-        className="flex-1 bg-transparent w-full border-none outline-none text-black p-5 rounded-xl text-lg"
+        onKeyDown={handleKeyDown} // Add keydown event listener here
+        className="flex-1 bg-gray-100 border-gray-300 rounded-lg px-4 py-2 text-black outline-none focus:ring-2 focus:ring-primary-purple/30"
       />
+
+      {/* Emoji Picker */}
       <div className="relative">
         <img
           src="/emoji.png"
-          alt=""
-          className="cursor-pointer w-6 h-6"
+          alt="Emoji"
+          className="cursor-pointer w-7 h-7"
           onClick={() => setOpenEmoji((prev) => !prev)}
         />
-        <div
-          className={`absolute bottom-12 -right-12 ${
-            openEmoji ? "block" : "hidden"
-          }`}
-        >
-          <EmojiPicker open={openEmoji} onEmojiClick={EmojHandle} />
-        </div>
+        {openEmoji && (
+          <div className="absolute bottom-10 right-0">
+            <EmojiPicker onEmojiClick={handleEmojiSelect} />
+          </div>
+        )}
       </div>
+
+      {/* Send Button */}
       <button
         onClick={handleSendMessage}
-        className="bg-[#882A85] text-white py-2 px-5 rounded-md text-lg "
+        className="bg-primary-purple text-white p-3 rounded-full hover:bg-fuchsia-900 transition-all flex items-center justify-center shadow-md hover:shadow-lg"
       >
-        Send
+        <BsSend className="w-5 h-5" />
       </button>
     </div>
   );
