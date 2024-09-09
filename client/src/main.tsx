@@ -14,6 +14,7 @@ import Conversation from "./routes/conversation/[id]";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
+import Settings from "./components/chat/Settings";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
         path: "/conversation/:id",
         element: <Conversation />,
       },
+      {
+        path: "/settings",
+        element: <Settings />,
+      }
     ],
   },
 ]);

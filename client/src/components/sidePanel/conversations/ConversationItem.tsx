@@ -2,8 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { MessageType } from "../../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
+import { getUser } from "../../../utils/localStorage";
 
 interface ChatListItemProps {
   name: string;
@@ -11,6 +14,7 @@ interface ChatListItemProps {
   conversationId: string;
   isGroup?: boolean;
   selected?: boolean;
+  photoUrl?: string;
 }
 
 const ConversationItem = ({
@@ -19,18 +23,47 @@ const ConversationItem = ({
   conversationId,
   selected,
   isGroup = false,
+  photoUrl,
 }: ChatListItemProps) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [isRead, setIsRead] = useState(true);
-
-  const { data: lastMessage, isLoading } = useQuery<MessageType>({
+  const currentUser = getUser();
+  const {
+    data: lastMessage,
+    isLoading,
+    error,
+  } = useQuery<MessageType>({
     queryKey: ["message", lastMessageId],
     queryFn: async () => {
       const res = (await newRequest.get(`/message/${lastMessageId}`)).data;
       return res;
     },
   });
+
+  const { data: lastMessageSender } = useQuery({
+    queryKey: ["user", lastMessage?.sender_id],
+    queryFn: async () => {
+      const res = (await newRequest(`user/id/${lastMessage?.sender_id}`)).data;
+      //console.log("user", res);
+      return res;
+    },
+    enabled: !!lastMessage,
+  });
+
+  useEffect(() => {
+    if (!error && lastMessage && currentUser.id !== lastMessage.sender_id) {
+      setIsRead(lastMessage.status === "seen");
+      if (lastMessage.status === "sent") {
+        console.log("message delivered", lastMessage.message_text);
+        socket.emit(SocketEvent.DELIVER_MESSAGE, {
+          message_id: lastMessage.id,
+        });
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMessage, error]);
 
   return (
     <div
@@ -45,18 +78,18 @@ const ConversationItem = ({
             ? "bg-gray-100 rounded-l-lg border-l-[5px] border-l-primary-purple"
             : "bg-white border-l-4 border-l-transparent"
         } shadow-lg border-b border-gray-200 hover:bg-gray-100 ${
-          !isRead ? "font-bold  shadow-md" : ""
+          !isRead ? "font-medium  shadow-md" : ""
         }`}
       >
         <img
-          src="/user.png"
+          src={photoUrl || "/user.png"}
           alt="User Avatar"
-          className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
+          className="w-12 h-12 rounded-full object-contain object-center"
         />
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full overflow-hidden">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center justify-center space-x-3">
-              <span className={`text-lg ${!isRead ? "font-semibold" : ""}`}>
+              <span className={`text-lg ${!isRead ? "font-bold" : ""}`}>
                 {name || "Julie Li"}
               </span>
               {!isRead && (
@@ -81,7 +114,10 @@ const ConversationItem = ({
               ))}
           </div>
           <div className="flex justify-between items-center">
-            <p className={`text-sm truncate ${"text-gray-600"}`}>
+            <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
+              {lastMessage?.sender_id === currentUser.id
+                ? "You: "
+                : isGroup && lastMessageSender?.username + ": "}
               {lastMessage?.message_text || "No message"}
             </p>
           </div>

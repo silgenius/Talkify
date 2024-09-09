@@ -173,7 +173,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
               ))}
               isMulti={isGroup}
             />
-            <label className="text-gray-600 text-sm font-medium">
+            <label className="text-gray-600 text-sm font-medium text-start">
               {isGroup ? "Add members" : "Select a contact to start a chat"}
             </label>
             <div className=" flex-1 overflow-y-auto -mx-6">
@@ -181,6 +181,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
                 <ul className="mt-2  ">
                   {results.map((contact) => (
                     <ContactCard
+                      key={contact.id}
                       contact={contact}
                       handleAdd={() => handleAdd(contact)}
                       isGroup={isGroup}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import socket from "../socket";
 import { SocketEvent } from "../utils/socketEvents";
 import { MessageType } from "../types";
@@ -9,6 +9,8 @@ import SidePanel from "./_layout/SidePanel";
 export default function Root() {
   const { id } = useParams();
   const currentUser = getUser();
+  const {pathname} = useLocation();
+
   useEffect(() => {
     // Connect to the socket server
     socket.connect();
@@ -60,17 +62,17 @@ export default function Root() {
   }, []);
 
   return (
-    <div className="h-screen flex">
-      {currentUser && (
+    <div className="h-screen flex bg-white">
+      {currentUser && pathname !== "/settings" && (
         <div
-          className={`lg:flex flex-col bg-[#882A8508] lg:w-1/4 ${
+          className={`flex-col bg-[#882A8508] lg:flex lg:w-1/2 xl:w-1/3 ${
             id ? "hidden" : "flex w-full"
           } h-screen shadow-xl`}
         >
           <SidePanel />
         </div>
       )}
-      <div className={`flex-1 ${id ? "w-full" : "hidden"} lg:block`}>
+      <div className={`flex-1 ${!currentUser || id ? "w-full" : "hidden"} lg:block`}>
         <Outlet />
       </div>
     </div>

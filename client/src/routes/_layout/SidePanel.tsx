@@ -5,6 +5,8 @@ import { MdContacts, MdOutlineContacts } from "react-icons/md";
 import {
   IoChatbox,
   IoChatboxOutline,
+  IoLogOut,
+  IoLogOutOutline,
   IoSettingsOutline,
   IoSettingsSharp,
 } from "react-icons/io5";
@@ -74,7 +76,7 @@ const SidePanel = () => {
         setUnderlineWidth(contactsRef.current.offsetWidth);
         setUnderlinePosition(contactsRef.current.offsetLeft);
       }
-    } else if (hash.includes("#settings")) {
+    } else if (hash.includes("#logout")) {
       if (settingsRef.current) {
         setUnderlineWidth(settingsRef.current.offsetWidth);
         setUnderlinePosition(settingsRef.current.offsetLeft);
@@ -93,7 +95,7 @@ const SidePanel = () => {
         <div className="flex flex-col items-start mb-1.5">
           {/* Navigation to Contacts Page */}
           <div className="w-full flex flex-col items-center">
-            <div className="flex items-center justify-between px-4 w-full py-2 shadow-xl shadow-primary-purple/5 relative">
+            <div className="flex items-center justify-between px-4 w-full py-2 shadow-xl shadow-primary-purple/5 relative min-h-16 ">
               <img
                 src={talkifyLogo}
                 alt="Talkify Logo"
@@ -124,14 +126,25 @@ const SidePanel = () => {
                   )}
                 </button>
                 <button
-                  ref={settingsRef}
-                  onClick={() => navigate("#settings")}
+
+                  onClick={() => navigate("/settings")}
                   className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
                 >
                   {hash.includes("#settings") ? (
                     <IoSettingsSharp className="inline-block text-3xl" />
                   ) : (
                     <IoSettingsOutline className="inline-block text-3xl" />
+                  )}
+                </button>
+                <button
+                  ref={settingsRef}
+                  onClick={() => navigate("#logout")}
+                  className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
+                >
+                  {hash.includes("#logout") ? (
+                    <IoLogOut className="inline-block text-3xl" />
+                  ) : (
+                    <IoLogOutOutline className="inline-block text-3xl" />
                   )}
                 </button>
               </div>
@@ -151,7 +164,7 @@ const SidePanel = () => {
       <div className="flex-1 overflow-y-auto">
         {hash.includes("#contacts") ? (
           <Contacts />
-        ) : hash.includes("#settings") ? (
+        ) : hash.includes("#logout") ? (
           <Settings />
         ) : (
           <Conversations conversations={conversations} />

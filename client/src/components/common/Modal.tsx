@@ -3,10 +3,16 @@ import React, { ReactNode, useState, useEffect } from "react";
 interface ModalProps {
   children: ReactNode;
   isOpen: boolean;
-  onClose: () => void;
+  height?: "full" | "fit";
+  onClose?: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
+const Modal: React.FC<ModalProps> = ({
+  children,
+  isOpen,
+  height = "full",
+  onClose,
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [animateModal, setAnimateModal] = useState(false);
 
@@ -29,11 +35,13 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
       }`}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl w-full h-[90%] max-w-md p-6 relative transform transition-transform duration-300 ${
+        className={`bg-white rounded-lg shadow-2xl w-full ${
+          height === "full" ? "h-full" : "h-fit"
+        } max-h-[90%] max-w-md p-6 relative transform transition-transform duration-300 ${
           animateModal ? "translate-y-0" : "translate-y-4"
         }`}
       >
-        <button
+        {onClose && <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-20"
         >
@@ -51,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
-        </button>
+        </button>}
         {children}
       </div>
     </div>

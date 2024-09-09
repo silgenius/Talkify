@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
 import { ConversationType, MessageType } from "../../types";
@@ -34,6 +34,8 @@ const ChatBoard = () => {
   const currentUser = getUser();
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<number | null>(null);
+
+  const queryClient = useQueryClient();
 
   //Redirect to login page if user is not logged in
   useEffect(() => {
@@ -99,12 +101,31 @@ const ChatBoard = () => {
         }
       }
     );
+
+    socket.on(SocketEvent.MESSAGE_DELIVERED, (message: MessageType) => {
+      if (message.conversation_id === id) {
+        console.log("message delivered", message);
+        queryClient.invalidateQueries({ queryKey: ["messages", id] });
+        queryClient.invalidateQueries({ queryKey: ["message", message.id] });
+      }
+    });
+
+    socket.on(SocketEvent.MESSAGE_READ, (message: MessageType) => {
+      if (message.conversation_id === id) {
+        console.log("message seen", message);
+        queryClient.invalidateQueries({ queryKey: ["messages", id] });
+        queryClient.invalidateQueries({ queryKey: ["message", message.id] });
+      }
+    });
+
     // Cleanup on component unmount
     return () => {
       socket.off(SocketEvent.TYPING_STARTED);
       socket.off(SocketEvent.TYPING_STOPPED);
+      socket.off(SocketEvent.MESSAGE_DELIVERED);
+      socket.off(SocketEvent.MESSAGE_READ);
     };
-  }, [currentUser, id]);
+  }, [currentUser, id, queryClient]);
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -173,17 +194,23 @@ const ChatBoard = () => {
             <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-24 pl-16 items-start">
               {messages?.data?.map(
                 (
-                  message: MessageType & { isFirst: boolean; isLast: boolean },
-                  index: number
+                  message: MessageType & { isFirst: boolean; isLast: boolean }
                 ) => (
                   <Message
-                    lastMessageRef={
-                      index === messages.data.length - 1 ? lastMessageRef : null
-                    }
                     key={message.id}
                     message={message}
                     isFirst={message.isFirst}
                     isLast={message.isLast}
+                    username={
+                      conversation.data.users.filter(
+                        (user) => user.id !== currentUser.id
+                      )[0].username
+                    }
+                    photoUrl={
+                      conversation.data.users.filter(
+                        (user) => user.id !== currentUser.id
+                      )[0].profile_url
+                    }
                   />
                 )
               )}
