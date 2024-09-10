@@ -5,6 +5,7 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
 from server.models.message import Message
+from server.models.message import MessageType
 from server.models.user import User
 from sqlalchemy import and_
 from server.models.contact import Contact, Status
@@ -63,6 +64,10 @@ def create_message():
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
 
+    message_type = data.get("message_type")
+    if not message_type:
+        message_type = MessageType.text
+
     #check if user is not blocked
     if not conversation.group:
         cs = conversation.users
@@ -75,12 +80,46 @@ def create_message():
             return jsonify({"error": "message cannot be sent"}), 403
 
     text = data.get("message_text")
-    if not text:
+    # MessagType text cannot be null
+    if not text and message_type == MessageType.text:
         return jsonify({"error": "message cannot be null"}), 400
 
-    message = Message(conversation_id=conversation.id, message_text=text, sender_id=user_id)
+    message = Message(conversation_id=conversation.id, sender_id=user_id)
+
+    if message_type == MessageType.audio:
+        message.is_audio()
+    else:
+        message.update_text(text)
+
     storage.new(message)
     storage.save()
     conversation.update_last_message_id(message.id)
 
     return jsonify(message.to_dict()), 201
+
+
+@app_handler.route('/message/call_update', methods=['PUT'])
+def update_message():
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({"error": "Not a JSON"}), 400
+
+    message_id = data.get("message_id")
+    if not message_id:
+        return jsonify({"error": "message type missing"}), 400
+
+    message = session.query(Message).filter_by(id=message_id).one_or_none()
+    if not message:
+        return jsonify({"error": "message not found"}), 400
+
+    message_type = data.get("message_type")
+    if not message_type:
+        return jsonify({"error": "message type missing"}), 400
+
+    if message_type != MessageType.audio:
+        return jsonify({"error": "cannot update message type"}), 403
+
+    message.save()
+
+    return jsonify({}), 200
