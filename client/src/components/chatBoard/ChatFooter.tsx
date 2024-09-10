@@ -45,6 +45,10 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
     onSuccess: (message: MessageType) => {
       setText("");
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: message.id });
+      socket.emit(SocketEvent.STOP_TYPING, {
+        conversation_id: id,
+        sender_id: currentUser.id,
+      });
       queryClient.invalidateQueries({
         queryKey: ["messages", message.conversation_id],
       });

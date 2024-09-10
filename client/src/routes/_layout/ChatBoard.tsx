@@ -56,6 +56,7 @@ const ChatBoard = () => {
       console.log(res);
       return res;
     },
+    enabled: !!id,
   });
   const other = conversation?.data?.users.filter(
     (user) => user.id !== currentUser.id
@@ -74,6 +75,7 @@ const ChatBoard = () => {
 
       return newMessages;
     },
+    enabled: !!id,
   });
 
   useEffect(() => {
@@ -265,7 +267,7 @@ const ChatBoard = () => {
   return (
     <div className="relative flex-1 w-full h-full">
       {/* Conditionally render VoiceCall component */}
-      {conversation.data && (
+      {
         <Modal isOpen={isCall} height="fit">
           <audio ref={remoteAudioRef} autoPlay />
           <VoiceCall
@@ -278,7 +280,7 @@ const ChatBoard = () => {
             callData={callData}
           />
         </Modal>
-      )}
+      }
 
       {!id ? (
         <EmptyChat />
