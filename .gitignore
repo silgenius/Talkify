@@ -5,3 +5,8 @@
 set_up.sql
 .env
 .dev
+*/**/__pycache__
+*.bash
+*.md
+app.js
+*.txt
