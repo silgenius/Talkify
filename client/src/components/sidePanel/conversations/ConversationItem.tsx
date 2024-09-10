@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { MessageType } from "../../../types";
@@ -29,6 +29,7 @@ const ConversationItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isRead, setIsRead] = useState(true);
   const currentUser = getUser();
+  const { id: currentConversationId } = useParams();
   const {
     data: lastMessage,
     isLoading,
@@ -39,6 +40,7 @@ const ConversationItem = ({
       const res = (await newRequest.get(`/message/${lastMessageId}`)).data;
       return res;
     },
+    enabled: !!lastMessageId,
   });
 
   const { data: lastMessageSender } = useQuery({
@@ -54,8 +56,8 @@ const ConversationItem = ({
   useEffect(() => {
     if (!error && lastMessage && currentUser.id !== lastMessage.sender_id) {
       setIsRead(lastMessage.status === "seen");
-      if (lastMessage.status === "sent") {
-        console.log("message delivered", lastMessage.message_text);
+      if (lastMessage.status === "sent" && currentConversationId !== conversationId) {
+        console.log("deliver message", lastMessage);
         socket.emit(SocketEvent.DELIVER_MESSAGE, {
           message_id: lastMessage.id,
         });
@@ -117,8 +119,10 @@ const ConversationItem = ({
             <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
               {lastMessage?.sender_id === currentUser.id
                 ? "You: "
-                : isGroup && lastMessageSender?.username + ": "}
-              {lastMessage?.message_text || "No message"}
+                : isGroup &&
+                  lastMessageSender &&
+                  lastMessageSender?.username + ": "}
+              {lastMessage?.message_text || "No messages yet"}
             </p>
           </div>
         </div>

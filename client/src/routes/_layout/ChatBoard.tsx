@@ -293,7 +293,7 @@ const ChatBoard = () => {
               startCall={handleCall}
             />
             {/* Messages Container*/}
-            <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-20 pl-16 items-start">
+            <div className="p-5 flex-1 overflow-y-auto flex flex-col gap-1 pb-20 pl-16 items-start">
               {messages?.data?.map(
                 (
                   message: MessageType & { isFirst: boolean; isLast: boolean }
@@ -305,12 +305,12 @@ const ChatBoard = () => {
                     isLast={message.isLast}
                     username={
                       conversation.data.users.filter(
-                        (user) => user.id !== currentUser.id
+                        (user) => user.id === message.sender_id
                       )[0].username
                     }
                     photoUrl={
                       conversation.data.users.filter(
-                        (user) => user.id !== currentUser.id
+                        (user) => user.id === message.sender_id
                       )[0].profile_url
                     }
                   />

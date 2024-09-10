@@ -85,6 +85,7 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
 
       {/* Text Input */}
       <input
+        autoFocus={true}
         type="text"
         placeholder="Type a message..."
         value={text}
