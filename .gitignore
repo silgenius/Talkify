@@ -10,3 +10,6 @@ set_up.sql
 *.md
 app.js
 *.txt
+server/api/controller/venv/*
+setenv
+

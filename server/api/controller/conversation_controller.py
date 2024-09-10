@@ -5,6 +5,8 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
 from server.models.user import User
+from server.models.contact import Contact
+
 
 session = storage.get_session()
 
@@ -22,14 +24,22 @@ def create_conversation():
     storage.new(new_conversation)
     storage.save()
 
-    for user_id in users:
-       user = session.query(User).filter_by(id=user_id).one_or_none()
-       if user:
-            user.conversations.append(new_conversation)
-       else:
-            storage.delete(new_conversation)
-            abort(404)
-    storage.save()
+    user1 = session.query(User).filter_by(id=user1_id).one_or_none()
+    user2 = session.query(User).filter_by(id=user1_id).one_or_none()
+    if user1 and user2:
+        user1.conversations.append(new_conversation)
+        user2.conversations.append(new_conversation)
+    else:
+        storage.delete(new_conversation)
+        abort(404)
+
+    verify = session.query(Contact).filter(and_(user_id=receiver.id, contact_id=sender.id)).one_or_none()
+    if not verify:
+        contact1 = Contact(user_id=user1.id, contact_id=user2.id, contact_name=user_2.username)
+        storage.new(contact1)
+        contact2 = Contact(user_id=user2.id, contact_id=user1.id, contact_name=user_1.username)
+        storage.new(contact1)
+        storage.save()
 
     return jsonify(new_conversation.to_dict()), 201
 
