@@ -28,6 +28,7 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
+  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending"}[]>([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -83,7 +84,11 @@ const ChatBoard = () => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "instant" });
     }
-  }, [messages]);
+  }, [messages.data, tmpMessages]);
+
+  useEffect(() => {
+    setTmpMessages((prev) => prev.splice(0, 1));
+  }, [messages.data])
 
   useEffect(() => {
     socket.on(
@@ -266,7 +271,6 @@ const ChatBoard = () => {
 
   return (
     <div className="relative flex-1 w-full h-full">
-      {/* Conditionally render VoiceCall component */}
       {
         <Modal isOpen={isCall} height="fit">
           <audio ref={remoteAudioRef} autoPlay />
@@ -296,7 +300,7 @@ const ChatBoard = () => {
             />
             {/* Messages Container*/}
             <div className="p-5 flex-1 overflow-y-auto flex flex-col gap-1 pb-20 pl-16 items-start">
-              {messages?.data?.map(
+              {messages.data && [...messages.data,...tmpMessages].map(
                 (
                   message: MessageType & { isFirst: boolean; isLast: boolean }
                 ) => (
@@ -308,12 +312,12 @@ const ChatBoard = () => {
                     username={
                       conversation.data.users.filter(
                         (user) => user.id === message.sender_id
-                      )[0].username
+                      )[0]?.username
                     }
                     photoUrl={
                       conversation.data.users.filter(
                         (user) => user.id === message.sender_id
-                      )[0].profile_url
+                      )[0]?.profile_url
                     }
                   />
                 )
@@ -325,6 +329,7 @@ const ChatBoard = () => {
               text={text}
               setText={setText}
               handleTyping={handleTyping}
+              setTmpMessages={setTmpMessages}
             />
           </div>
         )

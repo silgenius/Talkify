@@ -25,9 +25,17 @@ interface ChatFooterProps {
   text: string;
   setText: React.Dispatch<React.SetStateAction<string>>;
   handleTyping: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setTmpMessages: React.Dispatch<
+    React.SetStateAction<{ message_text: string; status: "sending" }[]>
+  >;
 }
 
-const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
+const ChatFooter = ({
+  text,
+  setText,
+  handleTyping,
+  setTmpMessages,
+}: ChatFooterProps) => {
   const [openEmoji, setOpenEmoji] = useState(false);
   const queryClient = useQueryClient();
   const { id } = useParams();
@@ -43,7 +51,6 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
       return res.data;
     },
     onSuccess: (message: MessageType) => {
-      setText("");
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: message.id });
       socket.emit(SocketEvent.STOP_TYPING, {
         conversation_id: id,
@@ -66,8 +73,19 @@ const ChatFooter = ({ text, setText, handleTyping }: ChatFooterProps) => {
       user_id: currentUser.id,
       message_text: text,
     };
-
     createMessage.mutate(messageData);
+    setTmpMessages((prev) => [
+      ...prev,
+      {
+        conversation_id: id,
+        sender_id: currentUser.id,
+        message_text: text,
+        status: "sending",
+        isLast: true,
+        isFirst: true,
+      },
+    ]);
+    setText("");
   };
 
   // Handler to detect Enter key press and send message

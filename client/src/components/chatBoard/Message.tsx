@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 
+import { MdAccessTime } from "react-icons/md";
+
 interface MessageProps {
   message: MessageType;
   isFirst: boolean;
@@ -32,7 +34,7 @@ const Message = ({
   }
 
   useEffect(() => {
-    if (!isSender && message.status !== "seen") {
+    if (!isSender && message.status === "sent" || message.status === "delivered") {
       console.log("read message", message.message_text);
       socket.emit(SocketEvent.READ_MESSAGE, { message_id: message.id });
     }
@@ -112,11 +114,16 @@ const Message = ({
             </>
           )}
           <span>
-            {new Date(message.created_at).toLocaleString("en-UK", { hour: "2-digit", minute: "2-digit" })}
+            {message.created_at && new Date(message.created_at).toLocaleString("en-UK", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </span>
           {isSender && (
             <div className="flex space-x-0.5">
-              {message.status === "sent" ? (
+              { message.status === "sending"? 
+              <MdAccessTime size={16}/> :
+              message.status === "sent" ? (
                 <BiCheck size={16} />
               ) : (
                 <BiCheckDouble
