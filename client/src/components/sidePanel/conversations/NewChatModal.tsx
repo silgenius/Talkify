@@ -35,11 +35,12 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   const currentUser = getUser();
   const queryClient = useQueryClient();
 
+  // Fetch all available contacts
   const { data: contacts } = useQuery<ContactType[]>({
-    queryKey: ["contacts"],
+    queryKey: ["availableContacts"],
     queryFn: async () => {
       const res = (await newRequest(`${currentUser.id}/contacts`)).data;
-      console.log(res);
+      //console.log(res);
       return res.contacts.filter(
         (contact: ContactType) =>
           contact.status === "accepted" || contact.status === "pending"

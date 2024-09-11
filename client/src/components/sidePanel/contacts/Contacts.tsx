@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { FaUserPlus } from "react-icons/fa";
 import SearchInput from "../../../components/common/SearchInput";
 import NewContactModal from "./NewContactModal";
-import { useQuery } from "@tanstack/react-query";
-import newRequest from "../../../utils/newRequest";
-import { getUser } from "../../../utils/localStorage";
+import { useQueryClient } from "@tanstack/react-query";
 import { ContactType } from "../../../types";
 import ContactCard from "./ContactCard";
-
 
 const Contacts: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -16,21 +13,13 @@ const Contacts: React.FC = () => {
   >("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredContacts, setFilteredContacts] = useState<ContactType[]>([]);
-  const currentUser = getUser();
-
-  const contacts = useQuery<ContactType[]>({
-    queryKey: ["contacts"],
-    queryFn: async () => {
-      const res = (await newRequest(`${currentUser.id}/contacts`)).data;
-      //console.log(res);
-      return res.contacts;
-    },
-  });
+  const queryClient = useQueryClient();
+  const contacts = queryClient.getQueryData<ContactType[]>(["contacts"]);
 
   useEffect(() => {
-    if (contacts.data) {
+    if (contacts) {
       setFilteredContacts(
-        contacts.data?.filter((contact) => {
+        contacts.filter((contact) => {
           console.log(contact);
 
           const matchesSearch = contact.contact.username
@@ -44,7 +33,7 @@ const Contacts: React.FC = () => {
         })
       );
     }
-  }, [contacts.data, setFilteredContacts, searchQuery, activeTab]);
+  }, [contacts, setFilteredContacts, searchQuery, activeTab]);
 
   //console.log(filteredContacts);
 
@@ -129,58 +118,58 @@ const Contacts: React.FC = () => {
 
 export default Contacts;
 
-  // const contacts = {
-  //   data: [
-  //     {
-  //       contact: {
-  //         id: "1",
-  //         username: "John Doe",
-  //         last_login: "now",
-  //         profile_url: "",
-  //       },
-  //       status: "online",
-  //       created_at: "now",
-  //     },
-  //     {
-  //       contact: {
-  //         id: "2",
-  //         username: "Jane Smith",
-  //         last_login: "now",
-  //         profile_url: "",
-  //       },
-  //       status: "pending",
-  //       created_at: "now",
-  //     },
-  //     {
-  //       contact: {
-  //         id: "3",
-  //         username: "Alice Johnson",
-  //         last_login: "now",
-  //         profile_url: "",
-  //       },
-  //       status: "requested",
-  //       created_at: "now",
-  //     },
-  //     {
-  //       contact: {
-  //         id: "4",
-  //         username: "Bob Brown",
-  //         last_login: "now",
-  //         profile_url: "",
-  //       },
-  //       status: "online",
-  //       created_at: "now",
-  //     },
-  //     {
-  //       contact: {
-  //         id: "5",
-  //         username: "Bob Brown",
-  //         last_login: "now",
-  //         profile_url: "",
-  //       },
-  //       status: "offline",
-  //       created_at: "now",
-  //     },
-  //     // Add more contacts here
-  //   ],
-  // };
+// const contacts = {
+//   data: [
+//     {
+//       contact: {
+//         id: "1",
+//         username: "John Doe",
+//         last_login: "now",
+//         profile_url: "",
+//       },
+//       status: "online",
+//       created_at: "now",
+//     },
+//     {
+//       contact: {
+//         id: "2",
+//         username: "Jane Smith",
+//         last_login: "now",
+//         profile_url: "",
+//       },
+//       status: "pending",
+//       created_at: "now",
+//     },
+//     {
+//       contact: {
+//         id: "3",
+//         username: "Alice Johnson",
+//         last_login: "now",
+//         profile_url: "",
+//       },
+//       status: "requested",
+//       created_at: "now",
+//     },
+//     {
+//       contact: {
+//         id: "4",
+//         username: "Bob Brown",
+//         last_login: "now",
+//         profile_url: "",
+//       },
+//       status: "online",
+//       created_at: "now",
+//     },
+//     {
+//       contact: {
+//         id: "5",
+//         username: "Bob Brown",
+//         last_login: "now",
+//         profile_url: "",
+//       },
+//       status: "offline",
+//       created_at: "now",
+//     },
+//     // Add more contacts here
+//   ],
+// };

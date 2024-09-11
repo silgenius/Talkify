@@ -28,7 +28,7 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
-  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending"}[]>([]);
+  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending" | "failed"}[]>([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -84,10 +84,10 @@ const ChatBoard = () => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "instant" });
     }
-  }, [messages.data, tmpMessages]);
+  }, [messages.data, tmpMessages, isTyping]);
 
   useEffect(() => {
-    setTmpMessages((prev) => prev.splice(0, 1));
+    setTmpMessages((prev) => prev.splice(0, 2));
   }, [messages.data])
 
   useEffect(() => {
@@ -322,14 +322,15 @@ const ChatBoard = () => {
                   />
                 )
               )}
-              <div ref={lastMessageRef}></div>
               <TypingIndicator isTyping={isTyping} />
+              <div ref={lastMessageRef}></div>
             </div>
             <ChatFooter
               text={text}
               setText={setText}
               handleTyping={handleTyping}
               setTmpMessages={setTmpMessages}
+              contactId={conversation.data.group? undefined : other?.id}
             />
           </div>
         )

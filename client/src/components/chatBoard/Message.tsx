@@ -6,8 +6,8 @@ import { BiCheck, BiCheckDouble } from "react-icons/bi";
 import { useEffect } from "react";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
-
-import { MdAccessTime } from "react-icons/md";
+import CallMessage from "./CallMessage";
+import { MdAccessTime, MdErrorOutline } from "react-icons/md";
 
 interface MessageProps {
   message: MessageType;
@@ -57,13 +57,14 @@ const Message = ({
           />
         )}
       </div>
-      {!containsOnlyEmojis(message.message_text) ? (
-        <div
-          className={`flex flex-col   ${
-            isSender
-              ? " bg-primary-purple text-gray-50 rounded-xl shadow-sm shadow-primary-purple/40"
-              : " bg-gray-100 text-gray-800 h-fit rounded-xl shadow-inner"
-          }  break-words py-2 px-4 max-w-[80%]
+      {message.message_type !== "audio call" ? (
+        !containsOnlyEmojis(message.message_text) ? (
+          <div
+            className={`flex flex-col   ${
+              isSender
+                ? " bg-primary-purple text-gray-50 rounded-xl shadow-sm shadow-primary-purple/40"
+                : " bg-gray-100 text-gray-800 h-fit rounded-xl shadow-inner"
+            }  break-words py-2 px-4 max-w-[80%]
             ${
               isSender
                 ? isFirst && isLast
@@ -81,25 +82,33 @@ const Message = ({
                 ? "rounded-tl"
                 : "rounded-l"
             } `}
-        >
-          {message.message_text}
-        </div>
+          >
+            {message.message_text}
+          </div>
+        ) : (
+          // TailwindCSS purge safelist
+          // grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6
+          <div
+            className={`grid grid-cols-${
+              message.message_text.length <= 12
+                ? String(Math.floor(message.message_text.length / 2))
+                : "6"
+            }`}
+          >
+            {[...message.message_text].map((emoji, index) => (
+              <p key={index} className="text-4xl my-0.5 -mx-0.5">
+                {emoji}
+              </p>
+            ))}
+          </div>
+        )
       ) : (
-        // TailwindCSS purge safelist
-        // grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6
-        <div
-          className={`grid grid-cols-${
-            message.message_text.length <= 12
-              ? String(Math.floor(message.message_text.length / 2))
-              : "6"
-          }`}
-        >
-          {[...message.message_text].map((emoji, index) => (
-            <p key={index} className="text-4xl my-0.5 -mx-0.5">
-              {emoji}
-            </p>
-          ))}
-        </div>
+        <>
+          <CallMessage
+            duration={message.message_text}
+            end_status={message.status as "rejected" | "missed" | "ended"}
+          />
+        </>
       )}
       {isLast && (
         <div
@@ -123,6 +132,9 @@ const Message = ({
             <div className="flex space-x-0.5">
               { message.status === "sending"? 
               <MdAccessTime size={16}/> :
+              message.status === "failed" ? (
+                <MdErrorOutline size={16} className="text-red-600" />
+              ) :
               message.status === "sent" ? (
                 <BiCheck size={16} />
               ) : (
@@ -133,7 +145,7 @@ const Message = ({
                   size={16}
                 />
               )}
-              <span>{message.status}</span>
+              <span className={message.status === "failed"? "text-red-600" : ""}>{message.status}</span>
             </div>
           )}
         </div>

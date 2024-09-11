@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { MessageType } from "../../../types";
 import { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
 import socket from "../../../socket";
 import { SocketEvent } from "../../../utils/socketEvents";
 import { getUser } from "../../../utils/localStorage";
+import { toast } from "react-toastify";
 
 interface ChatListItemProps {
   name: string;
@@ -15,6 +16,7 @@ interface ChatListItemProps {
   isGroup?: boolean;
   selected?: boolean;
   photoUrl?: string;
+  contactId?: string;
 }
 
 const ConversationItem = ({
@@ -24,12 +26,15 @@ const ConversationItem = ({
   selected,
   isGroup = false,
   photoUrl,
+  contactId
 }: ChatListItemProps) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [isRead, setIsRead] = useState(true);
   const currentUser = getUser();
   const { id: currentConversationId } = useParams();
+  const queryClient = useQueryClient();
+
   const {
     data: lastMessage,
     isLoading,
@@ -66,6 +71,47 @@ const ConversationItem = ({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage, error]);
+
+
+  const exitGroup = useMutation({
+    mutationFn: async (data: {conversation_id: string, user_id: string}) => {
+      const res = await newRequest.put(`/conversation/group/remove`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("You have left the group " + name);
+      navigate("/");
+    },
+    onError: (error) => {
+      console.log("error", error);
+      toast.error("Failed to leave the group");
+    }
+  })
+
+  const blockUser = useMutation({
+    mutationFn: async (data: {sender_id: string, receiver_id: string}) => {
+      const res = (await newRequest.post(`/block`, data)).data;
+      console.log(res); 
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["conversation", conversationId]});
+      queryClient.invalidateQueries({queryKey: ["contacts"]});
+      toast.success("User blocked successfully");
+    },
+    onError: (error) => {
+      console.log("error", error);
+      toast.error("Failed to block user");
+    }
+  });
+
+  const handleExit = () => {
+    exitGroup.mutate({conversation_id: conversationId, user_id: currentUser.id});
+  }
+
+  const handleBlock = () => {
+    blockUser.mutate({sender_id: currentUser.id, receiver_id: contactId as string});
+  }
 
   return (
     <div
@@ -159,12 +205,16 @@ const ConversationItem = ({
               Mark as {isRead ? "unread" : "read"}
             </MenuItem>
             <MenuItem>Mute notifications</MenuItem>
-            {isGroup && (
+            {isGroup ?(
               <>
                 <MenuDivider />
-                <MenuItem>Exit group</MenuItem>
+                <MenuItem onClick={handleExit}>Exit group</MenuItem>
               </>
-            )}
+            ):
+            <>
+              <MenuDivider />
+              <MenuItem onClick={handleBlock}>Block user</MenuItem>
+            </>}
           </Menu>
         </div>
       )}

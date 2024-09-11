@@ -56,6 +56,7 @@ const Conversations = ({ conversations }: ConversationsProps) => {
             {conversations.isError && <Error />}
             {filteredConversations?.map((conversation: ConversationType) => (
               <ConversationItem
+                contactId={conversation.group? undefined : conversation.others[0].id}
                 key={conversation.id}
                 name={
                   conversation.group

@@ -16,7 +16,7 @@ import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ConversationType, MessageType } from "../../types";
+import { ContactType, ConversationType, MessageType } from "../../types";
 import Conversations from "../../components/sidePanel/conversations/Conversations";
 import Contacts from "../../components/sidePanel/contacts/Contacts";
 import Settings from "../../components/sidePanel/settings/Settings";
@@ -40,6 +40,15 @@ const SidePanel = () => {
       const res = (await newRequest.get(`/${currentUser.id}/conversations`))
         .data;
       return res.conversations;
+    },
+  });
+
+  useQuery<ContactType[]>({
+    queryKey: ["contacts"],
+    queryFn: async () => {
+      const res = (await newRequest(`${currentUser.id}/contacts`)).data;
+      console.log("contacts", res);
+      return res.contacts;
     },
   });
 
@@ -126,7 +135,6 @@ const SidePanel = () => {
                   )}
                 </button>
                 <button
-
                   onClick={() => navigate("/settings")}
                   className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
                 >
