@@ -5,7 +5,7 @@ import RefusedCall from "./RefusedCall";
 interface CallEndedProps {
   onCallEnd: () => void;
   contact: { id: string; username: string; profile_url: string };
-  status?: "rejected" | "busy" | "unavailable" | "failed" | "missed";
+  status?: "rejected" | "busy" | "unavailable" | "failed" | "missed" | "answered";
 }
 
 const CallEnded: React.FC<CallEndedProps> = ({
@@ -15,7 +15,7 @@ const CallEnded: React.FC<CallEndedProps> = ({
 }) => {
   return (
     <>
-      {!status ? (
+      {!status || status === "answered"? (
         <div className="w-full text-center space-y-5">
           <img
             src={contact?.profile_url || "/user.png"}

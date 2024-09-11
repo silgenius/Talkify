@@ -47,6 +47,7 @@ type MessageType = {
   created_at: string;
   updated_at: string;
   status: string;
+  duration: number
 };
 export interface SettingType {
   id: number; // Unique identifier for the setting
@@ -74,9 +75,10 @@ type ContactAction = {
 type CallDataType =
   | {
       dialing: boolean;
-      endStatus?: "rejected" | "busy" | "unavailable" | "failed" | "missed";
+      endStatus?: "answered" | "rejected" | "busy" | "unavailable" | "failed" | "missed";
       caller?: { userId: string; peerId?: string };
       callee?: { userId: string; peerId?: string };
+      duration?: number;
     }
   | undefined;
 

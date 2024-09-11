@@ -145,7 +145,6 @@ export const CallProvider = ({ children }: { children: ReactNode }) => {
     });
 
     endCall();
-    console.log("Call rejected");
   };
 
   return (

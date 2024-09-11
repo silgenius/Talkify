@@ -34,7 +34,10 @@ const Message = ({
   }
 
   useEffect(() => {
-    if (!isSender && message.status === "sent" || message.status === "delivered") {
+    if (
+      (!isSender && message.status === "sent") ||
+      message.status === "delivered"
+    ) {
       console.log("read message", message.message_text);
       socket.emit(SocketEvent.READ_MESSAGE, { message_id: message.id });
     }
@@ -105,8 +108,8 @@ const Message = ({
       ) : (
         <>
           <CallMessage
-            duration={message.message_text}
-            end_status={message.status as "rejected" | "missed" | "ended"}
+            duration={message.duration}
+            end_status={message.status as "r" | "m" | "a"}
           />
         </>
       )}
@@ -123,19 +126,19 @@ const Message = ({
             </>
           )}
           <span>
-            {message.created_at && new Date(message.created_at).toLocaleString("en-UK", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {message.created_at &&
+              new Date(message.created_at).toLocaleString("en-UK", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
           </span>
           {isSender && (
             <div className="flex space-x-0.5">
-              { message.status === "sending"? 
-              <MdAccessTime size={16}/> :
-              message.status === "failed" ? (
+              {message.status === "sending" ? (
+                <MdAccessTime size={16} />
+              ) : message.status === "failed" ? (
                 <MdErrorOutline size={16} className="text-red-600" />
-              ) :
-              message.status === "sent" ? (
+              ) : message.status === "sent" ? (
                 <BiCheck size={16} />
               ) : (
                 <BiCheckDouble
@@ -145,7 +148,11 @@ const Message = ({
                   size={16}
                 />
               )}
-              <span className={message.status === "failed"? "text-red-600" : ""}>{message.status}</span>
+              <span
+                className={message.status === "failed" ? "text-red-600" : ""}
+              >
+                {message.status}
+              </span>
             </div>
           )}
         </div>
