@@ -15,11 +15,17 @@ class MessageStatus:
     seen = 'seen'
     edited = 'edited'
     unsent = 'unsent'
+    # call messages
+    rejected = 'rejected'
+    missed = 'missed'
+    answered = 'answered'
+    failed = 'failed'
 
 
 class MessageType:
     audio = 'audio call'
     text = 'text'
+    exit = 'exited'
 
 
 class Message(BaseModel, Base):
@@ -42,3 +48,15 @@ class Message(BaseModel, Base):
 
     def update_text(self, text):
         self.message_text = text
+
+    def update_call_message(self, message_type):
+        if message_type == "r":
+            self.message_type = MessageStatus.rejected
+        else if message_type == "m":
+            self.message_type = MessageStatus.missed
+        else if message_type == "a":
+            self.message_type = MessageStatus.answered
+        else if message_type == "f":
+            self.message_type = MessageStatus.failed
+        else:
+            self.message_type = "unknown"
