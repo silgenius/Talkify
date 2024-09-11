@@ -6,6 +6,7 @@ from server.models import storage
 from server.models.conversation import Conversation
 from server.models.user import User
 from server.models.contact import Contact
+from server.models.message import MessageType, Message
 from sqlalchemy import and_
 
 session = storage.get_session()
@@ -153,6 +154,13 @@ def leave_conversation():
         return jsonify({"error": "user not in conversation"}), 400
 
     conversation.users.remove(user)
-    storage.save()
 
-    return jsonify({}), 200
+    # creatd a user exited message
+    message = Message(conversation_id=conversation.id, sender_id=user_id)
+    text = f'{user.username} left the group'
+    message.update_text(text)
+    message.message_type = MessageType.exit
+    storage.save()
+    conversation.update_last_message_id(message.id)
+
+    return jsonify(message.to_dict()), 201

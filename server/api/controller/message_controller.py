@@ -122,8 +122,17 @@ def create_call_message():
     if not isinstance(duration, int):
         return jsonify({"error": "duration must be int"}), 400
 
+    status = data.get("status")
+    if not status:
+        return jsonify({"error": "status missing"}), 400
+
     message = Message(conversation_id=conversation.id, sender_id=user_id, duration=duration)
     message.is_audio() #set message type as audio
+    message.update_call_message(status)
+    if message.status == "unknown":
+        storage.delete(message)
+        storage.save()
+        return jsonify({"error": "unknown status"}), 400
 
     storage.new(message)
     storage.save()
