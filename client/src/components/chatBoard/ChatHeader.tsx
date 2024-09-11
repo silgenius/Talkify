@@ -18,11 +18,10 @@ const ChatHeader = ({
   const { name, photoUrl } = conversation.group
     ? { name: conversation.name, photoUrl: null }
     : {
-        name: conversation.users.filter((user) => user.id !== getUser().id)[0]
-          .username,
+        name: conversation.users.filter((user) => user.id !== getUser().id)[0]?.username,
         photoUrl: conversation.users.filter(
           (user) => user.id !== getUser().id
-        )[0].profile_url,
+        )[0]?.profile_url,
       };
 
   return (

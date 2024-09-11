@@ -1,7 +1,7 @@
-import EmptyChat from "./components/chatBoard/EmptyChat";
 import "./index.css";
 import { Link } from "react-router-dom";
 import { getUser } from "./utils/localStorage";
+import Conversation from "./routes/conversation/[id]";
 
 function App() {
   const currentUser = getUser();
@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       {currentUser ? (
-        <EmptyChat />
+        <Conversation />
       ) : (
         <div className="app-background">
           <div className="header">

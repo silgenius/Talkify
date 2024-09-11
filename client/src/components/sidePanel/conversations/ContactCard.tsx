@@ -5,8 +5,8 @@ interface ContactCardProps {
   contact: {
     id: string;
     username: string;
-    photoUrl?: string;
-    bio: string;
+    profile_url?: string;
+    last_login: string;
   };
   isGroup: boolean;
   handleAdd: () => void;
@@ -20,11 +20,11 @@ const ContactCard = ({ contact, isGroup, handleAdd }: ContactCardProps) => {
       onClick={handleAdd}
     >
       <div className="flex items-center">
-        {contact.photoUrl ? (
+        {contact.profile_url ? (
           <img
-            src={contact.photoUrl}
+            src={contact.profile_url}
             alt={contact.username}
-            className="w-12 h-12 rounded-full mr-4"
+            className="w-12 h-12 rounded-full object-contain object-center mr-4"
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center mr-4">
@@ -36,7 +36,7 @@ const ContactCard = ({ contact, isGroup, handleAdd }: ContactCardProps) => {
             {contact.username}
           </span>
           <p className="text-gray-500 text-sm">
-            {contact.bio}
+            {contact.last_login ? "Online" : "Offline"}
           </p>
         </div>
       </div>

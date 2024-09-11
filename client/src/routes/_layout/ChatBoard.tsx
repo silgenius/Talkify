@@ -28,6 +28,7 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
+  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending" | "failed"}[]>([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ const ChatBoard = () => {
       console.log(res);
       return res;
     },
+    enabled: !!id,
   });
   const other = conversation?.data?.users.filter(
     (user) => user.id !== currentUser.id
@@ -74,6 +76,7 @@ const ChatBoard = () => {
 
       return newMessages;
     },
+    enabled: !!id,
   });
 
   useEffect(() => {
@@ -81,7 +84,11 @@ const ChatBoard = () => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "instant" });
     }
-  }, [messages]);
+  }, [messages.data, tmpMessages, isTyping]);
+
+  useEffect(() => {
+    setTmpMessages((prev) => prev.splice(0, 2));
+  }, [messages.data])
 
   useEffect(() => {
     socket.on(
@@ -264,8 +271,7 @@ const ChatBoard = () => {
 
   return (
     <div className="relative flex-1 w-full h-full">
-      {/* Conditionally render VoiceCall component */}
-      {conversation.data && (
+      {
         <Modal isOpen={isCall} height="fit">
           <audio ref={remoteAudioRef} autoPlay />
           <VoiceCall
@@ -278,7 +284,7 @@ const ChatBoard = () => {
             callData={callData}
           />
         </Modal>
-      )}
+      }
 
       {!id ? (
         <EmptyChat />
@@ -293,8 +299,8 @@ const ChatBoard = () => {
               startCall={handleCall}
             />
             {/* Messages Container*/}
-            <div className="p-5 flex-1 overflow-scroll flex flex-col gap-1 pb-20 pl-16 items-start">
-              {messages?.data?.map(
+            <div className="p-5 flex-1 overflow-y-auto flex flex-col gap-1 pb-20 pl-16 items-start">
+              {messages.data && [...messages.data,...tmpMessages].map(
                 (
                   message: MessageType & { isFirst: boolean; isLast: boolean }
                 ) => (
@@ -305,24 +311,26 @@ const ChatBoard = () => {
                     isLast={message.isLast}
                     username={
                       conversation.data.users.filter(
-                        (user) => user.id !== currentUser.id
-                      )[0].username
+                        (user) => user.id === message.sender_id
+                      )[0]?.username
                     }
                     photoUrl={
                       conversation.data.users.filter(
-                        (user) => user.id !== currentUser.id
-                      )[0].profile_url
+                        (user) => user.id === message.sender_id
+                      )[0]?.profile_url
                     }
                   />
                 )
               )}
-              <div ref={lastMessageRef}></div>
               <TypingIndicator isTyping={isTyping} />
+              <div ref={lastMessageRef}></div>
             </div>
             <ChatFooter
               text={text}
               setText={setText}
               handleTyping={handleTyping}
+              setTmpMessages={setTmpMessages}
+              contactId={conversation.data.group? undefined : other?.id}
             />
           </div>
         )

@@ -8,19 +8,9 @@ import SearchInput from "../../common/SearchInput";
 import NewChatDetails from "./GroupDetails";
 import GroupMemberChip from "./GroupMemberChip";
 import { getUser } from "../../../utils/localStorage";
-
-const contacts = [
-  { id: "1", username: "John Doe", bio: "Software Engineer" },
-  { id: "2", username: "Jane Smith", bio: "Frontend Developer" },
-  { id: "3", username: "Alice Johnson", bio: "Product Manager" },
-  { id: "4", username: "Bob Brown", bio: "UI/UX Designer" },
-  { id: "5", username: "Bob Smith", bio: "Full Stack Developer" },
-  { id: "6", username: "Sarah Johnson", bio: "Backend Developer" },
-  { id: "7", username: "Michael Smith", bio: "Data Scientist" },
-  { id: "8", username: "Emily Davis", bio: "Mobile App Developer" },
-  { id: "9", username: "David Wilson", bio: "DevOps Engineer" },
-  { id: "10", username: "Olivia Brown", bio: "Software Tester" },
-];
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import newRequest from "../../../utils/newRequest";
+import { ContactType, ConversationType } from "../../../types";
 
 interface SearchModalProps {
   isModalOpen: boolean;
@@ -29,8 +19,8 @@ interface SearchModalProps {
 
 const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [results, setResults] = useState<typeof contacts>(contacts);
-  const [addedMembers, setAddedMembers] = useState<typeof contacts>([]);
+  const [results, setResults] = useState<ContactType[]>([]);
+  const [addedMembers, setAddedMembers] = useState<ContactType[]>([]);
   const [isGroup, setIsGroup] = useState(false);
   const [groupDetails, setGroupDetails] = useState<{
     name: string;
@@ -42,60 +32,141 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   const [currentStep, setCurrentStep] = useState<"members" | "details">(
     "members"
   );
+  const currentUser = getUser();
+  const queryClient = useQueryClient();
+
+  // Fetch all available contacts
+  const { data: contacts } = useQuery<ContactType[]>({
+    queryKey: ["availableContacts"],
+    queryFn: async () => {
+      const res = (await newRequest(`${currentUser.id}/contacts`)).data;
+      //console.log(res);
+      return res.contacts.filter(
+        (contact: ContactType) =>
+          contact.status === "accepted" || contact.status === "pending"
+      );
+    },
+  });
+
   const navigate = useNavigate();
+
   useEffect(() => {
+    if (!contacts) return;
+
     const filteredContacts = contacts.filter(
       (contact) =>
-        contact.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !addedMembers.find((member) => member.id === contact.id)
+        contact.contact.username
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
+        !addedMembers.find((member) => member.contact.id === contact.contact.id)
     );
     setResults(filteredContacts);
-  }, [searchQuery, addedMembers]);
+  }, [searchQuery, addedMembers, contacts]);
 
-  const handleAdd = (contact: (typeof contacts)[number]) => {
+  const createConversation = useMutation({
+    mutationFn: async (data: { users: [string, string] }) => {
+      const conversations = queryClient.getQueriesData({
+        queryKey: ["conversations"],
+      })[0][1] as ConversationType[];
+      const existingConversation = conversations.find(
+        (conversation) =>
+          !conversation.group &&
+          conversation.others.find((user) => user.id === data.users[1])
+      );
+
+      if (existingConversation) {
+        return { id: existingConversation.id, new: false };
+      }
+      const res = (await newRequest.post("/conversations/create", data)).data;
+      return { id: res.id, new: true };
+    },
+    onSuccess: (data) => {
+      if (data.new) toast.success(`Chat created successfully!`);
+      else toast.info(`Chat already exists!`);
+
+      navigate(`/conversation/${data.id}`);
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("An error occurred. Please try again.");
+    },
+  });
+
+  const handleAdd = (contact: ContactType) => {
     if (isGroup) {
-      if (addedMembers.find((member) => member.id === contact.id)) {
+      if (
+        addedMembers.find((member) => member.contact.id === contact.contact.id)
+      ) {
         toast.warn("Already Added");
         return;
       }
 
       setAddedMembers((prev) => [...prev, contact]);
-      setResults((prev) => prev.filter((member) => member.id !== contact.id));
+      setResults((prev) =>
+        prev?.filter((member) => member.contact.id !== contact.contact.id)
+      );
       setSearchQuery("");
-      toast.success(`${contact.username} added`);
+      toast.success(`${contact.contact.username} added`);
     } else {
-      // Here you would call your API to create a new chat
-      // newRequest.post("/create-chat", { user: contact });
-      const conversation = { id: "someid" };
-      toast.success(`Chat with ${contact.username} created successfully!`);
+      createConversation.mutate({
+        users: [currentUser.id, contact.contact.id],
+      });
       onClose();
-      navigate(`/conversation/${conversation.id}`);
     }
   };
 
-  const handleRemove = (contact: (typeof contacts)[number]) => {
+  const handleRemove = (contact: ContactType) => {
     setAddedMembers((prev) =>
-      prev.filter((member) => member.id !== contact.id)
+      prev.filter((member) => member.contact.id !== contact.contact.id)
     );
     setResults((prev) => [...prev, contact]);
-    toast.info(`${contact.username} removed`);
+    toast.info(`${contact.contact.username} removed`);
   };
+
+  const createGroup = useMutation({
+    mutationFn: async (data: {
+      name: string;
+      photo?: string;
+      users: string[];
+    }) => {
+      console.log("data", data);
+
+      const res = (await newRequest.post("/conversations/create/group", data))
+        .data;
+      console.log(res);
+
+      return res;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      toast.success(`Group "${data.name}" created successfully!`);
+      navigate(`/conversation/${data.id}`);
+      setTimeout(() => {
+        setAddedMembers([]);
+        setGroupDetails({ name: "", photo: "" });
+        setCurrentStep("members");
+      }, 300);
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("An error occurred. Please try again.");
+    },
+  });
 
   const handleCreateGroup = () => {
     if (addedMembers.length === 0) {
       toast.error("Please add at least one member to the group");
       return;
     }
-
-    // Here you would call your API to create the group
-    // newRequest.post("/create-group", { groupName: newGroupName, members: addedMembers });
-
-    toast.success(`Group "${groupDetails.name}" created successfully!`);
-    setTimeout(() => {
-      setAddedMembers([]);
-      setGroupDetails({ name: "", photo: "" });
-      setCurrentStep("members");
-    }, 300);
+    createGroup.mutate({
+      photo: groupDetails.photo,
+      name: groupDetails.name,
+      users: [
+        currentUser.id,
+        ...addedMembers.map((member) => member.contact.id),
+      ],
+    });
     onClose();
   };
   const handleNext = () => {
@@ -106,10 +177,10 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
     const newGroupName = `${getUser().username}, ${
       addedMembers.length > 2
         ? addedMembers
-            .splice(0, 2)
-            .map((user) => user.username)
+            .splice(0, 1)
+            .map((user) => user.contact.username)
             .join(", ") + ", and others"
-        : addedMembers.map((user) => user.username).join(", ")
+        : addedMembers.map((user) => user.contact.username).join(", ")
     }`;
     setGroupDetails((prev) => ({ ...prev, name: newGroupName }));
     setCurrentStep("details");
@@ -166,7 +237,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
               onInputChange={setSearchQuery}
               chips={addedMembers.map((member) => (
                 <GroupMemberChip
-                  key={member.id}
+                  key={member.contact.id}
                   member={member}
                   onClick={handleRemove}
                 />
@@ -181,8 +252,8 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
                 <ul className="mt-2  ">
                   {results.map((contact) => (
                     <ContactCard
-                      key={contact.id}
-                      contact={contact}
+                      key={contact.contact.id}
+                      contact={contact.contact}
                       handleAdd={() => handleAdd(contact)}
                       isGroup={isGroup}
                     />

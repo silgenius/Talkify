@@ -10,6 +10,13 @@ type UserType = {
   updated_at: Date;
 };
 
+type UserMiniDataType = {
+  id: string;
+  username: string;
+  profile_url: string;
+  last_login: string;
+};
+
 type ConversationType = {
   id: string;
   name: string;
@@ -75,6 +82,7 @@ type CallDataType =
 
 export type {
   UserType,
+  UserMiniDataType,
   ConversationType,
   MessageType,
   ContactType,
