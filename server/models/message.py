@@ -52,11 +52,11 @@ class Message(BaseModel, Base):
     def update_call_message(self, message_type):
         if message_type == "r":
             self.message_type = MessageStatus.rejected
-        else if message_type == "m":
+        elif message_type == "m":
             self.message_type = MessageStatus.missed
-        else if message_type == "a":
+        elif message_type == "a":
             self.message_type = MessageStatus.answered
-        else if message_type == "f":
+        elif message_type == "f":
             self.message_type = MessageStatus.failed
         else:
             self.message_type = "unknown"
