@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from server.models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Integer
 
 """
 Module: messages
@@ -29,6 +29,7 @@ class Message(BaseModel, Base):
     message_type = Column(String(60), default=MessageType.text, nullable=False)
     message_text = Column(Text, nullable=True)
     sender_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+    duration = Column(Integer, nullable=True) #available to call message
     status = Column(String(60), default=MessageStatus.sent, nullable=False)
 
     def __init__(self, *args, **kwargs):

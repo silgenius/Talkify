@@ -114,3 +114,45 @@ def get_conversation_by_id(conversation_id):
     conversation_data = conversation.to_dict()
     conversation_data['users'] = conversation_users
     return jsonify(conversation_data)
+
+
+@app_handler.route('conversation/group/remove', methods=['PUT'])
+def leave_conversation():
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({"error": "Invalid json"}), 400
+
+    conversation_id = data.get("conversation_id")
+    if not conversation_id:
+        return jsonify({"error": "conversation id missing"}), 400
+
+    conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
+
+    if not conversation.group:
+        return jsonify({"error": "conversation is not group"}), 403
+
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user id missing"}), 400
+
+    user = session.query(User).filter_by(id=user_id).one_or_none()
+    if not user:
+        return jsonify({"error": "user not found"}), 400
+
+    # check if user in group
+    conversation_users = conversation.users
+    verify = False
+    for usr in conversation_users:
+        if usr.id == user_id:
+            verify = True
+
+    if not verify:
+        return jsonify({"error": "user not in conversation"}), 400
+
+    conversation.users.remove(user)
+    storage.save()
+
+    return jsonify({}), 200

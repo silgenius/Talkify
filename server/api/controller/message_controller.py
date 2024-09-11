@@ -86,10 +86,7 @@ def create_message():
 
     message = Message(conversation_id=conversation.id, sender_id=user_id)
 
-    if message_type == MessageType.audio:
-        message.is_audio()
-    else:
-        message.update_text(text)
+    message.update_text(text)
 
     storage.new(message)
     storage.save()
@@ -98,28 +95,38 @@ def create_message():
     return jsonify(message.to_dict()), 201
 
 
-@app_handler.route('/message/call_update', methods=['PUT'])
-def update_message():
+@app_handler.route('/message/create_call', methods=['POST'])
+def create_call_message():
     try:
         data = request.get_json()
     except Exception:
         return jsonify({"error": "Not a JSON"}), 400
 
-    message_id = data.get("message_id")
-    if not message_id:
-        return jsonify({"error": "message type missing"}), 400
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user id missing"}), 400
+    user = session.query(User).filter_by(id=user_id).one_or_none()
+    if not user:
+        return jsonify({"error": "user not found"}), 400
 
-    message = session.query(Message).filter_by(id=message_id).one_or_none()
-    if not message:
-        return jsonify({"error": "message not found"}), 400
+    convo_id = data.get("conversation_id")
+    if not convo_id:
+        return jsonify({"error": "conversation id missing"}), 400
+    conversation = session.query(Conversation).filter_by(id=convo_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
 
-    message_type = data.get("message_type")
-    if not message_type:
-        return jsonify({"error": "message type missing"}), 400
+    duration = data.get("duration")
+    if not duration:
+        return jsonify({"error": "duration missing"}), 400
+    if not isinstance(duration, int):
+        return jsonify({"error": "duration must be int"}), 400
 
-    if message_type != MessageType.audio:
-        return jsonify({"error": "cannot update message type"}), 403
+    message = Message(conversation_id=conversation.id, sender_id=user_id, duration=duration)
+    message.is_audio() #set message type as audio
 
-    message.save()
+    storage.new(message)
+    storage.save()
+    conversation.update_last_message_id(message.id)
 
-    return jsonify({}), 200
+    return jsonify(message.to_dict()), 201
