@@ -3,9 +3,9 @@ import "./settings.css";
 
 const Settings = () => {
   const [activeSection, setActiveSection] = useState("Account");
-  const [expandedOption, setExpandedOption] = useState(null);
+  const [expandedOption, setExpandedOption] = useState<string | null>(null);
 
-  const toggleOptions = (option) => {
+  const toggleOptions = (option: typeof expandedOption) => {
     setExpandedOption(expandedOption === option ? null : option);
   };
 

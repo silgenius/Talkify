@@ -2,18 +2,22 @@ import { FiMic, FiMicOff, FiPhoneOff } from "react-icons/fi";
 import { MdVolumeUp, MdVolumeOff } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import { useCall } from "../../../hooks/useCall";
+import socket from "../../../socket";
+import { CallDataType } from "../../../types";
+import { formatTime } from "../../../utils/formatTime";
 
 interface ActiveCallProps {
   onCallEnd: () => void;
   contact: { id: string; username: string; profile_url: string };
+  callData: CallDataType;
 }
 
-const ActiveCall = ({ onCallEnd, contact }: ActiveCallProps) => {
+const ActiveCall = ({ onCallEnd, contact, callData }: ActiveCallProps) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(true);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const timerRef = useRef<number | null>(null);
-  const { myStream, remoteAudioRef } = useCall();
+  const { myStream, remoteAudioRef, activeCall } = useCall();
 
   const toggleMute = () => {
     if (myStream) {
@@ -52,10 +56,14 @@ const ActiveCall = ({ onCallEnd, contact }: ActiveCallProps) => {
   };
 
   const endCall = () => {
+    activeCall?.close();
+    socket.emit("end_call", {
+      ...callData,
+      dialing: false,
+      endStatus: "answered",
+      duration: timeElapsed,
+    });
     onCallEnd();
-    //toast.success("Call ended");
-    // Emit an event to notify the server that the call has ended
-    //socket.emit(SocketEvent.END_CALL, { conversation_id: conversation.id });
   };
 
   useEffect(() => {
@@ -71,14 +79,6 @@ const ActiveCall = ({ onCallEnd, contact }: ActiveCallProps) => {
       }
     };
   }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
 
   return (
     <div className="w-full">

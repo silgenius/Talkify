@@ -28,6 +28,7 @@ const VoiceCall = ({
       console.log("user", res);
       return res;
     },
+    enabled: !!contactId,
   });
 
   const handleClose = () => {
@@ -35,9 +36,14 @@ const VoiceCall = ({
   };
 
   const handleCancel = () => {
-    socket.emit("end_call", { ...callData, dialing: false });
-    setIsCall(false);
+    socket.emit("end_call", {
+      ...callData,
+      dialing: false,
+      endStatus: "missed",
+    });
+    handleClose();
   };
+
   return (
     <div>
       {callData?.dialing ? (
@@ -52,12 +58,16 @@ const VoiceCall = ({
         )
       ) : !activeCall ? (
         <CallEnded
-          onCallEnd={() => setIsCall(false)}
+          onCallEnd={handleClose}
           contact={contact}
           status={callData?.endStatus}
         />
       ) : (
-        <ActiveCall contact={contact} onCallEnd={() => activeCall.close()} />
+        <ActiveCall
+          callData={callData}
+          contact={contact}
+          onCallEnd={handleClose}
+        />
       )}
     </div>
   );

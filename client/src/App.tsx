@@ -15,10 +15,10 @@ function App() {
           <div className="header">
             <img src="./talkify-logo-01.png" alt="Logo" className="logo" />
             <div className="nav-links">
-              <Link className="nav-button" to="/register">
+              <Link className="nav-button bg-primary-purple text-white hover:bg-fuchsia-900" to="/register">
                 Register
               </Link>
-              <Link className="nav-button" to="/login">
+              <Link className="nav-button bg-white" to="/login">
                 Login
               </Link>
             </div>

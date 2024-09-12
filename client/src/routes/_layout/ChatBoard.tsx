@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
 import { CallDataType, ConversationType, MessageType } from "../../types";
@@ -18,6 +18,7 @@ import EmptyChat from "../../components/chatBoard/EmptyChat";
 import VoiceCall from "../../components/chatBoard/VoiceCall";
 import Modal from "../../components/common/Modal";
 import { useCall } from "../../hooks/useCall";
+import { formatTime } from "../../utils/formatTime";
 
 type typingSocketData = {
   username: string;
@@ -72,8 +73,6 @@ const ChatBoard = () => {
         isFirst: res[index - 1]?.sender_id !== message.sender_id,
         isLast: res[index + 1]?.sender_id !== message.sender_id,
       }));
-      console.log(newMessages);
-
       return newMessages;
     },
     enabled: !!id,
@@ -224,6 +223,17 @@ const ChatBoard = () => {
 
     socket.on("call_ended", (data: CallDataType) => {
       if (currentUser.id === data?.caller?.userId) {
+        if (id)
+          createCallMessage.mutate({
+            conversation_id: id,
+            user_id: currentUser.id,
+            status: data?.endStatus === "missed"? "m" : data?.endStatus === "rejected"? "r" : data?.endStatus === "answered"? "a" : "f",
+            duration: data.duration || 0,
+          });
+        console.log("call", data?.endStatus);
+        if (data.endStatus === "answered") 
+          toast.info(`Call lasted ${formatTime(data.duration as number)}`);
+        
         setCallData(data);
         setMyStream(undefined);
         myStream?.getTracks().forEach((track) => {
@@ -235,6 +245,9 @@ const ChatBoard = () => {
         setIsCall(false);
         setCallData(undefined);
         peer?.off("call");
+        console.log("call", data?.endStatus);
+        if (data.endStatus === "answered") 
+          toast.info(`Call lasted ${formatTime(data.duration as number)}`);
       }
     });
 
@@ -255,6 +268,25 @@ const ChatBoard = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myStream]);
+
+  const createCallMessage = useMutation({
+    mutationFn: async (data: {
+      user_id: string;
+      conversation_id: string;
+      status: string;
+      duration: number;
+    }) => {
+      console.log("call message", data);
+      const res = (await newRequest.post(`/message/create_call`, data)).data;
+      return res;
+    },
+    onSuccess: (data: MessageType) => {
+      socket.emit(SocketEvent.SEND_MESSAGE, { message_id: data.id });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   const handleCall = () => {
     setCallData((prev) => ({ ...prev, dialing: true }));
