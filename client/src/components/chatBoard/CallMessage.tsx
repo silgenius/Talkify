@@ -4,31 +4,31 @@ import { MdErrorOutline } from "react-icons/md";
 
 interface CallMessageProps {
   duration: number; // Duration in format 'HH:MM:SS' or similar
-  end_status: "r" | "m" | "a" | "f"; // Status of the call
+  end_status: "answered" | "missed" | "rejected" | "failed"; // Status of the call
 }
 
 const CallMessage: React.FC<CallMessageProps> = ({ duration, end_status }) => {
   // Determine styles based on end status
   const statusStyles = {
-    r: {
+    rejected: {
       icon: <FaPhoneSlash className="text-red-600" />,
       text: "Call Rejected",
       bgColor: "bg-red-100",
       borderColor: "border-red-300",
     },
-    m: {
+    missed: {
       icon: <FaClock className="text-yellow-600" />,
       text: "Missed Call",
       bgColor: "bg-yellow-100",
       borderColor: "border-yellow-300",
     },
-    a: {
+    answered: {
       icon: <FaPhoneAlt className="text-gray-600" />,
       text: "Call Ended",
       bgColor: "bg-gray-100",
       borderColor: "border-gray-300",
     },
-    f: {
+    failed: {
       icon: <MdErrorOutline className="text-red-600" />,
       text: "Call Failed",
       bgColor: "bg-red-100",
@@ -38,7 +38,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ duration, end_status }) => {
 
   const { icon, text, bgColor, borderColor } = statusStyles[end_status]
     ? statusStyles[end_status]
-    : statusStyles.f;
+    : statusStyles.failed;
 
   return (
     <div
@@ -52,7 +52,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ duration, end_status }) => {
       {/* Call Details */}
       <div className="ml-4 flex-1">
         <p className="text-xl font-semibold text-gray-800">{text}</p>
-        {end_status === "a" && (
+        {end_status === "answered" && (
           <p className="text-gray-600 text-lg mt-1 text-center">{`Duration: ${duration}`}</p>
         )}
       </div>

@@ -8,6 +8,7 @@ import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 import CallMessage from "./CallMessage";
 import { MdAccessTime, MdErrorOutline } from "react-icons/md";
+import ExitMessage from "./ExitMessage";
 
 interface MessageProps {
   message: MessageType;
@@ -16,6 +17,9 @@ interface MessageProps {
   username: string;
   photoUrl: string;
 }
+
+const callEndStatus = ["answered", "missed", "rejected", "failed"];
+
 const Message = ({
   message,
   isFirst,
@@ -60,14 +64,28 @@ const Message = ({
           />
         )}
       </div>
-      {message.message_type !== "audio call" ? (
-        !containsOnlyEmojis(message.message_text) ? (
-          <div
-            className={`flex flex-col   ${
-              isSender
-                ? " bg-primary-purple text-gray-50 rounded-xl shadow-sm shadow-primary-purple/40"
-                : " bg-gray-100 text-gray-800 h-fit rounded-xl shadow-inner"
-            }  break-words py-2 px-4 max-w-[80%]
+      {callEndStatus.includes(message.message_type) ? (
+        <>
+          <CallMessage
+            duration={message.duration}
+            end_status={
+              message.message_type as
+                | "answered"
+                | "missed"
+                | "rejected"
+                | "failed"
+            }
+          />
+        </>
+      ) : message.message_type === "exited" ? (
+        <ExitMessage text={message.message_text} />
+      ) : !containsOnlyEmojis(message.message_text) ? (
+        <div
+          className={`flex flex-col   ${
+            isSender
+              ? " bg-primary-purple text-gray-50 rounded-xl shadow-sm shadow-primary-purple/40"
+              : " bg-gray-100 text-gray-800 h-fit rounded-xl shadow-inner"
+          }  break-words py-2 px-4 max-w-[80%]
             ${
               isSender
                 ? isFirst && isLast
@@ -85,33 +103,25 @@ const Message = ({
                 ? "rounded-tl"
                 : "rounded-l"
             } `}
-          >
-            {message.message_text}
-          </div>
-        ) : (
-          // TailwindCSS purge safelist
-          // grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6
-          <div
-            className={`grid grid-cols-${
-              message.message_text.length <= 12
-                ? String(Math.floor(message.message_text.length / 2))
-                : "6"
-            }`}
-          >
-            {[...message.message_text].map((emoji, index) => (
-              <p key={index} className="text-4xl my-0.5 -mx-0.5">
-                {emoji}
-              </p>
-            ))}
-          </div>
-        )
+        >
+          {message.message_text}
+        </div>
       ) : (
-        <>
-          <CallMessage
-            duration={message.duration}
-            end_status={message.status as "r" | "m" | "a"}
-          />
-        </>
+        // TailwindCSS purge safelist
+        // grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6
+        <div
+          className={`grid grid-cols-${
+            message.message_text.length <= 12
+              ? String(Math.floor(message.message_text.length / 2))
+              : "6"
+          }`}
+        >
+          {[...message.message_text].map((emoji, index) => (
+            <p key={index} className="text-4xl my-0.5 -mx-0.5">
+              {emoji}
+            </p>
+          ))}
+        </div>
       )}
       {isLast && (
         <div

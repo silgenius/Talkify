@@ -228,7 +228,7 @@ const ChatBoard = () => {
             conversation_id: id,
             user_id: currentUser.id,
             status: data?.endStatus === "missed"? "m" : data?.endStatus === "rejected"? "r" : data?.endStatus === "answered"? "a" : "f",
-            duration: 0,
+            duration: data.duration || 0,
           });
         console.log("call", data?.endStatus);
         if (data.endStatus === "answered") 
@@ -276,9 +276,12 @@ const ChatBoard = () => {
       status: string;
       duration: number;
     }) => {
+      console.log("call message", data);
       const res = (await newRequest.post(`/message/create_call`, data)).data;
-      console.log("call message", res);
       return res;
+    },
+    onSuccess: (data: MessageType) => {
+      socket.emit(SocketEvent.SEND_MESSAGE, { message_id: data.id });
     },
     onError: (error) => {
       console.log(error);

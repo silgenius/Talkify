@@ -78,7 +78,10 @@ const ConversationItem = ({
       const res = await newRequest.put(`/conversation/group/remove`, data);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data: MessageType) => {
+      queryClient.invalidateQueries({queryKey: ["conversations"]});
+      queryClient.invalidateQueries({queryKey: ["conversation", conversationId]});
+      socket.emit(SocketEvent.SEND_MESSAGE, { message_id: data.id });
       toast.success("You have left the group " + name);
       navigate("/");
     },
