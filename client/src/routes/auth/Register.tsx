@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { googleLogo } from "../../assets";
 import Button from "./components/Button";
 import Input from "./components/Input";
 import Logo from "./components/Logo";
 import SideBar from "./components/SideBar";
 import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { getUser } from "../../utils/localStorage";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +16,21 @@ const Register = () => {
     email: "",
   });
   const { signUp } = useAuth();
+
+  const navigate = useNavigate();
+  const currentUser = getUser();
+
+  useEffect(() => {
+    if (currentUser) {
+      const timer = setTimeout(() => {
+        toast.error("You are already logged in");
+        navigate("/");
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser, navigate]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };

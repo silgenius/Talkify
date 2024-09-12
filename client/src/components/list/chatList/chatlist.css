@@ -26,33 +26,61 @@
         object-fit: contain;
     }
 
-
-    
-    .addSymbol {
+    .settingsIcon{
         display: flex;
         align-items: center;
         justify-content: center;
         width: 25px;           
         height: 25px;
         margin-left: 120px;
-        background-color: #882A85; 
-        border-radius: 50%;
+        background-color: #f6cff5; 
+        border-radius: 10%;
         cursor: pointer;
     }
-    
-    .addSymbol img {
+    .settingsIcon img {
         width: 15px;
         height: 15px;
         display: block;        
     }
+    
 
-    .chatTitle {
+
+    .chatLine {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 1px;
+      }
+      
+      .addSymbol {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        background-color: #882A85;
+        border-radius: 50%;
+        margin-left: 12px;
+        margin-top: 6px;
+        cursor: pointer;
+
+      }
+      
+      .addSymbol img {
+        width: 10px;
+        height: 10px;
+        display: block;
+      }
+      
+      .chatTitle {
         font-size: 30px;
         font-weight: 700;
-        color: #333333; 
-        margin-top: 1px;
-        padding-inline: 10%;
-    }
+        color: #333333;
+        margin-bottom: 5;
+        padding-left:20px ;
+      }
+
     .search{
         display: flex;
         align-items: center;

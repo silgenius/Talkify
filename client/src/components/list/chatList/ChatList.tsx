@@ -7,11 +7,16 @@ const Chatlist = () => {
       <div className='header'>
         <div className='logoSection'>
           <img className=" hover:cursor-pointer" src='/talkify.png' onClick={() => navigate('/')} alt='Talkify Logo' />
-          <div className="addSymbol">
+          <div className="settingsIcon hover:cursor-pointer" onClick={() => navigate('/settings')}>
+        <img src="/setting.png" alt="Settings" />
+      </div>
+      </div>
+      <div className='chatLine'>
+        <p className='chatTitle'>Chats</p>
+        <div className="addSymbol">
             <img src="/plus.png" alt="" />
           </div>
-        </div>
-        <p className='chatTitle'>Chats</p>
+          </div>
       </div>
       <div className="search">
         <div className="searchBar">
