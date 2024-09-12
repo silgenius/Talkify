@@ -116,8 +116,8 @@ def create_call_message():
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
 
-    duration = data.get("duration")
-    if not duration:
+    duration = data.get("duration", None)
+    if duration is None:
         return jsonify({"error": "duration missing"}), 400
     if not isinstance(duration, int):
         return jsonify({"error": "duration must be int"}), 400

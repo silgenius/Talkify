@@ -160,6 +160,7 @@ def leave_conversation():
     text = f'{user.username} left the group'
     message.update_text(text)
     message.message_type = MessageType.exit
+    storage.new(message)
     storage.save()
     conversation.update_last_message_id(message.id)
 
