@@ -62,7 +62,7 @@ def login_callback():
     user_details["token"] = user_token
     return jsonify(user_details), 200
 
-@auth_handler.route('/signup//google-callback')
+@auth_handler.route('/signup/google-callback')
 def signup_callback():
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
