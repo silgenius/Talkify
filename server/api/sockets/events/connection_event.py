@@ -7,7 +7,7 @@ from server.models.user import User
 
 session = storage.get_session()
 
-@socketio.on('conect_user')
+@socketio.on('connect_user')
 def handle_user_conected(data):
     if not isinstance(data, dict):
         emit('error', {'error': 'data must be dict obj'})
