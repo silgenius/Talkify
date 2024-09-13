@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, session, jsonify
+from flask import Flask, redirect, url_for, jsonify
 import jwt
 import os
 from server.models import storage
@@ -10,7 +10,7 @@ from flask import Blueprint
 auth_handler = Blueprint('auth', __name__, url_prefix='/auth')
 
 load_dotenv()
-
+session = storage.get_session()
 
 print(os.getenv('CLIENT_ID'))
 print(os.getenv('CLIENT_SECRET'))
@@ -41,18 +41,21 @@ def signup():
     redirect_uri = url_for('auth.signup_callback', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
-@auth_handler.route('/login/google-callback')
+@auth_handler.route('/login/google_callback')
 def login_callback():
+    from server.api.app import google
+
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
     user_info = resp.json()
     user = session.query(User).filter_by(email=user_info['email']).one_or_none()
+    print(f"{user_info['name']} @ {user_info['email']}")
     if not user:
         return jsonify({"error": "user does not exist"}), 404
 
     user_details = {}
     user_token = jwt.encode({
-        'sub': user_id['id'],
+        'sub': user.id,
         'email': user_info['email'],
         'profile_url': user_info['picture'],
         'user_name': user_info['name']
@@ -62,7 +65,7 @@ def login_callback():
     user_details["token"] = user_token
     return jsonify(user_details), 200
 
-@auth_handler.route('/signup/google-callback')
+@auth_handler.route('/signup/google_callback')
 def signup_callback():
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
@@ -73,7 +76,7 @@ def signup_callback():
 
     user = User(email=user_info['email'], profile_url=user_info['picture'], username=user_info['name'])
     storage.new(user)
-    storag.save()
+    storage.save()
 
     user_details = {}
     user_token = jwt.encode({

@@ -35,8 +35,9 @@ google = oauth.register(
         authorize_params=None,
         access_token_params=None,
         refresh_token_url=None,
-        redirect_uri='http://localhost:5000/authorized',
-        api_base_url='https://www.googleapis.com/oauth2/v1/',
+        redirect_uri=["https://talkify.techerudites.tech/auth/login/google_callback",
+        "https://talkify.techerudites.tech/auth/signup/google_callback"],
+        api_base_url='https://www.googleapis.com/oauth2/v3/',
         client_kwargs={'scope': 'openid profile email'},
         server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
 )
