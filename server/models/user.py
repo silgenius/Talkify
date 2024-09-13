@@ -36,6 +36,7 @@ class User(BaseModel, Base):
     email = Column(String(60), nullable=False)
     profile_url = Column(String(60), nullable=True)
     last_login= Column(DateTime, nullable=False)
+    bio = Column(String(300), nullable=True)
     conversations = relationship('Conversation', secondary=user_conversation, back_populates='users', viewonly=False)
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
     contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
@@ -51,14 +52,25 @@ class User(BaseModel, Base):
         """
         self.last_login = datetime.now()
 
-    def mini_data(self):
+    def mini_data(self, bio=False):
         """
         Get user data
         """
         user_data = {}
         user_data['id'] = self.id
+        if bio:
+            if not self.bio:
+                user_data['bio'] = ""
+            else:
+                user_data['bio'] = self.bio
         user_data['username'] = self.username
         user_data['last_login'] = self.last_login.isoformat()
         user_data['profile_url'] = self.profile_url
 
         return user_data
+
+    def set_bio(self, bio):
+        """
+        set user's bio
+        """
+        self.bio = bio

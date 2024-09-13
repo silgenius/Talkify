@@ -3,94 +3,67 @@
 @tailwind utilities;
 
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-  }
-  
-
-body {
-  margin: 0;
-  padding: 0;
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-.app-background {
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  background-image: url('/BackApp.png'); 
-  background-size: cover;
-  background-position: center; 
-  background-repeat: no-repeat; 
+/* Keyframes for animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-
-.header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0;
-
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.logo {
-  height: 120px;
-  padding-left:24px ;
+@keyframes slideInRight {
+  from {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.nav-links {
-  display: flex;
-  gap: 16px;
-  padding-right: 24px;
+@keyframes bounceIn {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.nav-button {
-  background-color: none;
-  color: none;
-  padding: 10px; 
-  width: 150px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+/* Applying animations */
+.animate-fadeIn {
+  animation: fadeIn 1s ease-in-out;
 }
 
-.nav-button:hover {
-  background-color: #882A85;
-  color: white;
+.animate-slideInLeft {
+  animation: slideInLeft 1s ease-in-out;
 }
 
-
-.content {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  padding-left: 24px;
+.animate-slideInRight {
+  animation: slideInRight 1s ease-in-out;
 }
 
-.text-container {
-  max-width: 800px; 
+.animate-bounceIn {
+  animation: bounceIn 1.5s infinite;
 }
 
-.heading-1 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  color: white; 
-  padding-top: 60px;
-  padding-left: 20px ;
+html {
+  scroll-behavior: smooth;
 }
-
-.heading-2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #7556ad;
-  margin-top: 25px;
-  padding-left: 20px ;
-}
-

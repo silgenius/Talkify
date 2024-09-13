@@ -12,7 +12,7 @@
         img{
             width: 100px;
             height: 100px;
-
+            border-radius: 50%;
             object-fit: cover;
         }
     }
@@ -65,14 +65,14 @@
                             }
                             span{
                                 font-size: 14px;
-                                color:lightgray;
+                                color:#882A85;
                                 font-weight: 300;
                             }
                         }
                         .icon{
                             width: 30px;
                             height: 30px;
-                            background-color: #e8e2e2;
+                            background-color: #882A85;
                             padding: 10px;
                             border-radius: 50%;
                             cursor: pointer;
@@ -81,10 +81,11 @@
 
                     button{
                         padding: 10px 20px;
-                        background-color: #e8e2e2;
+                        background-color: #882A85;
                         color: white;
                         border: none;
                         border-radius: 5px;
+                        cursor: pointer;
                     }
                 }
         }
