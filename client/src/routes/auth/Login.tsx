@@ -3,13 +3,29 @@ import Button from "./components/Button";
 import Input from "./components/Input";
 import SideBar from "./components/SideBar";
 import Logo from "./components/Logo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { getUser } from "../../utils/localStorage";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const { singIn } = useAuth();
 
+  const navigate = useNavigate();
+  const currentUser = getUser();
+
+  useEffect(() => {
+    if (currentUser) {
+      const timer = setTimeout(() => {
+        toast.error("You are already logged in");
+        navigate("/");
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
