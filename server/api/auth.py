@@ -44,12 +44,12 @@ def signup():
 @auth_handler.route('/login/google_callback')
 def login_callback():
     from server.api.app import google
+    from server.api.app import app
 
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
     user_info = resp.json()
     user = session.query(User).filter_by(email=user_info['email']).one_or_none()
-    print(f"{user_info['name']} @ {user_info['email']}")
     if not user:
         return jsonify({"error": "user does not exist"}), 404
 
@@ -58,15 +58,17 @@ def login_callback():
         'sub': user.id,
         'email': user_info['email'],
         'profile_url': user_info['picture'],
-        'user_name': user_info['name']
+        'username': user_info['name']
     }, app.config['SECRET_KEY'])
-
     user_details["email"] = user_info['email']
     user_details["token"] = user_token
     return jsonify(user_details), 200
 
 @auth_handler.route('/signup/google_callback')
 def signup_callback():
+    from server.api.app import google
+    from server.api.app import app
+
     token = google.authorize_access_token()
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo', token=token)
     user_info = resp.json()
@@ -75,6 +77,7 @@ def signup_callback():
         return jsonify({"error": "user already exist"}), 403
 
     user = User(email=user_info['email'], profile_url=user_info['picture'], username=user_info['name'])
+    user.update_last_login()
     storage.new(user)
     storage.save()
 
@@ -83,7 +86,7 @@ def signup_callback():
         'sub': user.id,
         'email': user_info['email'],
         'profile_url': user_info['picture'],
-        'user_name': user_info['name']
+        'username': user_info['name']
         }, app.config['SECRET_KEY'])
     user_details["email"] = user_info['email']
     user_details["token"] = user_token
