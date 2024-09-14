@@ -8,15 +8,40 @@ from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from server.models import storage
 from server.api.controller import app_handler
+from server.api.controller import auth_handler
 from os import getenv
+from server.api.auth import auth_handler
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+import os 
 
+load_dotenv()
 
 app = Flask(__name__)
-app.register_blueprint(app_handler)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-CORS(app, resources={r"/api/*": {
+app.register_blueprint(app_handler)
+app.register_blueprint(auth_handler)
+
+CORS(app, resources={r"/*": {
     "origins": "*"
     }})
+
+#setup OAuth
+oauth = OAuth(app)
+google = oauth.register(
+        name='google',
+        client_id=os.getenv('CLIENT_ID'),
+        client_secret=os.getenv('CLIENT_SECRET'),
+        authorize_params=None,
+        access_token_params=None,
+        refresh_token_url=None,
+        redirect_uri=["https://talkify.techerudites.tech/auth/login/google_callback",
+        "https://talkify.techerudites.tech/auth/signup/google_callback"],
+        api_base_url='https://www.googleapis.com/oauth2/v3/',
+        client_kwargs={'scope': 'openid profile email'},
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
+)
 
 @app.teardown_appcontext
 def storage_close(exception):
