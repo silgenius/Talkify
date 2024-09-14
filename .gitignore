@@ -6,4 +6,10 @@ set_up.sql
 .env
 .dev
 venv/*
+*/**/__pycache__
+*.bash
+*.md
+app.js
+*.txt
 server/api/controller/venv/*
+setenv

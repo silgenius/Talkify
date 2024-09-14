@@ -1,0 +1,1 @@
+export const callTimeout = 30; // seconds

@@ -52,12 +52,17 @@ class User(BaseModel, Base):
         """
         self.last_login = datetime.now()
 
-    def mini_data(self):
+    def mini_data(self, bio=False):
         """
         Get user data
         """
         user_data = {}
         user_data['id'] = self.id
+        if bio:
+            if not self.bio:
+                user_data['bio'] = ""
+            else:
+                user_data['bio'] = self.bio
         user_data['username'] = self.username
         user_data['last_login'] = self.last_login.isoformat()
         user_data['profile_url'] = self.profile_url

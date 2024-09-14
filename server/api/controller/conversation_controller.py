@@ -5,6 +5,9 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.conversation import Conversation
 from server.models.user import User
+from server.models.contact import Contact
+from server.models.message import MessageType, Message
+from sqlalchemy import and_
 
 session = storage.get_session()
 
@@ -22,14 +25,25 @@ def create_conversation():
     storage.new(new_conversation)
     storage.save()
 
-    for user_id in users:
-       user = session.query(User).filter_by(id=user_id).one_or_none()
-       if user:
-            user.conversations.append(new_conversation)
-       else:
-            storage.delete(new_conversation)
-            abort(404)
-    storage.save()
+    user1 = session.query(User).filter_by(id=users[0]).one_or_none()
+    user2 = session.query(User).filter_by(id=users[1]).one_or_none()
+    if user1 and user2:
+        user1.conversations.append(new_conversation)
+        user2.conversations.append(new_conversation)
+        storage.save()
+    else:
+        storage.delete(new_conversation)
+        abort(404)
+
+    # check if user already have the other user in their contact
+    # create if not or skip
+    verify = session.query(Contact).filter(and_(Contact.user_id == user1.id, Contact.contact_id == user2.id)).one_or_none()
+    if not verify:
+        contact1 = Contact(user_id=user1.id, contact_id=user2.id, contact_name=user_2.username)
+        storage.new(contact1)
+        contact2 = Contact(user_id=user2.id, contact_id=user1.id, contact_name=user_1.username)
+        storage.new(contact1)
+        storage.save()
 
     return jsonify(new_conversation.to_dict()), 201
 
@@ -101,3 +115,53 @@ def get_conversation_by_id(conversation_id):
     conversation_data = conversation.to_dict()
     conversation_data['users'] = conversation_users
     return jsonify(conversation_data)
+
+
+@app_handler.route('conversation/group/remove', methods=['PUT'])
+def leave_conversation():
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({"error": "Invalid json"}), 400
+
+    conversation_id = data.get("conversation_id")
+    if not conversation_id:
+        return jsonify({"error": "conversation id missing"}), 400
+
+    conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
+    if not conversation:
+        return jsonify({"error": "conversation not found"}), 400
+
+    if not conversation.group:
+        return jsonify({"error": "conversation is not group"}), 403
+
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user id missing"}), 400
+
+    user = session.query(User).filter_by(id=user_id).one_or_none()
+    if not user:
+        return jsonify({"error": "user not found"}), 400
+
+    # check if user in group
+    conversation_users = conversation.users
+    verify = False
+    for usr in conversation_users:
+        if usr.id == user_id:
+            verify = True
+
+    if not verify:
+        return jsonify({"error": "user not in conversation"}), 400
+
+    conversation.users.remove(user)
+
+    # creatd a user exited message
+    message = Message(conversation_id=conversation.id, sender_id=user_id)
+    text = f'{user.username} left the group'
+    message.update_text(text)
+    message.message_type = MessageType.exit
+    storage.new(message)
+    storage.save()
+    conversation.update_last_message_id(message.id)
+
+    return jsonify(message.to_dict()), 201
