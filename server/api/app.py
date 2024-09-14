@@ -8,7 +8,6 @@ from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from server.models import storage
 from server.api.controller import app_handler
-from server.api.controller import auth_handler
 from os import getenv
 from server.api.auth import auth_handler
 from authlib.integrations.flask_client import OAuth
