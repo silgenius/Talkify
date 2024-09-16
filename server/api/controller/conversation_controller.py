@@ -51,8 +51,8 @@ def create_conversation(auth_email, sub):
     return jsonify(new_conversation.to_dict()), 201
 
 @app_handler.route('/conversations/create/group', methods=['POST'])
-#@required
-def create_group():
+@required
+def create_group(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:

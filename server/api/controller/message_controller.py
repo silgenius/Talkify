@@ -48,7 +48,8 @@ def retrieve_message_id(auth_email, sub, message_id):
 
 
 @app_handler.route('/message/create', methods=['POST'])
-def create_message():
+@required
+def create_message(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
@@ -100,7 +101,8 @@ def create_message():
 
 
 @app_handler.route('/message/create_call', methods=['POST'])
-def create_call_message():
+@required
+def create_call_message(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
