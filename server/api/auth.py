@@ -1,10 +1,11 @@
-from flask import Flask, redirect, url_for, jsonify
+from flask import Flask, request, redirect, url_for, jsonify, render_template
 import jwt
 import os
 from server.models import storage
 from server.models.user import User
 from dotenv import load_dotenv
 from flask import Blueprint
+from functools import wraps
 
 
 auth_handler = Blueprint('auth', __name__, url_prefix='/auth')
@@ -12,21 +13,26 @@ auth_handler = Blueprint('auth', __name__, url_prefix='/auth')
 load_dotenv()
 session = storage.get_session()
 
-print(os.getenv('CLIENT_ID'))
-print(os.getenv('CLIENT_SECRET'))
 
 def required(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
-        token = request.header.get("Authorization")
-        if not token:
-            return jsonify({"error": "token is missing"}), 403
         try:
-            data = jwt.decode(token.split()[1], app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = data['email']
+            token = request.headers.get("Authorization")
         except Exception:
-            return jsonify({"error": "invalid token"}), 403
+            return jsonify({"error": "Authorization header missing"}), 401
 
-        return f(user, *args, **kwargs)
+        if not token:
+            return jsonify({"error": "token is missing"}), 401
+        try:
+            print(token.split()[1])
+            data = jwt.decode(token.split()[1], os.getenv('SECRET_KEY'), algorithms=["HS256"])
+            auth_email = data['email']
+            sub = data['sub']
+        except Exception:
+            return jsonify({"error": "invalid token"}), 401
+
+        return f(auth_email, sub, *args, **kwargs)
     return wrapper
 
 @auth_handler.route('/login', methods=['GET'])
@@ -51,7 +57,8 @@ def login_callback():
     user_info = resp.json()
     user = session.query(User).filter_by(email=user_info['email']).one_or_none()
     if not user:
-        return jsonify({"error": "user does not exist"}), 404
+        error_details = {"error": "user does not exist"}
+        return render_template('auth.html', user_details=error_details)
 
     user_details = {}
     user_token = jwt.encode({
@@ -62,7 +69,9 @@ def login_callback():
     }, app.config['SECRET_KEY'])
     user_details["email"] = user_info['email']
     user_details["token"] = user_token
-    return jsonify(user_details), 200
+    print(user_details) #debugging
+    return render_template('auth.html', user_details=user_details)
+
 
 @auth_handler.route('/signup/google_callback')
 def signup_callback():
@@ -74,7 +83,8 @@ def signup_callback():
     user_info = resp.json()
     user = session.query(User).filter_by(email=user_info['email']).one_or_none()
     if user:
-        return jsonify({"error": "user already exist"}), 403
+        error_details = {"error": "user already exist"}
+        return render_template('auth.html', user_details=error_details)
 
     user = User(email=user_info['email'], profile_url=user_info['picture'], username=user_info['name'])
     user.update_last_login()
@@ -90,5 +100,4 @@ def signup_callback():
         }, app.config['SECRET_KEY'])
     user_details["email"] = user_info['email']
     user_details["token"] = user_token
-
-    return jsonify(user_details), 200
+    return render_template('auth.html', user_details=user_details)
