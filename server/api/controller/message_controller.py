@@ -9,12 +9,15 @@ from server.models.message import MessageType
 from server.models.user import User
 from sqlalchemy import and_
 from server.models.contact import Contact, Status
+from server.api.auth import required
+
 
 session = storage.get_session()
 
 
 @app_handler.route('/<string:conversation_id>/messages', methods=['GET'])
-def retrive_message_conv_id(conversation_id):
+@required
+def retrive_message_conv_id(auth_email, sub, conversation_id):
     """
     Retrieves all messages for a specific conversation.
     """
@@ -33,7 +36,8 @@ def retrive_message_conv_id(conversation_id):
 
 
 @app_handler.route('/message/<string:message_id>', methods=['GET'])
-def retrieve_message_id(message_id):
+@required
+def retrieve_message_id(auth_email, sub, message_id):
     """
     Retrieves message through it id
     """
