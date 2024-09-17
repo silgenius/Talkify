@@ -25,7 +25,6 @@ def required(f):
         if not token:
             return jsonify({"error": "token is missing"}), 401
         try:
-            print(token.split()[1])
             data = jwt.decode(token.split()[1], os.getenv('SECRET_KEY'), algorithms=["HS256"])
             auth_email = data['email']
             sub = data['sub']
