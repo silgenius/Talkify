@@ -5,11 +5,14 @@ from server.api.controller import app_handler
 from server.models import storage
 from server.models.user import User
 from server.models.contact import Contact
+from server.api.auth import required
+
 
 session = storage.get_session()
 
 @app_handler.route("/<string:user_id>/contacts")
-def get_user_contact(user_id):
+@required
+def get_user_contact(auth_email, sub, user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if not user:
         abort(404)

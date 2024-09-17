@@ -34,7 +34,7 @@ class User(BaseModel, Base):
 
     username = Column(String(60), nullable=False)
     email = Column(String(60), nullable=False)
-    profile_url = Column(String(60), nullable=True)
+    profile_url = Column(String(200), nullable=True)
     last_login= Column(DateTime, nullable=False)
     bio = Column(String(300), nullable=True)
     conversations = relationship('Conversation', secondary=user_conversation, back_populates='users', viewonly=False)
