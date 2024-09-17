@@ -15,9 +15,6 @@ def user_by_id(auth_email, sub, user_id):
     Retrieves a user based on their unique user ID
     """
 
-    if user_id != sub:
-        return jsonify({"error": "you cant access this page"}), 401
-
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
         return jsonify(user.to_dict())
@@ -48,3 +45,13 @@ def user_by_email(auth_email, sub):
         storage.save()
         return jsonify(user.to_dict())
     abort(404)
+
+@app_handler.route("/user", methods=['GET'])
+@required
+def search_by_username(auth_email, sub):
+    username = request.args.get('search', '')
+    pattern = f'%{username}%'
+    users = session.query(User).filter(User.username.like(pattern)).all()
+    result = [user.mini_data() for user in users]
+
+    return jsonify(result), 200
