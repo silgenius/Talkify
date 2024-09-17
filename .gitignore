@@ -12,3 +12,4 @@ app.js
 *.txt
 server/api/controller/venv/*
 setenv
+nginx_config
