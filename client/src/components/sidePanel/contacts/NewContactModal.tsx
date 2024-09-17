@@ -18,17 +18,17 @@ interface AddContactModalProps {
 
 const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [contact, setContact] = useState<UserType>();
+  const [contacts, setContacts] = useState<UserType[]>();
   const currentUser = getUser();
 
   const getContact = useMutation({
-    mutationFn: async (data: { email: string }) => {
-      const res = (await newRequest.post("/user/email", data)).data;
+    mutationFn: async (data: string) => {
+      const res = (await newRequest.get(`/user?search=${data}`)).data;
       console.log(res);
-      return res;
+      return res.filter((user: UserType) => user.id !== currentUser.id);
     },
     onSuccess: (data) => {
-      setContact(data);
+      setContacts(data);
     },
     onError: () => {
       toast.error("User not found");
@@ -43,7 +43,7 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
     },
     onSuccess: () => {
       toast.success("Friend request sent");
-      setContact(undefined);
+      //setContacts([]);
     },
     onError: () => {
       toast.error("Failed to send friend request");
@@ -51,10 +51,10 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   });
 
   const handleSearch = () => {
-    getContact.mutate({ email: searchQuery });
+    getContact.mutate(searchQuery);
   };
 
-  const handleSendRequest = () => {
+  const handleSendRequest = (contact: UserType) => {
     if (contact)
       sendRequest.mutate({
         sender_id: currentUser.id,
@@ -85,49 +85,51 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
         </button>
       </div>
 
-      {contact ? (
-        <div className="px-4 py-4 bg-gray-100 rounded-lg shadow-md flex items-center justify-between">
-          <div className="relative flex items-center">
-            <Menu
-              position="anchor"
-              transition
-              menuButton={
-                <button className="text-gray-500 p-2 rounded-full hover:bg-gray-300">
-                  <FaEllipsisV />
-                </button>
-              }
-              className="right-0"
-            >
-              <MenuItem className="flex items-center space-x-2">
-                <IoPaperPlane />
-                <p>Send a dm</p>
-              </MenuItem>
-              <MenuItem className="flex items-center space-x-2">
-                <ImBlocked />
-                <p>Block</p>
-              </MenuItem>
-            </Menu>
-            <img
-              src={contact.profile_url || "/user.png"}
-              alt={contact.username}
-              className="w-12 h-12 rounded-full mr-4 object-contain object-center"
-            />
+      {contacts && contacts?.length > 0 ? (
+        contacts?.map((contact) => (
+          <div className="px-4 py-4 bg-gray-100 rounded-lg shadow-md flex items-center justify-between">
+            <div className="relative flex items-center">
+              <Menu
+                position="anchor"
+                transition
+                menuButton={
+                  <button className="text-gray-500 p-2 rounded-full hover:bg-gray-300">
+                    <FaEllipsisV />
+                  </button>
+                }
+                className="right-0"
+              >
+                <MenuItem className="flex items-center space-x-2">
+                  <IoPaperPlane />
+                  <p>Send a dm</p>
+                </MenuItem>
+                <MenuItem className="flex items-center space-x-2">
+                  <ImBlocked />
+                  <p>Block</p>
+                </MenuItem>
+              </Menu>
+              <img
+                src={contact.profile_url || "/user.png"}
+                alt={contact.username}
+                className="w-12 h-12 rounded-full mr-4 object-contain object-center"
+              />
 
-            <div>
-              <span className="text-gray-800 font-semibold">
-                {contact.username}
-              </span>
-              <p className="text-gray-500 text-sm">{contact.email}</p>
+              <div>
+                <span className="text-gray-800 font-semibold">
+                  {contact.username}
+                </span>
+                <p className="text-gray-500 text-sm">{contact.email}</p>
+              </div>
             </div>
+            <button
+              onClick={() => handleSendRequest(contact)}
+              className="bg-primary-purple text-white p-2 rounded-md flex items-center"
+            >
+              <BiUserPlus className="text-xl" />
+              <span className="ml-2">Add Friend</span>
+            </button>
           </div>
-          <button
-            onClick={handleSendRequest}
-            className="bg-primary-purple text-white p-2 rounded-md flex items-center"
-          >
-            <BiUserPlus className="text-xl" />
-            <span className="ml-2">Add Friend</span>
-          </button>
-        </div>
+        ))
       ) : (
         <p className="text-center text-gray-500 mt-4">No users found</p>
       )}
