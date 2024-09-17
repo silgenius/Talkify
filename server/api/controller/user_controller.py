@@ -4,12 +4,13 @@ from flask import Flask, request, jsonify, abort
 from server.api.controller import app_handler
 from server.models import storage
 from server.models.user import User
-
+from server.api.auth import required
 
 session = storage.get_session()
 
 @app_handler.route("/user/id/<string:user_id>", methods=['GET'])
-def user_by_id(user_id):
+@required
+def user_by_id(auth_email, sub, user_id):
     """
     Retrieves a user based on their unique user ID
     """
@@ -20,7 +21,8 @@ def user_by_id(user_id):
     abort(404)
 
 @app_handler.route("/user/email", methods=['POST'])
-def user_by_email():
+@required
+def user_by_email(auth_email, sub):
     """
     Retrieves a user based on their email address.
     """
@@ -34,9 +36,22 @@ def user_by_email():
     if not user_email:
         return jsonify({"error": "Missing email"}), 400
 
+    if user_email != auth_email:
+        return jsonify({"error": "you cant access this page"}), 401
+
     user = session.query(User).filter_by(email=user_email).one_or_none()
     if user:
         user.update_last_login()
         storage.save()
         return jsonify(user.to_dict())
     abort(404)
+
+@app_handler.route("/user", methods=['GET'])
+@required
+def search_by_username(auth_email, sub):
+    username = request.args.get('search', '')
+    pattern = f'%{username}%'
+    users = session.query(User).filter(User.username.like(pattern)).all()
+    result = [user.mini_data() for user in users]
+
+    return jsonify(result), 200

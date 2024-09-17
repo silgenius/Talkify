@@ -8,11 +8,14 @@ from server.models.user import User
 from server.models.contact import Contact
 from server.models.message import MessageType, Message
 from sqlalchemy import and_
+from server.api.auth import required
+
 
 session = storage.get_session()
 
 @app_handler.route('/conversations/create', methods=['POST'])
-def create_conversation():
+@required
+def create_conversation(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
@@ -48,7 +51,8 @@ def create_conversation():
     return jsonify(new_conversation.to_dict()), 201
 
 @app_handler.route('/conversations/create/group', methods=['POST'])
-def create_group():
+@required
+def create_group(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
@@ -79,7 +83,8 @@ def create_group():
     return jsonify(new_conversation.to_dict()), 201
 
 @app_handler.route('/<string:user_id>/conversations', methods=['GET'])
-def get_user_conversations(user_id):
+@required
+def get_user_conversations(auth_email, sub, user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
         user_conversations = user.conversations
@@ -105,7 +110,8 @@ def get_user_conversations(user_id):
     return jsonify({"error": "user not found"}), 400
 
 @app_handler.route('conversation/<string:conversation_id>', methods=['GET'])
-def get_conversation_by_id(conversation_id):
+@required
+def get_conversation_by_id(auth_email, sub, conversation_id):
     conversation = session.query(Conversation).filter_by(id=conversation_id).one_or_none()
     if not conversation:
         return jsonify({"error": "conversation not found"}), 400
@@ -118,7 +124,8 @@ def get_conversation_by_id(conversation_id):
 
 
 @app_handler.route('conversation/group/remove', methods=['PUT'])
-def leave_conversation():
+@required
+def leave_conversation(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:

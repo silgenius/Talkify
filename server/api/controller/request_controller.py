@@ -6,12 +6,14 @@ from server.models import storage
 from server.models.user import User
 from  server.models.contact import Contact, Status
 from sqlalchemy import and_
+from server.api.auth import required
 
 
 session = storage.get_session()
 
 @app_handler.route("/request", methods=['POST'])
-def send_request():
+@required
+def send_request(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
@@ -46,7 +48,8 @@ def send_request():
 
 
 @app_handler.route("/accept", methods=['POST'])
-def accept_request():
+@required
+def accept_request(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
@@ -73,7 +76,8 @@ def accept_request():
 
 
 @app_handler.route('/block', methods=['POST'])
-def block_contact():
+@required
+def block_contact(auth_email, sub):
     try:
         data = request.get_json()
     except Exception:
