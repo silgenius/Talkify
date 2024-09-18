@@ -1,9 +1,11 @@
 import { getUser } from "./utils/localStorage";
 import Conversation from "./routes/conversation/[id]";
-import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
-import { GiRocket, GiMicrophone, GiSmartphone } from "react-icons/gi";
+import { FaLinkedin, FaGithub, FaTwitter, FaMicrophoneAlt } from "react-icons/fa";
 import { talkifyLogo } from "./assets";
 import "./index.css";
+import { IoRocketSharp } from "react-icons/io5";
+import { FiSmartphone } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 function App() {
   const currentUser = getUser();
@@ -41,12 +43,12 @@ function App() {
                 >
                   About
                 </a>
-                <a
-                  href="/register"
+                <Link
+                  to="/register"
                   className="px-4 py-2 rounded-full bg-primary-purple text-white text-sm font-semibold shadow-lg hover:bg-fuchsia-900 hover:scale-105 transition-transform duration-300"
                 >
                   Get Started
-                </a>
+                </Link>
               </nav>
             </div>
           </header>
@@ -69,12 +71,12 @@ function App() {
                 Effortless connections, meaningful conversations. Where
                 communication meets style.
               </p>
-              <a
-                href="/register"
+              <Link
+                to="/register"
                 className="px-6 py-3 rounded-full bg-gradient-to-r from-primary-purple to-fuchsia-900 text-white font-bold text-lg shadow-lg hover:opacity-90 transition-all"
               >
                 Get Started
-              </a>
+              </Link>
             </div>
             <div className="w-1/2"></div>
           </section>
@@ -90,7 +92,7 @@ function App() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
                 <div className="bg-fuchsia-900 text-white p-6 rounded-lg shadow-lg flex flex-col items-center hover:scale-105 transition-transform">
-                  <GiRocket className="text-6xl mb-4 animate-spin-slow" />
+                  <IoRocketSharp className="text-6xl mb-4 animate-spin-slow" />
                   <h3 className="text-xl font-semibold mb-2">
                     Seamless Messaging
                   </h3>
@@ -100,7 +102,7 @@ function App() {
                   </p>
                 </div>
                 <div className="bg-fuchsia-900 text-white p-6 rounded-lg shadow-lg flex flex-col items-center hover:scale-105 transition-transform">
-                  <GiMicrophone className="text-6xl mb-4" />
+                  <FaMicrophoneAlt className="text-6xl mb-4" />
                   <h3 className="text-xl font-semibold mb-2">
                     Voice & Video Calls
                   </h3>
@@ -110,7 +112,7 @@ function App() {
                   </p>
                 </div>
                 <div className="bg-fuchsia-900 text-white p-6 rounded-lg shadow-lg flex flex-col items-center hover:scale-105 transition-transform">
-                  <GiSmartphone className="text-6xl mb-4" />
+                  <FiSmartphone className="text-6xl mb-4" />
                   <h3 className="text-xl font-semibold mb-2">
                     Customizable Profiles
                   </h3>

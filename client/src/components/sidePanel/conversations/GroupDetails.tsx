@@ -1,5 +1,5 @@
 import React from "react";
-import { FaUserAlt } from "react-icons/fa";
+import { MdOutlineGroup } from "react-icons/md";
 
 interface GroupDetailsProps {
   groupDetails: {
@@ -15,11 +15,11 @@ const GroupDetails = ({ groupDetails, setGroupDetails }: GroupDetailsProps) => {
     <div className="space-y-6 p-6 max-w-lg mx-auto w-full flex flex-col flex-1">
       {/* Group Photo Input */}
       <div className="flex flex-col items-center mb-6 ">
-        <label className="relative flex flex-col items-center justify-center w-32 h-32 bg-gray-200 text-blue-600 rounded-full shadow-md cursor-pointer hover:bg-blue-300 transition-colors duration-200 ease-in-out">
+        <label className="relative flex flex-col items-center justify-center w-32 h-32 bg-gray-200 text-gray-600 rounded-full shadow-md cursor-pointer hover:bg-blue-200 transition-colors duration-200 ease-in-out">
           {groupDetails.photo ? (
             <img src={groupDetails.photo} />
           ) : (
-            <FaUserAlt className="text-4xl" />
+            <MdOutlineGroup className="text-6xl" />
           )}
           <input
             type="file"

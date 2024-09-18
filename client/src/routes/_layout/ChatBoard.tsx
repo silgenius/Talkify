@@ -13,12 +13,13 @@ import ChatFooter from "../../components/chatBoard/ChatFooter";
 import TypingIndicator from "../../components/chatBoard/TypingIndicator";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "react-toastify";
-import Detail from "../../components/detail/Detail";
+import Detail from "../../components/chatBoard/Detail";
 import EmptyChat from "../../components/chatBoard/EmptyChat";
 import VoiceCall from "../../components/chatBoard/VoiceCall";
 import Modal from "../../components/common/Modal";
 import { useCall } from "../../hooks/useCall";
 import { formatTime } from "../../utils/formatTime";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 
 type typingSocketData = {
   username: string;
@@ -29,7 +30,9 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
-  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending" | "failed"}[]>([]);
+  const [tmpMessages, setTmpMessages] = useState<
+    { message_text: string; status: "sending" | "failed" }[]
+  >([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -55,7 +58,7 @@ const ChatBoard = () => {
     queryKey: ["conversation", id],
     queryFn: async () => {
       const res = (await newRequest.get(`/conversation/${id}`)).data;
-      console.log(res);
+      //console.log(res);
       return res;
     },
     enabled: !!id,
@@ -86,8 +89,12 @@ const ChatBoard = () => {
   }, [messages.data, tmpMessages, isTyping]);
 
   useEffect(() => {
-    setTmpMessages((prev) => prev.splice(0, 2));
-  }, [messages.data])
+    setTmpMessages((prev) => [...prev.splice(0, 2)]);
+  }, [messages.data]);
+
+  useEffect(() => {
+    setShowDetail(false);
+  }, [id])
 
   useEffect(() => {
     socket.on(
@@ -227,13 +234,20 @@ const ChatBoard = () => {
           createCallMessage.mutate({
             conversation_id: id,
             user_id: currentUser.id,
-            status: data?.endStatus === "missed"? "m" : data?.endStatus === "rejected"? "r" : data?.endStatus === "answered"? "a" : "f",
+            status:
+              data?.endStatus === "missed"
+                ? "m"
+                : data?.endStatus === "rejected"
+                ? "r"
+                : data?.endStatus === "answered"
+                ? "a"
+                : "f",
             duration: data.duration || 0,
           });
         console.log("call", data?.endStatus);
-        if (data.endStatus === "answered") 
+        if (data.endStatus === "answered")
           toast.info(`Call lasted ${formatTime(data.duration as number)}`);
-        
+
         setCallData(data);
         setMyStream(undefined);
         myStream?.getTracks().forEach((track) => {
@@ -246,7 +260,7 @@ const ChatBoard = () => {
         setCallData(undefined);
         peer?.off("call");
         console.log("call", data?.endStatus);
-        if (data.endStatus === "answered") 
+        if (data.endStatus === "answered")
           toast.info(`Call lasted ${formatTime(data.duration as number)}`);
       }
     });
@@ -302,7 +316,9 @@ const ChatBoard = () => {
   };
 
   return (
-    <div className="relative flex-1 w-full h-full">
+    <div
+      className={`flex items-center justify-center relative flex-1 w-full h-full`}
+    >
       {
         <Modal isOpen={isCall} height="fit">
           <audio ref={remoteAudioRef} autoPlay />
@@ -320,56 +336,82 @@ const ChatBoard = () => {
 
       {!id ? (
         <EmptyChat />
-      ) : conversation.isLoading ? (
-        <LoadingSpinner />
       ) : (
-        conversation.data && (
-          <div className="flex-1 border-r border-[#e8e2e2] h-screen flex flex-col relative">
-            <ChatHeader
-              conversation={conversation.data}
-              setShowDetail={setShowDetail}
-              startCall={handleCall}
-            />
-            {/* Messages Container*/}
-            <div className="p-5 flex-1 overflow-y-auto flex flex-col gap-1 pb-20 pl-16 items-start">
-              {messages.data && [...messages.data,...tmpMessages].map(
-                (
-                  message: MessageType & { isFirst: boolean; isLast: boolean }
-                ) => (
-                  <Message
-                    key={message.id}
-                    message={message}
-                    isFirst={message.isFirst}
-                    isLast={message.isLast}
-                    username={
-                      conversation.data.users.filter(
-                        (user) => user.id === message.sender_id
-                      )[0]?.username
-                    }
-                    photoUrl={
-                      conversation.data.users.filter(
-                        (user) => user.id === message.sender_id
-                      )[0]?.profile_url
-                    }
-                  />
-                )
-              )}
-              <TypingIndicator isTyping={isTyping} />
-              <div ref={lastMessageRef}></div>
-            </div>
-            <ChatFooter
-              text={text}
-              setText={setText}
-              handleTyping={handleTyping}
-              setTmpMessages={setTmpMessages}
-              contactId={conversation.data.group? undefined : other?.id}
-            />
-          </div>
-        )
+        <div
+          className={`flex-1 h-screen flex-col relative ${
+            showDetail ? "hidden md:flex lg:hidden xl:flex" : "flex"
+          }`}
+        >
+          <ChatHeader
+            conversation={conversation?.data}
+            isLoading={conversation.isLoading}
+            setShowDetail={setShowDetail}
+            startCall={handleCall}
+          />
+          {/* Messages Container*/}
+          {conversation.isLoading || messages.isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            conversation.data && (
+              <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-1 pl-16 items-start">
+                {messages.data?.length > 0 ? (
+                  [...messages.data, ...tmpMessages].map(
+                    (
+                      message: MessageType & {
+                        isFirst: boolean;
+                        isLast: boolean;
+                      }
+                    ) => (
+                      <Message
+                        key={message.id}
+                        message={message}
+                        isFirst={message.isFirst}
+                        isLast={message.isLast}
+                        username={
+                          conversation.data?.users.filter(
+                            (user) => user.id === message.sender_id
+                          )[0]?.username
+                        }
+                        photoUrl={
+                          conversation.data?.users.filter(
+                            (user) => user.id === message.sender_id
+                          )[0]?.profile_url
+                        }
+                      />
+                    )
+                  )
+                ) : (
+                  <div className="flex flex-col items-center justify-center self-center text-center p-6 h-full rounded-lg">
+                    <IoChatbubbleEllipsesOutline className="text-gray-400 text-6xl mb-4" />
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      No messages yet
+                    </h2>
+                    <p className="text-gray-500">
+                      Start the conversation by sending the first message!
+                    </p>
+                  </div>
+                )}
+                <TypingIndicator isTyping={isTyping} />
+                <div ref={lastMessageRef}></div>
+              </div>
+            )
+          )}
+          <ChatFooter
+            text={text}
+            setText={setText}
+            handleTyping={handleTyping}
+            setTmpMessages={setTmpMessages}
+            contactId={conversation.data?.group ? undefined : other?.id}
+            showDetail={showDetail}
+          />
+        </div>
       )}
       {showDetail && (
-        <div className="w-1/4">
-          <Detail />
+        <div className="w-full md:w-1/2 lg:w-full xl:w-2/5 h-full overflow-auto shadow-lg shadow-primary-purple/15 border-primary-purple/20">
+          <Detail
+            conversation={conversation.data}
+            onClose={() => setShowDetail(false)}
+          />
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { talkifyLogo } from "../../../assets";
+import { talkifyLogo } from "../../assets";
 
 const Logo = () => {
   return (
