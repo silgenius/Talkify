@@ -56,7 +56,7 @@ const Message = ({
       }`}
     >
       <div className=" absolute -left-10 top-0">
-        {!isSender && isFirst && (
+        {!isSender && isFirst && message.message_type !== "exited" && (
           <img
             src={photoUrl || "/user.png"}
             alt=""
@@ -125,50 +125,52 @@ const Message = ({
           ))}
         </div>
       )}
-      {isLast && !callEndStatus.includes(message.message_type) && (
-        <div
-          className={`flex items-center space-x-1 text-xs text-gray-500 p-0.5 ${
-            isSender ? "self-end" : "self-start"
-          }`}
-        >
-          {!isSender && (
-            <>
-              <span>{username}</span>
-              <GoDotFill size={5} />
-            </>
-          )}
-          <span>
-            {message.created_at &&
-              new Date(message.created_at).toLocaleString("en-UK", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-          </span>
-          {isSender && (
-            <div className="flex space-x-0.5">
-              {message.status === "sending" ? (
-                <MdAccessTime size={16} />
-              ) : message.status === "failed" ? (
-                <MdErrorOutline size={16} className="text-red-600" />
-              ) : message.status === "sent" ? (
-                <BiCheck size={16} />
-              ) : (
-                <BiCheckDouble
-                  className={`${
-                    message.status === "seen" ? "text-primary-purple" : ""
-                  }`}
-                  size={16}
-                />
-              )}
-              <span
-                className={message.status === "failed" ? "text-red-600" : ""}
-              >
-                {message.status}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      {isLast &&
+        !callEndStatus.includes(message.message_type) &&
+        message.message_type !== "exited" && (
+          <div
+            className={`flex items-center space-x-1 text-xs text-gray-500 p-0.5 ${
+              isSender ? "self-end" : "self-start"
+            }`}
+          >
+            {!isSender && (
+              <>
+                <span>{username}</span>
+                <GoDotFill size={5} />
+              </>
+            )}
+            <span>
+              {message.created_at &&
+                new Date(message.created_at).toLocaleString("en-UK", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+            </span>
+            {isSender && (
+              <div className="flex space-x-0.5">
+                {message.status === "sending" ? (
+                  <MdAccessTime size={16} />
+                ) : message.status === "failed" ? (
+                  <MdErrorOutline size={16} className="text-red-600" />
+                ) : message.status === "sent" ? (
+                  <BiCheck size={16} />
+                ) : (
+                  <BiCheckDouble
+                    className={`${
+                      message.status === "seen" ? "text-primary-purple" : ""
+                    }`}
+                    size={16}
+                  />
+                )}
+                <span
+                  className={message.status === "failed" ? "text-red-600" : ""}
+                >
+                  {message.status}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 };

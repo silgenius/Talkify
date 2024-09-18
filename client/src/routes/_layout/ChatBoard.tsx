@@ -13,7 +13,7 @@ import ChatFooter from "../../components/chatBoard/ChatFooter";
 import TypingIndicator from "../../components/chatBoard/TypingIndicator";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "react-toastify";
-import Detail from "../../components/detail/Detail";
+import Detail from "../../components/chatBoard/Detail";
 import EmptyChat from "../../components/chatBoard/EmptyChat";
 import VoiceCall from "../../components/chatBoard/VoiceCall";
 import Modal from "../../components/common/Modal";
@@ -332,7 +332,7 @@ const ChatBoard = () => {
       {!id ? (
         <EmptyChat />
       ) : (
-        <div className="flex-1 border-r border-[#e8e2e2] h-screen flex flex-col relative">
+        <div className="flex-1 h-screen flex flex-col relative">
           <ChatHeader
             conversation={conversation?.data}
             isLoading={conversation.isLoading}
@@ -386,8 +386,11 @@ const ChatBoard = () => {
         </div>
       )}
       {showDetail && (
-        <div className="w-1/4">
-          <Detail />
+        <div className="w-2/5 xl:w-2/5 h-full overflow-auto shadow-lg shadow-primary-purple/15 border-primary-purple/20">
+          <Detail
+            conversation={conversation.data}
+            onClose={() => setShowDetail(false)}
+          />
         </div>
       )}
     </div>

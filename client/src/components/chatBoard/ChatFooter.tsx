@@ -130,7 +130,7 @@ const ChatFooter = ({
     setIsBlocked(contact?.status === "blocked");
   }, [contacts, contactId, queryClient]);
   return (
-    <div className="w-full min-h-16 p-3 flex bg-white items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
+    <div className="w-full border-primary-purple/20 min-h-16 p-3 flex bg-whie items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
       {isBlocked ? (
         <div className="text-gray-500 w-full text-center">
           this user is unavailable
@@ -152,7 +152,7 @@ const ChatFooter = ({
             value={text}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown} // Add keydown event listener here
-            className="flex-1 bg-gray-100 border-gray-300 rounded-lg px-4 py-2 text-black outline-none focus:ring-2 focus:ring-primary-purple/30"
+            className="flex-1 bg-gray-100 border-gray-300 rounded-lg px-4 py-2 placeholder:text-gray-500 text-black outline-none focus:ring-2 focus:ring-primary-purple/30"
           />
 
           {/* Emoji Picker */}
