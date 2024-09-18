@@ -57,11 +57,7 @@ const useAuth = () => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== "https://talkify.techerudites.tech") return;
 
-      console.log("Event:", event.data);
-
       const { email, token, error } = event.data;
-      console.log("Email:", email, "Token:", token);
-
       if (error) {
         console.error("Error:", error);
         toast.error(error);
@@ -70,7 +66,6 @@ const useAuth = () => {
 
       localStorage.setItem("authToken", token);
       singIn.mutate(email);
-
     };
 
     window.addEventListener("message", handleMessage);
@@ -81,7 +76,6 @@ const useAuth = () => {
   const handleGoogleAuth = (authType: string) => {
     const width = 500;
     const height = 600;
-    //const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
 
     window.open(
