@@ -29,6 +29,7 @@ interface ChatFooterProps {
     >
   >;
   contactId?: string;
+  showDetail: boolean;
 }
 
 const ChatFooter = ({
@@ -37,6 +38,7 @@ const ChatFooter = ({
   handleTyping,
   setTmpMessages,
   contactId,
+  showDetail,
 }: ChatFooterProps) => {
   const [openEmoji, setOpenEmoji] = useState(false);
   const queryClient = useQueryClient();
@@ -156,7 +158,7 @@ const ChatFooter = ({
           />
 
           {/* Emoji Picker */}
-          <div className="relative">
+          <div className={`relative ${showDetail? "hidden xl:block" : ""}`}>
             <img
               src="/emoji.png"
               alt="Emoji"

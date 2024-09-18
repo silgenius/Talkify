@@ -332,7 +332,7 @@ const ChatBoard = () => {
       {!id ? (
         <EmptyChat />
       ) : (
-        <div className="flex-1 h-screen flex flex-col relative">
+        <div className={`flex-1 h-screen flex-col relative ${showDetail? "hidden md:flex lg:hidden xl:flex" : "flex"}`}>
           <ChatHeader
             conversation={conversation?.data}
             isLoading={conversation.isLoading}
@@ -382,11 +382,12 @@ const ChatBoard = () => {
             handleTyping={handleTyping}
             setTmpMessages={setTmpMessages}
             contactId={conversation.data?.group ? undefined : other?.id}
+            showDetail={showDetail}
           />
         </div>
       )}
       {showDetail && (
-        <div className="w-2/5 xl:w-2/5 h-full overflow-auto shadow-lg shadow-primary-purple/15 border-primary-purple/20">
+        <div className="w-full md:w-1/2 lg:w-full xl:w-2/5 h-full overflow-auto shadow-lg shadow-primary-purple/15 border-primary-purple/20">
           <Detail
             conversation={conversation.data}
             onClose={() => setShowDetail(false)}
