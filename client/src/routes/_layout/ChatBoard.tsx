@@ -29,7 +29,9 @@ const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [isTyping, setIsTyping] = useState<string[]>([]);
-  const [tmpMessages, setTmpMessages] = useState<{message_text: string, status: "sending" | "failed"}[]>([]);
+  const [tmpMessages, setTmpMessages] = useState<
+    { message_text: string; status: "sending" | "failed" }[]
+  >([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -55,7 +57,7 @@ const ChatBoard = () => {
     queryKey: ["conversation", id],
     queryFn: async () => {
       const res = (await newRequest.get(`/conversation/${id}`)).data;
-      console.log(res);
+      //console.log(res);
       return res;
     },
     enabled: !!id,
@@ -86,8 +88,8 @@ const ChatBoard = () => {
   }, [messages.data, tmpMessages, isTyping]);
 
   useEffect(() => {
-    setTmpMessages((prev) => prev.splice(0, 2));
-  }, [messages.data])
+    setTmpMessages((prev) => [...prev.splice(0, 2)]);
+  }, [messages.data]);
 
   useEffect(() => {
     socket.on(
@@ -227,13 +229,20 @@ const ChatBoard = () => {
           createCallMessage.mutate({
             conversation_id: id,
             user_id: currentUser.id,
-            status: data?.endStatus === "missed"? "m" : data?.endStatus === "rejected"? "r" : data?.endStatus === "answered"? "a" : "f",
+            status:
+              data?.endStatus === "missed"
+                ? "m"
+                : data?.endStatus === "rejected"
+                ? "r"
+                : data?.endStatus === "answered"
+                ? "a"
+                : "f",
             duration: data.duration || 0,
           });
         console.log("call", data?.endStatus);
-        if (data.endStatus === "answered") 
+        if (data.endStatus === "answered")
           toast.info(`Call lasted ${formatTime(data.duration as number)}`);
-        
+
         setCallData(data);
         setMyStream(undefined);
         myStream?.getTracks().forEach((track) => {
@@ -246,7 +255,7 @@ const ChatBoard = () => {
         setCallData(undefined);
         peer?.off("call");
         console.log("call", data?.endStatus);
-        if (data.endStatus === "answered") 
+        if (data.endStatus === "answered")
           toast.info(`Call lasted ${formatTime(data.duration as number)}`);
       }
     });
@@ -302,7 +311,9 @@ const ChatBoard = () => {
   };
 
   return (
-    <div className="relative flex-1 w-full h-full">
+    <div
+      className={`flex items-center justify-center relative flex-1 w-full h-full`}
+    >
       {
         <Modal isOpen={isCall} height="fit">
           <audio ref={remoteAudioRef} autoPlay />
@@ -320,52 +331,59 @@ const ChatBoard = () => {
 
       {!id ? (
         <EmptyChat />
-      ) : conversation.isLoading ? (
-        <LoadingSpinner />
       ) : (
-        conversation.data && (
-          <div className="flex-1 border-r border-[#e8e2e2] h-screen flex flex-col relative">
-            <ChatHeader
-              conversation={conversation.data}
-              setShowDetail={setShowDetail}
-              startCall={handleCall}
-            />
-            {/* Messages Container*/}
-            <div className="p-5 flex-1 overflow-y-auto flex flex-col gap-1 pb-20 pl-16 items-start">
-              {messages.data && [...messages.data,...tmpMessages].map(
-                (
-                  message: MessageType & { isFirst: boolean; isLast: boolean }
-                ) => (
-                  <Message
-                    key={message.id}
-                    message={message}
-                    isFirst={message.isFirst}
-                    isLast={message.isLast}
-                    username={
-                      conversation.data.users.filter(
-                        (user) => user.id === message.sender_id
-                      )[0]?.username
-                    }
-                    photoUrl={
-                      conversation.data.users.filter(
-                        (user) => user.id === message.sender_id
-                      )[0]?.profile_url
-                    }
-                  />
-                )
-              )}
-              <TypingIndicator isTyping={isTyping} />
-              <div ref={lastMessageRef}></div>
-            </div>
-            <ChatFooter
-              text={text}
-              setText={setText}
-              handleTyping={handleTyping}
-              setTmpMessages={setTmpMessages}
-              contactId={conversation.data.group? undefined : other?.id}
-            />
-          </div>
-        )
+        <div className="flex-1 border-r border-[#e8e2e2] h-screen flex flex-col relative">
+          <ChatHeader
+            conversation={conversation?.data}
+            isLoading={conversation.isLoading}
+            setShowDetail={setShowDetail}
+            startCall={handleCall}
+          />
+          {/* Messages Container*/}
+          {conversation.isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            conversation.data && (
+              <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-1 pl-16 items-start">
+                {messages.data &&
+                  [...messages.data, ...tmpMessages].map(
+                    (
+                      message: MessageType & {
+                        isFirst: boolean;
+                        isLast: boolean;
+                      }
+                    ) => (
+                      <Message
+                        key={message.id}
+                        message={message}
+                        isFirst={message.isFirst}
+                        isLast={message.isLast}
+                        username={
+                          conversation.data?.users.filter(
+                            (user) => user.id === message.sender_id
+                          )[0]?.username
+                        }
+                        photoUrl={
+                          conversation.data?.users.filter(
+                            (user) => user.id === message.sender_id
+                          )[0]?.profile_url
+                        }
+                      />
+                    )
+                  )}
+                <TypingIndicator isTyping={isTyping} />
+                <div ref={lastMessageRef}></div>
+              </div>
+            )
+          )}
+          <ChatFooter
+            text={text}
+            setText={setText}
+            handleTyping={handleTyping}
+            setTmpMessages={setTmpMessages}
+            contactId={conversation.data?.group ? undefined : other?.id}
+          />
+        </div>
       )}
       {showDetail && (
         <div className="w-1/4">

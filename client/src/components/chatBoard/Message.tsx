@@ -75,6 +75,8 @@ const Message = ({
                 | "rejected"
                 | "failed"
             }
+            createdAt={message.created_at}
+            isSender={isSender}
           />
         </>
       ) : message.message_type === "exited" ? (
@@ -123,7 +125,7 @@ const Message = ({
           ))}
         </div>
       )}
-      {isLast && (
+      {isLast && !callEndStatus.includes(message.message_type) && (
         <div
           className={`flex items-center space-x-1 text-xs text-gray-500 p-0.5 ${
             isSender ? "self-end" : "self-start"
