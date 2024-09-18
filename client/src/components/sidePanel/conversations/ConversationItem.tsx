@@ -128,7 +128,7 @@ const ConversationItem = ({
       receiver_id: contactId as string,
     });
   };
-
+  
   return (
     <div
       className="relative"
@@ -182,9 +182,9 @@ const ConversationItem = ({
               ))}
           </div>
           <div className="flex justify-between items-center">
-            {lastMessageLoading || !lastMessage ? (
+            {lastMessageLoading ? (
               <div className="w-40 h-2 bg-gray-300 rounded animate-pulse" />
-            ) : (
+            ) : !lastMessage? <></> : (
               <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
                 {lastMessage?.sender_id === currentUser.id
                   ? "You: "

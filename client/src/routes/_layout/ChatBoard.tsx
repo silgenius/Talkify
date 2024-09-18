@@ -19,6 +19,7 @@ import VoiceCall from "../../components/chatBoard/VoiceCall";
 import Modal from "../../components/common/Modal";
 import { useCall } from "../../hooks/useCall";
 import { formatTime } from "../../utils/formatTime";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 
 type typingSocketData = {
   username: string;
@@ -332,7 +333,11 @@ const ChatBoard = () => {
       {!id ? (
         <EmptyChat />
       ) : (
-        <div className={`flex-1 h-screen flex-col relative ${showDetail? "hidden md:flex lg:hidden xl:flex" : "flex"}`}>
+        <div
+          className={`flex-1 h-screen flex-col relative ${
+            showDetail ? "hidden md:flex lg:hidden xl:flex" : "flex"
+          }`}
+        >
           <ChatHeader
             conversation={conversation?.data}
             isLoading={conversation.isLoading}
@@ -340,12 +345,12 @@ const ChatBoard = () => {
             startCall={handleCall}
           />
           {/* Messages Container*/}
-          {conversation.isLoading ? (
+          {conversation.isLoading || messages.isLoading ? (
             <LoadingSpinner />
           ) : (
             conversation.data && (
               <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-1 pl-16 items-start">
-                {messages.data &&
+                {messages.data?.length > 0 ? (
                   [...messages.data, ...tmpMessages].map(
                     (
                       message: MessageType & {
@@ -370,7 +375,18 @@ const ChatBoard = () => {
                         }
                       />
                     )
-                  )}
+                  )
+                ) : (
+                  <div className="flex flex-col items-center justify-center self-center text-center p-6 h-full rounded-lg">
+                    <IoChatbubbleEllipsesOutline className="text-gray-400 text-6xl mb-4" />
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      No messages yet
+                    </h2>
+                    <p className="text-gray-500">
+                      Start the conversation by sending the first message!
+                    </p>
+                  </div>
+                )}
                 <TypingIndicator isTyping={isTyping} />
                 <div ref={lastMessageRef}></div>
               </div>

@@ -99,7 +99,7 @@ const Contacts: React.FC = () => {
           </button>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-md p-4 overflow-y-auto">
           {filteredContacts?.length > 0 ? (
             filteredContacts.map((contact: ContactType) => (
               <ContactCard key={contact.contact.id} contact={contact} />

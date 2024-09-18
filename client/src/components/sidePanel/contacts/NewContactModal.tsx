@@ -64,7 +64,7 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   };
 
   return (
-    <Modal height="fit" isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
         Add New Contact
       </h2>
@@ -85,54 +85,56 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
         </button>
       </div>
 
-      {contacts && contacts?.length > 0 ? (
-        contacts?.map((contact) => (
-          <div className="px-4 py-4 bg-gray-100 rounded-lg shadow-md flex items-center justify-between">
-            <div className="relative flex items-center">
-              <Menu
-                position="anchor"
-                transition
-                menuButton={
-                  <button className="text-gray-500 p-2 rounded-full hover:bg-gray-300">
-                    <FaEllipsisV />
-                  </button>
-                }
-                className="right-0"
-              >
-                <MenuItem className="flex items-center space-x-2">
-                  <IoPaperPlane />
-                  <p>Send a dm</p>
-                </MenuItem>
-                <MenuItem className="flex items-center space-x-2">
-                  <ImBlocked />
-                  <p>Block</p>
-                </MenuItem>
-              </Menu>
-              <img
-                src={contact.profile_url || "/user.png"}
-                alt={contact.username}
-                className="w-12 h-12 rounded-full mr-4 object-contain object-center"
-              />
+      <div className="flex-1 overflow-y-auto space-y-4 ">
+        {contacts && contacts?.length > 0 ? (
+          contacts?.map((contact) => (
+            <div className="px-4 py-4 bg-gray-100 rounded-lg shadow flex items-center justify-between">
+              <div className="relative flex items-center">
+                <Menu
+                  position="anchor"
+                  transition
+                  menuButton={
+                    <button className="text-gray-500 p-2 rounded-full hover:bg-gray-300">
+                      <FaEllipsisV />
+                    </button>
+                  }
+                  className="right-0"
+                >
+                  <MenuItem className="flex items-center space-x-2">
+                    <IoPaperPlane />
+                    <p>Send a dm</p>
+                  </MenuItem>
+                  <MenuItem className="flex items-center space-x-2">
+                    <ImBlocked />
+                    <p>Block</p>
+                  </MenuItem>
+                </Menu>
+                <img
+                  src={contact.profile_url || "/user.png"}
+                  alt={contact.username}
+                  className="w-12 h-12 rounded-full mr-4 object-contain object-center"
+                />
 
-              <div>
-                <span className="text-gray-800 font-semibold">
-                  {contact.username}
-                </span>
-                <p className="text-gray-500 text-sm">{contact.email}</p>
+                <div>
+                  <span className="text-gray-800 font-semibold">
+                    {contact.username}
+                  </span>
+                  <p className="text-gray-500 text-sm">{contact.email}</p>
+                </div>
               </div>
+              <button
+                onClick={() => handleSendRequest(contact)}
+                className="bg-primary-purple text-white p-2 rounded-md flex items-center"
+              >
+                <BiUserPlus className="text-xl" />
+                <span className="ml-2">Add Friend</span>
+              </button>
             </div>
-            <button
-              onClick={() => handleSendRequest(contact)}
-              className="bg-primary-purple text-white p-2 rounded-md flex items-center"
-            >
-              <BiUserPlus className="text-xl" />
-              <span className="ml-2">Add Friend</span>
-            </button>
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-500 mt-4">No users found</p>
-      )}
+          ))
+        ) : (
+          <p className="text-center text-gray-500 mt-4">No users found</p>
+        )}
+      </div>
     </Modal>
   );
 };

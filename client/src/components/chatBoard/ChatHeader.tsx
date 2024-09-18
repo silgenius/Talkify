@@ -53,7 +53,7 @@ const ChatHeader = ({
           </span>
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 text-gray-800">
         <button
           className="p-1.5 rounded-full top-4 right-4 transition-all hover:bg-primary-purple/5 hover:text-primary-purple"
           onClick={startCall}

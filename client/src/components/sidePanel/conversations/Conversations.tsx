@@ -7,6 +7,7 @@ import ConversationItem from "./ConversationItem";
 import { UseQueryResult } from "@tanstack/react-query";
 import SearchInput from "../../common/SearchInput";
 import NewChatModal from "./NewChatModal";
+import { FiMessageSquare } from "react-icons/fi";
 
 interface ConversationsProps {
   conversations: UseQueryResult<ConversationType[], Error>;
@@ -54,26 +55,40 @@ const Conversations = ({ conversations }: ConversationsProps) => {
         ) : (
           <>
             {conversations.isError && <Error />}
-            {filteredConversations?.map((conversation: ConversationType) => (
-              <ConversationItem
-                contactId={conversation.group? undefined : conversation.others[0].id}
-                key={conversation.id}
-                name={
-                  conversation.group
-                    ? conversation.name
-                    : conversation.others[0].username
-                }
-                lastMessageId={conversation.last_message_id}
-                conversationId={conversation.id}
-                selected={id === conversation.id}
-                isGroup={conversation.group}
-                photoUrl={
-                  !conversation.group
-                    ? conversation.others[0].profile_url
-                    : undefined
-                }
-              />
-            ))}
+            {filteredConversations && filteredConversations?.length > 0 ? (
+              filteredConversations?.map((conversation: ConversationType) => (
+                <ConversationItem
+                  contactId={
+                    conversation.group ? undefined : conversation.others[0].id
+                  }
+                  key={conversation.id}
+                  name={
+                    conversation.group
+                      ? conversation.name
+                      : conversation.others[0].username
+                  }
+                  lastMessageId={conversation.last_message_id}
+                  conversationId={conversation.id}
+                  selected={id === conversation.id}
+                  isGroup={conversation.group}
+                  photoUrl={
+                    !conversation.group
+                      ? conversation.others[0].profile_url
+                      : undefined
+                  }
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center text-center text-gray-500">
+                <FiMessageSquare className="w-20 h-20 mb-4 text-gray-400" />{" "}
+                {/* Using an icon */}
+                <h2 className="text-xl font-bold">No Conversations Found</h2>
+                <p className="text-sm">
+                  Start a new chat or search for a contact to begin a
+                  conversation.
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
