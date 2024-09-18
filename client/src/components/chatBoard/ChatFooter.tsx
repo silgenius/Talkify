@@ -1,14 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EmojiPicker from "emoji-picker-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import newRequest from "../../utils/newRequest";
 import { ContactType, MessageType } from "../../types";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 import { useParams } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
-
-// Importing icons from react-icons
 import { BsPlus, BsCameraVideo, BsMic, BsSend } from "react-icons/bs";
 
 type Emoji = {
@@ -44,6 +42,15 @@ const ChatFooter = ({
   const queryClient = useQueryClient();
   const { id } = useParams();
   const currentUser = getUser();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [tmpText, setTmpText] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    setText(tmpText[id as string] || "");
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [id, setText, tmpText]);
 
   const handleEmojiSelect = (e: Emoji) => {
     setText((prev) => prev + e.emoji);
@@ -99,6 +106,7 @@ const ChatFooter = ({
       ]);
     }, 100);
     setText("");
+    setTmpText((prev) => ({ ...prev, [id as string]: "" }));
   };
 
   // Handler to detect Enter key press and send message
@@ -108,7 +116,10 @@ const ChatFooter = ({
       handleSendMessage();
     }
   };
-
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTmpText(prev => ({...prev, [id as string]: e.target.value}));
+    handleTyping(e);
+  }
   const [isBlocked, setIsBlocked] = useState(false);
 
   const contacts = queryClient.getQueryData<ContactType[]>(["contacts"]);
@@ -119,7 +130,7 @@ const ChatFooter = ({
     setIsBlocked(contact?.status === "blocked");
   }, [contacts, contactId, queryClient]);
   return (
-    <div className="absolute bottom-0 left-0 w-full min-h-16 p-3 flex bg-white items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
+    <div className="w-full min-h-16 p-3 flex bg-white items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
       {isBlocked ? (
         <div className="text-gray-500 w-full text-center">
           this user is unavailable
@@ -135,11 +146,11 @@ const ChatFooter = ({
 
           {/* Text Input */}
           <input
-            autoFocus={true}
+            ref={inputRef}
             type="text"
             placeholder="Type a message..."
             value={text}
-            onChange={handleTyping}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown} // Add keydown event listener here
             className="flex-1 bg-gray-100 border-gray-300 rounded-lg px-4 py-2 text-black outline-none focus:ring-2 focus:ring-primary-purple/30"
           />
