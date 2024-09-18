@@ -93,6 +93,10 @@ const ChatBoard = () => {
   }, [messages.data]);
 
   useEffect(() => {
+    setShowDetail(false);
+  }, [id])
+
+  useEffect(() => {
     socket.on(
       SocketEvent.TYPING_STARTED,
       ({ username, conversation_id }: typingSocketData) => {
