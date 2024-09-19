@@ -55,7 +55,7 @@ const useAuth = () => {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== "https://talkify.techerudites.tech") return;
+      if (event.origin !== (import.meta.env.VITE_SERVER_ORIGIN || "https://talkify.techerudites.tech")) return;
 
       const { email, token, error } = event.data;
       if (error) {
@@ -79,7 +79,7 @@ const useAuth = () => {
     const top = window.screen.height / 2 - height / 2;
 
     window.open(
-      `https://talkify.techerudites.tech/auth/${authType}`,
+      `http://localhost:5000/auth/${authType}`,
       "GoogleSignUpWindow",
       `width=${width},height=${height},top=${top},toolbar=no,scrollbars=yes,resizable=no`
     );
