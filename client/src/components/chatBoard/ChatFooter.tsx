@@ -158,7 +158,7 @@ const ChatFooter = ({
           />
 
           {/* Emoji Picker */}
-          <div className={`relative ${showDetail? "hidden xl:block" : ""}`}>
+          <div className={`relative ${showDetail? "hidden xl:block" : ""} hidden xs:block`}>
             <img
               src="/emoji.png"
               alt="Emoji"
