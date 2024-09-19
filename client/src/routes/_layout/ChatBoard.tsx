@@ -29,7 +29,9 @@ type typingSocketData = {
 const ChatBoard = () => {
   const [text, setText] = useState("");
   const [showDetail, setShowDetail] = useState(false);
-  const [isTyping, setIsTyping] = useState<string[]>([]);
+  const [isTyping, setIsTyping] = useState<
+    { username: string; conversationId: string }[]
+  >([]);
   const [tmpMessages, setTmpMessages] = useState<
     { message_text: string; status: "sending" | "failed" }[]
   >([]);
@@ -94,29 +96,60 @@ const ChatBoard = () => {
 
   useEffect(() => {
     setShowDetail(false);
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
     socket.on(
       SocketEvent.TYPING_STARTED,
       ({ username, conversation_id }: typingSocketData) => {
         // Show typing indicator in other conversation members' screens
-        if (conversation_id === id && username !== currentUser.username) {
+        const conversations = queryClient.getQueryData([
+          "conversations",
+        ]) as ConversationType[];
+        if (
+          conversations.find(
+            (conversation) => conversation.id === conversation_id
+          ) &&
+          username !== currentUser.username
+        ) {
           setIsTyping((prev) =>
-            !prev.includes(username) ? [...prev, username] : [...prev]
+            !prev.find(
+              (user) =>
+                user.username === username &&
+                user.conversationId === conversation_id
+            )
+              ? [...prev, { username, conversationId: conversation_id }]
+              : [...prev]
           );
         }
+        //console.log("typing started", username);
       }
     );
     socket.on(
       SocketEvent.TYPING_STOPPED,
       ({ username, conversation_id }: typingSocketData) => {
         // Hide typing indicator
-        if (conversation_id === id && username !== currentUser.username) {
-          setIsTyping((prev) => prev.filter((name) => name !== username));
+        const conversations = queryClient.getQueryData([
+          "conversations",
+        ]) as ConversationType[];
+        if (
+          conversations.find(
+            (conversation) => conversation.id === conversation_id
+          ) &&
+          username !== currentUser.username
+        ) {
+          setIsTyping((prev) =>
+            prev.filter(
+              (user) =>
+                user.username !== username &&
+                user.conversationId !== conversation_id
+            )
+          );
         }
+        //console.log("typing stopped", username);
       }
     );
+    //console.log("typing", isTyping);
 
     socket.on(SocketEvent.MESSAGE_DELIVERED, (message: MessageType) => {
       if (message.conversation_id === id) {
