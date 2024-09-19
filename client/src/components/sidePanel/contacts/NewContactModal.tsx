@@ -88,7 +88,7 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
       <div className="flex-1 overflow-y-auto space-y-4 ">
         {contacts && contacts?.length > 0 ? (
           contacts?.map((contact) => (
-            <div className="px-4 py-4 bg-gray-100 rounded-lg shadow flex items-center justify-between">
+            <div key={contact.id} className="px-4 py-4 bg-gray-100 rounded-lg shadow flex items-center justify-between">
               <div className="relative flex items-center">
                 <Menu
                   position="anchor"
