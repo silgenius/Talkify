@@ -4,6 +4,8 @@ from flask_socketio import emit
 from server.api.sockets.events import socketio
 from server.models import storage
 from server.models.contact import Contact
+from server.models.user import User
+
 
 session = storage.get_session()
 
