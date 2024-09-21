@@ -2,7 +2,7 @@ import { MdDeleteOutline, MdVolumeOff, MdOutlineImage } from "react-icons/md";
 import { ConversationType } from "../../types";
 import React from "react";
 import { BiX } from "react-icons/bi";
-import { getChatName } from "../../utils/conversationData";
+import { getChatName, getChatPhoto } from "../../utils/conversationData";
 import { getUser } from "../../utils/localStorage";
 import GroupIcon from "../common/GroupIcon";
 
@@ -16,7 +16,7 @@ const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
     return;
   }
   const currentUser = getUser();
-
+  const photo = getChatPhoto(conversation, currentUser);
   return (
     <div className="flex flex-col h-full w-full bg-white p-4 relative">
       <button
@@ -31,7 +31,7 @@ const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
           <GroupIcon />
         ) : (
           <img
-            src={conversation.users[0].profile_url || "/user.png"}
+            src={photo || "/user.png"}
             alt={`${conversation.name || "Conversation"} Avatar`}
             className="w-20 h-20 rounded-full object-contain"
           />
