@@ -1,206 +1,279 @@
 import { useState } from "react";
-import "./settings.css";
-
+import SearchInput from "../common/SearchInput";
+import { FaUser, FaKey, FaBell } from "react-icons/fa";
+import { IoLogOutOutline } from "react-icons/io5";
+import useAuth from "../../hooks/useAuth";
+import { FaShield } from "react-icons/fa6";
 const Settings = () => {
-  const [activeSection, setActiveSection] = useState("Account");
+  const [activeTab, setActiveTab] = useState("Account");
   const [expandedOption, setExpandedOption] = useState<string | null>(null);
 
   const toggleOptions = (option: typeof expandedOption) => {
     setExpandedOption(expandedOption === option ? null : option);
   };
 
-  const confirmDeleteAccount = () => {
-    if (window.confirm("Are you sure you want to delete this account?")) {
-      alert("Account deleted.");
-    }
+  const { logout } = useAuth();
+  const handleLogout = () => {
+    logout();
+  };
+
+  const tabcolors = {
+    acitve: "text-primary-purple bg-primary-purple/20",
+    inactive: "text-gray-500 bg-white",
   };
 
   return (
-    <div className="settings-container">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <img
-            src="./settings.png"
-            alt="Settings Icon"
-            className="settings-icon"
-          />
-          <h3>Settings</h3>
-        </div>
-        <ul>
-          <li
-            className={activeSection === "Account" ? "active" : ""}
-            onClick={() => setActiveSection("Account")}
+    <div className="flex flex-col h-full py-2">
+      <header className="flex items-center justify-between mb-6 px-4">
+        <h1 className="text-4xl font-bold text-gray-800">Settings</h1>
+      </header>
+      <div className="px-4">
+        <SearchInput value="" onInputChange={() => {}} />
+      </div>
+      <div className="flex-1 overflow-y-auto h-full px-4">
+        <nav className="mb-4 flex gap-4 text-nowrap overflow-x-auto">
+          <button
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "Account" ? tabcolors.acitve : tabcolors.inactive
+            }`}
+            onClick={() => setActiveTab("Account")}
           >
             Account
-          </li>
-          <li
-            className={activeSection === "notifications" ? "active" : ""}
-            onClick={() => setActiveSection("notifications")}
+          </button>
+          <button
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "notifications"
+                ? tabcolors.acitve
+                : tabcolors.inactive
+            }`}
+            onClick={() => setActiveTab("notifications")}
           >
             Notifications
-          </li>
-          <li
-            className={activeSection === "privacy" ? "active" : ""}
-            onClick={() => setActiveSection("privacy")}
+          </button>
+          <button
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "privacy" ? tabcolors.acitve : tabcolors.inactive
+            }`}
+            onClick={() => setActiveTab("privacy")}
           >
             Privacy
-          </li>
-        </ul>
-      </div>
+          </button>
+        </nav>
+        {/* Main Content */}
 
-      <div className="main-content">
-        {activeSection === "Account" && (
-          <div className="content">
-            <h3>Account Settings</h3>
-            <div className="input-section">
-              <label>Username</label>
-              <input type="text" placeholder="Juile Li" />
-
-              <label>Email</label>
-              <input type="email" placeholder="Juileli@example.com" />
-
-              <h3>Change Password</h3>
-              <label>Current Password</label>
-              <input type="password" placeholder="Current Password" />
-              <label>New Password</label>
-              <input type="password" placeholder="New Password" />
-              <label>Confirm New Password</label>
-              <input type="password" placeholder="Confirm New Password" />
-              <button className="change-password-button">
-                Confirm Change Password
-              </button>
-            </div>
-            <div className="content-section">
-              <button
-                className="delete-account-button"
-                onClick={confirmDeleteAccount}
-              >
-                Delete Account
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeSection === "notifications" && (
-          <div className="content">
-            <h3>Notification Settings</h3>
-
-            <div className="notification-section">
-              <h4 className="notification-title">Message Notifications</h4>
-              <div className="notification-item">
-                <label className="notification-label">
-                  Enable Notifications
-                  <div className="switch">
-                    <input type="checkbox" id="enable-message-notifications" />
-                    <span className="slider"></span>
-                  </div>
-                </label>
+        <div className="flex-1 px-4 py-4 mb-4 overflow-auto bg-white rounded-lg shadow-lg">
+          {activeTab === "Account" && (
+            <div>
+              <div className="flex items-center justify-start space-x-4 text-gray-800 mb-8">
+                <FaUser className="inline-block text-xl" />
+                <h3 className="text-2xl font-semibold">Account Settings</h3>
               </div>
-              <div className="notification-item">
-                <label className="notification-label">
-                  Enable Sound
-                  <div className="switch">
-                    <input type="checkbox" id="enable-message-sound" />
-                    <span className="slider"></span>
-                  </div>
+              <div>
+                <label className="block text-lg font-medium text-primary-purple mb-2">
+                  Username
                 </label>
-              </div>
-            </div>
+                <input
+                  type="text"
+                  placeholder="Julie Li"
+                  className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-purple"
+                />
 
-            <div className="notification-section">
-              <h4 className="notification-title">Group Notifications</h4>
-              <div className="notification-item">
-                <label className="notification-label">
-                  Enable Notifications
-                  <div className="switch">
-                    <input type="checkbox" id="enable-group-notifications" />
-                    <span className="slider"></span>
-                  </div>
+                <label className="block text-lg font-medium text-primary-purple mb-2">
+                  Bio
                 </label>
-              </div>
-              <div className="notification-item">
-                <label className="notification-label">
-                  Enable Sound
-                  <div className="switch">
-                    <input type="checkbox" id="enable-group-sound" />
-                    <span className="slider"></span>
-                  </div>
+                <textarea
+                  placeholder="Write about yourself"
+                  className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-purple"
+                />
+                <div className="flex items-center justify-start space-x-4 text-gray-800 mb-8">
+                  <FaKey className="inline-block text-xl" />
+                  <h3 className="text-2xl font-semibold ">Change Password</h3>
+                </div>
+                <label className="block text-lg font-medium text-primary-purple mb-2">
+                  Current Password
                 </label>
-              </div>
-            </div>
-          </div>
-        )}
+                <input
+                  type="password"
+                  placeholder="Current Password"
+                  className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-purple"
+                />
 
-        {activeSection === "privacy" && (
-          <div className="content">
-            <h3>Privacy Settings</h3>
-            <div className="privacy-options">
-              <div className="privacy-option">
-                <button
-                  className="toggle-button"
-                  onClick={() => toggleOptions("lastSeen")}
-                >
-                  {expandedOption === "lastSeen"
-                    ? "Last seen & Online Options"
-                    : "View Last Seen & Online"}
+                <label className="block text-lg font-medium text-primary-purple mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-purple"
+                />
+
+                <label className="block text-lg font-medium text-primary-purple mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-purple"
+                />
+              </div>
+
+              <div className="mt-4 space-y-4">
+                <button className="w-full bg-primary-purple text-white font-semibold p-3 rounded-lg hover:bg-primary-purple-dark transition">
+                  Save Changes
                 </button>
-                {expandedOption === "lastSeen" && (
-                  <div className="option-content">
-                    <p>Last Seen & Online: Choose visibility</p>
-                    <label>
-                      <input type="radio" name="lastSeen" /> Everyone
-                    </label>
-                    <label>
-                      <input type="radio" name="lastSeen" /> My Contacts
-                    </label>
-                    <label>
-                      <input type="radio" name="lastSeen" /> Nobody
-                    </label>
-                  </div>
-                )}
-              </div>
-              <div className="privacy-option">
                 <button
-                  className="toggle-button"
-                  onClick={() => toggleOptions("profilePhoto")}
+                  className="w-full bg-gray-500 text-white font-semibold p-3 rounded-lg hover:bg-gray-600 transition flex items-center justify-center"
+                  onClick={handleLogout}
                 >
-                  {expandedOption === "profilePhoto"
-                    ? "Profile Photo Options"
-                    : "View Profile Photo"}
+                  <IoLogOutOutline className="mr-2 text-2xl" /> Logout
                 </button>
-                {expandedOption === "profilePhoto" && (
-                  <div className="option-content">
-                    <p>Profile Photo: Choose visibility</p>
-                    <label>
-                      <input type="radio" name="profilePhoto" /> Everyone
-                    </label>
-                    <label>
-                      <input type="radio" name="profilePhoto" /> My Contacts
-                    </label>
-                    <label>
-                      <input type="radio" name="profilePhoto" /> Nobody
-                    </label>
-                  </div>
-                )}
-              </div>
-              <div className="privacy-option">
-                <button
-                  className="toggle-button"
-                  onClick={() => toggleOptions("blockedContacts")}
-                >
-                  {expandedOption === "blockedContacts"
-                    ? "Blocked Contacts"
-                    : "Blocked Contacts"}
-                </button>
-                {expandedOption === "blockedContacts" && (
-                  <div className="blocked-contacts">
-                    <p>No blocked contacts.</p>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {activeTab === "notifications" && (
+            <div>
+              <div className="flex items-center justify-start space-x-4 text-gray-800 mb-8">
+                <FaBell className="inline-block text-xl" />
+                <h3 className="text-2xl font-semibold">
+                  Notification Settings
+                </h3>
+              </div>
+
+              <div className="mb-6 p-4 border border-gray-300 rounded-lg shadow-sm bg-white">
+                <h4 className="text-lg font-medium text-primary-purple mb-4 border-b pb-2 border-gray-300">
+                  Message Notifications
+                </h4>
+                <div className="flex justify-between items-center mb-4">
+                  <label className="text-lg">Enable Notifications</label>
+                  <div className="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+                    <input
+                      type="checkbox"
+                      className="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6"
+                    />
+                    <span className="block overflow-hidden h-6 rounded-full bg-gray-300"></span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <label className="text-lg">Enable Sound</label>
+                  <div className="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+                    <input
+                      type="checkbox"
+                      className="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6"
+                    />
+                    <span className="block overflow-hidden h-6 rounded-full bg-gray-300"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border border-gray-300 rounded-lg shadow-sm bg-white">
+                <h4 className="text-lg font-medium text-primary-purple mb-4 border-b pb-2 border-gray-300">
+                  Group Notifications
+                </h4>
+                <div className="flex justify-between items-center mb-4">
+                  <label className="text-lg">Enable Notifications</label>
+                  <div className="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+                    <input
+                      type="checkbox"
+                      className="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6"
+                    />
+                    <span className="block overflow-hidden h-6 rounded-full bg-gray-300"></span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <label className="text-lg">Enable Sound</label>
+                  <div className="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+                    <input
+                      type="checkbox"
+                      className="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6"
+                    />
+                    <span className="block overflow-hidden h-6 rounded-full bg-gray-300"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "privacy" && (
+            <div>
+              <div className="flex items-center justify-start space-x-4 text-gray-800 mb-8">
+                <FaShield className="inline-block text-xl" />
+                <h3 className="text-2xl font-semibold">Privacy Settings</h3>
+              </div>
+              <div>
+                <div className="mb-6">
+                  <button
+                    className="w-full flex justify-between items-center bg-gray-200 p-4 rounded-lg hover:bg-gray-300 transition"
+                    onClick={() => toggleOptions("lastSeen")}
+                  >
+                    {expandedOption === "lastSeen"
+                      ? "Last seen & Online Options"
+                      : "View Last Seen & Online"}
+                  </button>
+                  {expandedOption === "lastSeen" && (
+                    <div className="mt-4 p-4 border border-gray-300 rounded-lg bg-white">
+                      <p className="mb-4 text-gray-600">
+                        Last Seen & Online: Choose visibility
+                      </p>
+                      <label className="block mb-2">
+                        <input type="radio" name="lastSeen" /> Everyone
+                      </label>
+                      <label className="block mb-2">
+                        <input type="radio" name="lastSeen" /> My Contacts
+                      </label>
+                      <label className="block">
+                        <input type="radio" name="lastSeen" /> Nobody
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-6">
+                  <button
+                    className="w-full flex justify-between items-center bg-gray-200 p-4 rounded-lg hover:bg-gray-300 transition"
+                    onClick={() => toggleOptions("profilePhoto")}
+                  >
+                    {expandedOption === "profilePhoto"
+                      ? "Profile Photo Options"
+                      : "View Profile Photo"}
+                  </button>
+                  {expandedOption === "profilePhoto" && (
+                    <div className="mt-4 p-4 border border-gray-300 rounded-lg bg-white">
+                      <p className="mb-4 text-gray-600">
+                        Profile Photo: Choose visibility
+                      </p>
+                      <label className="block mb-2">
+                        <input type="radio" name="profilePhoto" /> Everyone
+                      </label>
+                      <label className="block mb-2">
+                        <input type="radio" name="profilePhoto" /> My Contacts
+                      </label>
+                      <label className="block">
+                        <input type="radio" name="profilePhoto" /> Nobody
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-6">
+                  <button
+                    className="w-full flex justify-between items-center bg-gray-200 p-4 rounded-lg hover:bg-gray-300 transition"
+                    onClick={() => toggleOptions("blockedContacts")}
+                  >
+                    {expandedOption === "blockedContacts"
+                      ? "Blocked Contacts"
+                      : "Blocked Contacts"}
+                  </button>
+                  {expandedOption === "blockedContacts" && (
+                    <div className="mt-4 p-4 border border-gray-300 rounded-lg bg-white">
+                      <p className="text-gray-600">No blocked contacts.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

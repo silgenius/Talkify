@@ -29,7 +29,7 @@ const ChatHeader = ({
 
   return (
     <div className="p-2 px-4 shadow-md border-primary-purple/20 shadow-primary-purple/5 flex items-center justify-between min-h-[4.5rem]">
-      <div className="flex items-center gap-1 sm:gap-5">
+      <div className="flex items-center gap-1 xs:gap-2">
         <button
           className="lg:hidden p-1.5 rounded-full top-4 right-4 transition-all hover:bg-primary-purple/10 hover:text-primary-purple"
           onClick={() => navigate("/")}
@@ -38,7 +38,7 @@ const ChatHeader = ({
         </button>
         <div
           onClick={() => setShowDetail((prev) => !prev)}
-          className="flex items-center gap-2 xs:gap-5 hover:cursor-pointer"
+          className="flex items-center gap-2 xs:gap-4 hover:cursor-pointer"
         >
           {conversation?.group ? (
             <GroupIcon className="!w-10 !h-10 xs:!w-12 xs:!h-12" />

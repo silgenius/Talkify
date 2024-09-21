@@ -5,8 +5,6 @@ import { MdContacts, MdOutlineContacts } from "react-icons/md";
 import {
   IoChatbox,
   IoChatboxOutline,
-  IoLogOut,
-  IoLogOutOutline,
   IoSettingsOutline,
   IoSettingsSharp,
 } from "react-icons/io5";
@@ -19,7 +17,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ContactType, ConversationType, MessageType } from "../../types";
 import Conversations from "../../components/sidePanel/conversations/Conversations";
 import Contacts from "../../components/sidePanel/contacts/Contacts";
-import Settings from "../../components/sidePanel/settings/Settings";
+import Settings from "../../components/chat/Settings";
 
 const SidePanel = () => {
   const navigate = useNavigate();
@@ -85,7 +83,7 @@ const SidePanel = () => {
         setUnderlineWidth(contactsRef.current.offsetWidth);
         setUnderlinePosition(contactsRef.current.offsetLeft);
       }
-    } else if (hash.includes("#logout")) {
+    } else if (hash.includes("#settings")) {
       if (settingsRef.current) {
         setUnderlineWidth(settingsRef.current.offsetWidth);
         setUnderlinePosition(settingsRef.current.offsetLeft);
@@ -135,24 +133,14 @@ const SidePanel = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => navigate("/settings")}
+                  ref={settingsRef}
+                  onClick={() => navigate("#settings")}
                   className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
                 >
                   {hash.includes("#settings") ? (
                     <IoSettingsSharp className="inline-block text-3xl" />
                   ) : (
                     <IoSettingsOutline className="inline-block text-3xl" />
-                  )}
-                </button>
-                <button
-                  ref={settingsRef}
-                  onClick={() => navigate("#logout")}
-                  className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
-                >
-                  {hash.includes("#logout") ? (
-                    <IoLogOut className="inline-block text-3xl" />
-                  ) : (
-                    <IoLogOutOutline className="inline-block text-3xl" />
                   )}
                 </button>
               </div>
@@ -172,7 +160,7 @@ const SidePanel = () => {
       <div className="flex-1 overflow-y-auto">
         {hash.includes("#contacts") ? (
           <Contacts />
-        ) : hash.includes("#logout") ? (
+        ) : hash.includes("#settings") ? (
           <Settings />
         ) : (
           <Conversations conversations={conversations} />

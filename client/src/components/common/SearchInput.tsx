@@ -22,6 +22,7 @@ const SearchInput = ({
         <div className="flex items-center">
           <BiSearch className="text-gray-500 mr-2" size={20} />
           <input
+            autoFocus
             type="text"
             placeholder={placeholder || "Search..."}
             value={value}
