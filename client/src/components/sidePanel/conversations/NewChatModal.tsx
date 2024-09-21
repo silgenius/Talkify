@@ -64,14 +64,14 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   }, [searchQuery, addedMembers, contacts]);
 
   const createConversation = useMutation({
-    mutationFn: async (data: { users: [string, string] }) => {
+    mutationFn: async (data: { users: [string]; created_by: string }) => {
       const conversations = queryClient.getQueriesData({
         queryKey: ["conversations"],
       })[0][1] as ConversationType[];
       const existingConversation = conversations.find(
         (conversation) =>
           !conversation.group &&
-          conversation.others.find((user) => user.id === data.users[1])
+          conversation.others.find((user) => user.id === data.users[0])
       );
 
       if (existingConversation) {
@@ -110,7 +110,8 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       toast.success(`${contact.contact.username} added`);
     } else {
       createConversation.mutate({
-        users: [currentUser.id, contact.contact.id],
+        created_by: currentUser.id,
+        users: [contact.contact.id],
       });
       onClose();
     }
@@ -126,6 +127,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
 
   const createGroup = useMutation({
     mutationFn: async (data: {
+      created_by: string;
       name: string;
       photo?: string;
       users: string[];
@@ -160,12 +162,10 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return;
     }
     createGroup.mutate({
+      created_by: currentUser.id,
       photo: groupDetails.photo,
       name: groupDetails.name,
-      users: [
-        currentUser.id,
-        ...addedMembers.map((member) => member.contact.id),
-      ],
+      users: [...addedMembers.map((member) => member.contact.id)],
     });
     onClose();
   };
