@@ -55,6 +55,8 @@ class BaseModel:
            new_dict.pop('_sa_instance_state')
        if new_dict.get('messages'):
            new_dict.pop('messages')
+       if new_dict.get('password'):
+           new_dict.pop('password')
        return new_dict
 
     def save(self):
