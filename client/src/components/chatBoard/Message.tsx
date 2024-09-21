@@ -148,7 +148,8 @@ const Message = ({
             </span>
             {isSender && (
               <div className="flex space-x-0.5">
-                {message.status === "sending" ? (
+                {message.status === "sending" ||
+                (!message.created_at && message.status === "sent") ? (
                   <MdAccessTime size={16} />
                 ) : message.status === "failed" ? (
                   <MdErrorOutline size={16} className="text-red-600" />
@@ -165,7 +166,9 @@ const Message = ({
                 <span
                   className={message.status === "failed" ? "text-red-600" : ""}
                 >
-                  {message.status}
+                  {!message.created_at && message.status === "sent"
+                    ? "sending"
+                    : message.status}
                 </span>
               </div>
             )}

@@ -33,7 +33,13 @@ const ChatBoard = () => {
     { username: string; conversationId: string }[]
   >([]);
   const [tmpMessages, setTmpMessages] = useState<
-    { message_text: string; status: "sending" | "failed" }[]
+    {
+      messageId: number;
+      message_text: string;
+      status: "sending" | "failed" | "sent";
+      isFirst: boolean;
+      isLast: boolean;
+    }[]
   >([]);
 
   const { id } = useParams();
@@ -91,9 +97,17 @@ const ChatBoard = () => {
   }, [messages.data, tmpMessages, isTyping]);
 
   useEffect(() => {
-    setTmpMessages((prev) => [...prev.splice(0, 2)]);
+    setTmpMessages((prev) =>
+      prev.filter((message) => message.status !== "sent")
+    );
   }, [messages.data]);
 
+  useEffect(() => {
+    setTmpMessages((prev) =>
+      prev.filter((message) => message.status !== "sent")
+    );
+  }, [messages.data]);
+  
   useEffect(() => {
     setShowDetail(false);
   }, [id]);
@@ -391,12 +405,13 @@ const ChatBoard = () => {
                   [...messages.data, ...tmpMessages].map(
                     (
                       message: MessageType & {
+                        messageId: number;
                         isFirst: boolean;
                         isLast: boolean;
                       }
                     ) => (
                       <Message
-                        key={message.id}
+                        key={message.id || message.messageId}
                         message={message}
                         isFirst={message.isFirst}
                         isLast={message.isLast}

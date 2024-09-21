@@ -25,7 +25,13 @@ interface ChatFooterProps {
   handleTyping: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setTmpMessages: React.Dispatch<
     React.SetStateAction<
-      { message_text: string; status: "sending" | "failed" }[]
+      {
+        messageId: number;
+        message_text: string;
+        status: "sending" | "failed" | "sent";
+        isFirst: boolean;
+        isLast: boolean;
+      }[]
     >
   >;
   contactId?: string;
@@ -59,54 +65,71 @@ const ChatFooter = ({
   };
 
   const createMessage = useMutation({
-    mutationFn: async (data: MessageDataType) => {
+    mutationFn: async (data: MessageDataType & { messageId: number }) => {
       const res = await newRequest.post(`/message/create`, data);
-      return res.data;
+      
+      return { ...res.data, messageId: data.messageId };
     },
-    onSuccess: (message: MessageType) => {
+    onSuccess: (message: MessageType & {messageId: number}) => {
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: message.id });
       socket.emit(SocketEvent.STOP_TYPING, {
         conversation_id: id,
         sender_id: currentUser.id,
       });
+      
+      setTmpMessages((prev) => {
+        const lastMessage = prev.find(
+          (msg) => msg.messageId === message.messageId
+        );
+        if (lastMessage) {
+          lastMessage!.status = "sent";
+        }
+        return [...prev];
+      });
       queryClient.invalidateQueries({
         queryKey: ["messages", message.conversation_id],
       });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
-    onError: (error) => {
+    onError: (error, data) => {
       //toast.error("An error occurred. Please try again later");
       setTmpMessages((prev) => {
-        const lastMessage = prev[prev.length - 1];
-        lastMessage.status = "failed";
+        const lastMessage = prev.find(
+          (msg) => msg.messageId === data.messageId
+        );
+        if (lastMessage) {
+          lastMessage!.status = "failed";
+        }
         return [...prev];
-      });
+      })
       console.log(error);
     },
   });
 
   const handleSendMessage = () => {
     if (text.trim() === "") return;
-
-    const messageData: MessageDataType = {
+    const messageId = Math.random() * 1000000; 
+    const messageData: MessageDataType & { messageId: number } = {
+      messageId: messageId,
       conversation_id: id,
       user_id: currentUser.id,
       message_text: text,
     };
     createMessage.mutate(messageData);
-    setTimeout(() => {
-      setTmpMessages((prev) => [
-        ...prev,
-        {
-          id: Math.random().toString(),
-          conversation_id: id,
-          sender_id: currentUser.id,
-          message_text: text,
-          status: "sending",
-          isLast: true,
-          isFirst: true,
-        },
-      ]);
-    }, 100);
+
+    setTmpMessages((prev) => [
+      ...prev,
+      {
+        messageId: messageId,
+        conversation_id: id,
+        sender_id: currentUser.id,
+        message_text: text,
+        status: "sending",
+        isLast: true,
+        isFirst: true,
+      },
+    ]);
+
     setText("");
     setTmpText((prev) => ({ ...prev, [id as string]: "" }));
   };
@@ -119,9 +142,9 @@ const ChatFooter = ({
     }
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTmpText(prev => ({...prev, [id as string]: e.target.value}));
+    setTmpText((prev) => ({ ...prev, [id as string]: e.target.value }));
     handleTyping(e);
-  }
+  };
   const [isBlocked, setIsBlocked] = useState(false);
 
   const contacts = queryClient.getQueryData<ContactType[]>(["contacts"]);
@@ -158,7 +181,11 @@ const ChatFooter = ({
           />
 
           {/* Emoji Picker */}
-          <div className={`relative ${showDetail? "hidden xl:block" : ""} hidden xs:block`}>
+          <div
+            className={`relative ${
+              showDetail ? "hidden xl:block" : ""
+            } hidden xs:block`}
+          >
             <img
               src="/emoji.png"
               alt="Emoji"
