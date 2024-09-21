@@ -11,6 +11,9 @@ export default {
         'secondary-purple': "#AE56AC",
         customGreen: "#00FF00",
       },
+      screens: {
+        xs: "440px"
+      }
     },
   },
   plugins: [],

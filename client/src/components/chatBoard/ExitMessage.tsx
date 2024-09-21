@@ -1,5 +1,5 @@
-import React from 'react';
-import { AiOutlineUserDelete } from 'react-icons/ai'; // Importing an icon for visual flair
+import React from "react";
+import { BiExit } from "react-icons/bi";
 
 interface ExitMessageProps {
   text: string;
@@ -7,11 +7,11 @@ interface ExitMessageProps {
 
 const ExitMessage: React.FC<ExitMessageProps> = ({ text }) => {
   return (
-    <div className="flex items-center justify-center bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg shadow-md w-full max-w-md mx-auto mt-4">
-      <AiOutlineUserDelete className="text-red-500 text-xl mr-3" />
-      <span className="text-sm font-semibold">
-        {text}.
-      </span>
+    <div className="flex items-center justify-center p-4 rounded-lg gap-2 w-full mx-auto">
+
+      <BiExit className="text-gray-500 text-xl" />
+      <span className="text-sm font-semibold text-gray-500">{text}.</span>
+
     </div>
   );
 };

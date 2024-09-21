@@ -37,6 +37,11 @@ const Contacts: React.FC = () => {
 
   //console.log(filteredContacts);
 
+  const tabcolors = {
+    acitve: "text-primary-purple bg-primary-purple/20",
+    inactive: "text-gray-500 bg-white",
+  };
+
   return (
     <div className="flex flex-col h-full py-2">
       <header className="flex items-center justify-between mb-6 px-4">
@@ -61,40 +66,32 @@ const Contacts: React.FC = () => {
       <div className="flex-1 overflow-y-auto h-full px-4">
         <nav className="mb-4 flex gap-4 text-nowrap overflow-x-auto">
           <button
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === "all"
-                ? "bg-primary-purple text-white"
-                : "bg-white text-gray-700"
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "all" ? tabcolors.acitve : tabcolors.inactive
             }`}
             onClick={() => setActiveTab("all")}
           >
             All
           </button>
           <button
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === "accepted"
-                ? "bg-primary-purple text-white"
-                : "bg-white text-gray-700"
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "accepted" ? tabcolors.acitve : tabcolors.inactive
             }`}
             onClick={() => setActiveTab("accepted")}
           >
             Online
           </button>
           <button
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === "pending"
-                ? "bg-primary-purple text-white"
-                : "bg-white text-gray-700"
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "pending" ? tabcolors.acitve : tabcolors.inactive
             }`}
             onClick={() => setActiveTab("pending")}
           >
             Pending
           </button>
           <button
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === "requested"
-                ? "bg-primary-purple text-white"
-                : "bg-white text-gray-700"
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${
+              activeTab === "requested" ? tabcolors.acitve : tabcolors.inactive
             }`}
             onClick={() => setActiveTab("requested")}
           >
@@ -102,7 +99,7 @@ const Contacts: React.FC = () => {
           </button>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-md p-4 ">
+        <div className="bg-white rounded-lg shadow-md p-4 overflow-y-auto">
           {filteredContacts?.length > 0 ? (
             filteredContacts.map((contact: ContactType) => (
               <ContactCard key={contact.contact.id} contact={contact} />
