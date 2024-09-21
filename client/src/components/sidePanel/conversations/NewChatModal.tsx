@@ -161,6 +161,15 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       toast.error("Please add at least one member to the group");
       return;
     }
+    if (!groupDetails.name || groupDetails.name.trim() === "") {
+      toast.warning("Please enter a valid group name");
+      return;
+    }
+    if (groupDetails.name.length > 60) {
+      toast.warning("Group name is too long");
+      return;
+    }
+
     createGroup.mutate({
       created_by: currentUser.id,
       photo: groupDetails.photo,
