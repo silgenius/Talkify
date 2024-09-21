@@ -20,8 +20,6 @@ const Contacts: React.FC = () => {
     if (contacts) {
       setFilteredContacts(
         contacts.filter((contact) => {
-          console.log(contact);
-
           const matchesSearch = contact.contact.username
             .toLowerCase()
             .includes(searchQuery.toLowerCase());

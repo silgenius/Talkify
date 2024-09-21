@@ -16,7 +16,7 @@ const Register = () => {
     lastName: "",
     email: "",
   });
-  const { signUp, handleGoogleAuth } = useAuth();
+  const { singIn, handleGoogleAuth } = useAuth();
 
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -38,7 +38,7 @@ const Register = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    signUp.mutate(formData);
+    alert("Please sign up with google :)");
   };
 
   return (
@@ -90,6 +90,7 @@ const Register = () => {
               type="outline"
               rounded
               onClick={() => handleGoogleAuth("signup")}
+              loading={singIn.isPending}
             />
             <Button htmlType="submit" text="Sign Up" />
             <div className="flex md:hidden items-center">

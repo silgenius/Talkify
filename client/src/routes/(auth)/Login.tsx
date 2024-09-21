@@ -30,7 +30,7 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    singIn.mutate(email);
+    alert("Please sign in with google :)");
   };
 
   return (
@@ -57,6 +57,7 @@ const Login = () => {
               type="outline"
               rounded
               onClick={() => handleGoogleAuth("login")}
+              loading={singIn.isPending}
             />
             <Button htmlType="submit" text="Sign In" />
             <div className="flex md:hidden items-center">
