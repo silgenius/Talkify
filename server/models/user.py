@@ -41,6 +41,7 @@ class User(BaseModel, Base):
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
     contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
     notifications = relationship('Notification', backref='user', cascade='all, delete, delete-orphan')
+    password = Column(String(60), nullable=True)
 
     def __init__(self, *args, **kwargs):
         """initializes city"""
@@ -50,7 +51,7 @@ class User(BaseModel, Base):
         """
         Updates the last_login attribute to the current date and time.
         """
-        self.last_login = datetime.now()
+        self.last_login = datetime.utcnow()
 
     def mini_data(self, bio=False):
         """
