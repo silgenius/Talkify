@@ -22,6 +22,7 @@ import { formatTime } from "../../utils/formatTime";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 
 type typingSocketData = {
+  id: string,
   username: string;
   conversation_id: string;
 };
@@ -115,7 +116,7 @@ const ChatBoard = () => {
   useEffect(() => {
     socket.on(
       SocketEvent.TYPING_STARTED,
-      ({ username, conversation_id }: typingSocketData) => {
+      ({id: userId, username, conversation_id }: typingSocketData) => {
         // Show typing indicator in other conversation members' screens
         const conversations = queryClient.getQueryData([
           "conversations",
@@ -124,7 +125,7 @@ const ChatBoard = () => {
           conversations.find(
             (conversation) => conversation.id === conversation_id
           ) &&
-          username !== currentUser.username
+          userId !== currentUser.id
         ) {
           setIsTyping((prev) =>
             !prev.find(
@@ -141,7 +142,7 @@ const ChatBoard = () => {
     );
     socket.on(
       SocketEvent.TYPING_STOPPED,
-      ({ username, conversation_id }: typingSocketData) => {
+      ({id: userId, username, conversation_id }: typingSocketData) => {
         // Hide typing indicator
         const conversations = queryClient.getQueryData([
           "conversations",
@@ -150,7 +151,7 @@ const ChatBoard = () => {
           conversations.find(
             (conversation) => conversation.id === conversation_id
           ) &&
-          username !== currentUser.username
+          userId !== currentUser.id
         ) {
           setIsTyping((prev) =>
             prev.filter(
