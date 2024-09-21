@@ -12,7 +12,6 @@ import Login from "./routes/(auth)/Login";
 import Register from "./routes/(auth)/Register";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
-import Settings from "./components/chat/Settings";
 import { CallProvider } from "./contexts/CallContext";
 
 const queryClient = new QueryClient();
@@ -38,10 +37,6 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
-      },
-      {
-        path: "/settings",
-        element: <Settings />,
       },
     ],
   },

@@ -17,7 +17,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ContactType, ConversationType, MessageType } from "../../types";
 import Conversations from "../../components/sidePanel/conversations/Conversations";
 import Contacts from "../../components/sidePanel/contacts/Contacts";
-import Settings from "../../components/chat/Settings";
+import Settings from "../../components/sidePanel/settings/Settings";
 
 const SidePanel = () => {
   const navigate = useNavigate();
