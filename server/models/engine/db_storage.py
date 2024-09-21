@@ -36,10 +36,10 @@ class DBStorage:
         db_url = 'mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(username, password, host, database)
         self.__engine = create_engine(
                 db_url,
-                pool_size=10,
-                max_overflow=20,
-                pool_timeout=30,
-                pool_recycle=3600,
+                pool_size=20,
+                max_overflow=40,
+                pool_timeout=60,
+                pool_recycle=1800,
                 pool_pre_ping=True)
     
     def reload(self):
@@ -49,24 +49,6 @@ class DBStorage:
         Base.metadata.create_all(self.__engine)
         Session = scoped_session(sessionmaker(bind=self.__engine, expire_on_commit=False))
         self.__session = Session
-
-    def all(self, cls=None):
-        """
-        query on the current database session
-        """
-        tables = []
-        obj_dict = {}
-        if cls is None:
-            tables = [User, Message, Conversation, Contact, Notification]
-        else:
-            tables.append(cls)
-
-        for table in tables:
-            objs = self.__session.query(table).all()
-            for obj in objs:
-                key = '{}.{}'.format(obj.__class__.__name__, obj.id)
-                obj_dict[key] = obj
-        return obj_dict
 
     def new(self, obj):
         """
@@ -85,7 +67,11 @@ class DBStorage:
         """
         commit all changes of the current database session
         """
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__sesson.rollback()
+            raise e
         
     def close(self):
         """
