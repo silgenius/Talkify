@@ -1,8 +1,8 @@
 import { googleLogo } from "../../assets";
-import Button from "./components/Button";
+import Button from "../../components/common/Button";
 import Input from "./components/Input";
 import SideBar from "./components/SideBar";
-import Logo from "./components/Logo";
+import Logo from "../../components/common/Logo";
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const { singIn } = useAuth();
+  const { singIn , handleGoogleAuth} = useAuth();
 
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -31,6 +31,7 @@ const Login = () => {
     e.preventDefault();
     singIn.mutate(email);
   };
+
   return (
     <div className="flex w-full h-screen">
       <div className="w-2/3 px-10 py-5 flex flex-col items-center justify-center relative">
@@ -54,6 +55,7 @@ const Login = () => {
               text="Sign in with Google"
               type="outline"
               rounded
+              onClick={() => handleGoogleAuth("login")}
             />
             <Button htmlType="submit" text="Sign In" />
           </form>
