@@ -24,6 +24,10 @@ def handle_conversation(data):
         emit('error', {'error': 'conversation missing'})
         return
 
-    conv = conversation.to_dict()
-    conv.pop("last_message_id")
-    emit('conversation_created', conv, broadcast=True)
+    conversation_users = conversation.users
+    conversation_users = [user.mini_data() for user in conversation_users]
+    conversation_data = conversation.to_dict()
+    conversation_data['users'] = conversation_users
+    conversation_data.pop("last_message_id")
+    
+    emit('conversation_created', conversation_data, broadcast=True)
