@@ -30,8 +30,8 @@ class BaseModel:
                 setattr(self, key, value)
                 
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
 
     def __str__(self):
        """
@@ -55,10 +55,12 @@ class BaseModel:
            new_dict.pop('_sa_instance_state')
        if new_dict.get('messages'):
            new_dict.pop('messages')
+       if new_dict.get('password'):
+           new_dict.pop('password')
        return new_dict
 
     def save(self):
         from . import storage
 
-        updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
         storage.save()

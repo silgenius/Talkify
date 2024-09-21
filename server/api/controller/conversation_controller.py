@@ -20,31 +20,33 @@ def create_conversation(auth_email, sub):
         data = request.get_json()
     except Exception:
         return jsonify({"error": "Invalid json"}), 400
+
     users = data.get("users")
-    if not users or len(users) != 2:
-        return jsonify({"error": "Invalid user list"}), 400
+    if not users or len(users) != 1:
+        return jsonify({"error": "Invalid users list"}), 400
 
-    new_conversation = Conversation()
-    storage.new(new_conversation)
-    storage.save()
+    created_by = data.get("created_by")
+    if not created_by:
+        return jsonify({"error": "created_by missing"}), 400
 
-    user1 = session.query(User).filter_by(id=users[0]).one_or_none()
-    user2 = session.query(User).filter_by(id=users[1]).one_or_none()
+    user1 = session.query(User).filter_by(id=created_by).one_or_none()
+    user2 = session.query(User).filter_by(id=users[0]).one_or_none()
     if user1 and user2:
+        new_conversation = Conversation(created_by=user1.id)
+        storage.new(new_conversation)
         user1.conversations.append(new_conversation)
         user2.conversations.append(new_conversation)
         storage.save()
-    else:
-        storage.delete(new_conversation)
-        abort(404)
 
     # check if user already have the other user in their contact
     # create if not or skip
     verify = session.query(Contact).filter(and_(Contact.user_id == user1.id, Contact.contact_id == user2.id)).one_or_none()
     if not verify:
         contact1 = Contact(user_id=user1.id, contact_id=user2.id, contact_name=user_2.username)
+        conact1.status = Status.requested
         storage.new(contact1)
         contact2 = Contact(user_id=user2.id, contact_id=user1.id, contact_name=user_1.username)
+        contact2.status = Status.pending
         storage.new(contact1)
         storage.save()
 
@@ -59,18 +61,30 @@ def create_group(auth_email, sub):
          return jsonify({"error": "Invalid json"}), 400
 
     users = data.get("users")
-    if not users or len(users) < 2:
+    if not users or len(users) < 1:
         return jsonify({"error": "Invalid user list"}), 400
+
+    created_by = data.get("created_by")
+    if not created_by:
+        return jsonify({"error": "created_by missing"}), 400
 
     group_name = data.get("name")
     if not group_name:
         return jsonify({"error": "Missing group name"}), 400
 
-    new_conversation = Conversation(name=group_name)
-    new_conversation.is_group()
-    storage.new(new_conversation)
-    storage.save()
+    #add group creator to the group
+    user = session.query(User).filter_by(id=created_by).one_or_none()
+    if user:
+        new_conversation = Conversation(name=group_name, created_by=created_by)
+        new_conversation.is_group()
+        storage.new(new_conversation)
+        storage.save()
+        user.conversations.append(new_conversation)
+    else:
+        storage.delete(new_conversation)
+        abort(404)
 
+    #add other members to the group
     for user_id in users:
         user = session.query(User).filter_by(id=user_id).one_or_none()
         if user:
@@ -78,6 +92,7 @@ def create_group(auth_email, sub):
         else:
             storage.delete(new_conversation)
             abort(404)
+
     storage.save()
 
     return jsonify(new_conversation.to_dict()), 201
@@ -87,6 +102,7 @@ def create_group(auth_email, sub):
 def get_user_conversations(auth_email, sub, user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
+        user.update_last_login()
         user_conversations = user.conversations
         convo_dict = {}
         convo_dict["conversations"] = []

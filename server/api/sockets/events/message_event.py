@@ -54,10 +54,11 @@ def handle_typing(data):
             emit('error', {'error': 'user does not exist'})
             return
 
-        emit('typing_started', {'username': user.username,
-             'conversation_id': convo_id}, broadcast=True)
+        emit('typing_started', {'username': user.username, 'user_id': user.id, 'conversation_id': convo_id}, broadcast=True)
     finally:
         session.close()
+
+    
 
 
 @socketio.on('stop_typing')
@@ -83,10 +84,10 @@ def handle_stop_typing(data):
             emit('error', {'error': 'user does not exist'})
             return
 
-        emit('typing_stopped', {'username': user.username,
-             'conversation_id': convo_id}, broadcast=True)
+        emit('typing_stopped', {'username': user.username, 'user_id': user.id, 'conversation_id': convo_id}, broadcast=True)
     finally:
         session.close()
+    
 
 
 @socketio.on('deliver_message')

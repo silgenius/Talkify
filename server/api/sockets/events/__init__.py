@@ -19,3 +19,5 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 from server.api.sockets.events.message_event import *
 from server.api.sockets.events.connection_event import*
 from server.api.sockets.events.call_event import *
+from server.api.sockets.events.conversation_event import *
+from server.api.sockets.events.contact_event import *
