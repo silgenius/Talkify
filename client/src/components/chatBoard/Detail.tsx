@@ -21,9 +21,9 @@ const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
     <div className="flex flex-col h-full w-full bg-white p-4 relative">
       <button
         onClick={onClose}
-        className="absolute p-1.5 rounded-full top-4 right-4 transition-all hover:bg-primary-purple/10 hover:text-primary-purple"
+        className="absolute p-1.5 rounded-full top-4 md:right-4 transition-all hover:bg-primary-purple/10 hover:text-primary-purple"
       >
-        <BiX className="w-5 h-5" />
+        <BiX className="w-6 h-6" />
       </button>
       {/* Header */}
       <div className="flex flex-col items-center justify-center mt-8 space-y-4">
