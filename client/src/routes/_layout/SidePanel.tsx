@@ -56,8 +56,8 @@ const SidePanel = () => {
     }
   }, [conversations.isError]);
 
-  // Listen for new messages and update the conversations and messages query
   useEffect(() => {
+    // Listen for new messages and update the conversations and messages query
     socket.on(SocketEvent.MESSAGE_SENT, (message: MessageType) => {
       const inConversation = conversations.data?.find(
         (conversation: ConversationType) =>
@@ -72,9 +72,32 @@ const SidePanel = () => {
       }
     });
 
+    // Listen for new conversations and update the conversations query
+    socket.on(
+      SocketEvent.CONVERSATION_CREATED,
+      (conversation: ConversationType) => {
+        if (
+          conversation.users.find((user) => user.id === currentUser.id) ||
+          conversation.created_by === currentUser.id
+        ) {
+          queryClient.invalidateQueries({ queryKey: ["conversations"] });
+        }
+      }
+    );
+
+    // Listen for contact actions and update the contacts query
+    socket.on(SocketEvent.CONTACT_ACTION_SENT, (reciever_id: string) => {
+      if (reciever_id === currentUser.id)
+        queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    });
+
     return () => {
       socket.off(SocketEvent.MESSAGE_SENT);
+      socket.off(SocketEvent.CONVERSATION_CREATED);
+      socket.off(SocketEvent.CONTACT_ACTION_SENT);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, queryClient]);
 
   useEffect(() => {

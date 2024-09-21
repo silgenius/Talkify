@@ -24,6 +24,7 @@ type ConversationType = {
   group: boolean;
   created_at: string;
   updated_at: string;
+  created_by: string;
   others: {
     id: string;
     username: string;
