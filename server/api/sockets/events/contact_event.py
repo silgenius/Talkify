@@ -5,6 +5,7 @@ from server.api.sockets.events import socketio
 from server.models import storage
 from server.models.contact import Contact
 from server.models.user import User
+from sqlalchemy import and_
 
 
 session = storage.get_session()
