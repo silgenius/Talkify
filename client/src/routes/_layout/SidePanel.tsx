@@ -76,20 +76,26 @@ const SidePanel = () => {
     socket.on(
       SocketEvent.CONVERSATION_CREATED,
       (conversation: ConversationType) => {
-        if (
-          conversation.users.find((user) => user.id === currentUser.id) ||
-          conversation.created_by === currentUser.id
-        ) {
+        if (conversation.users.find((user) => user.id === currentUser.id)) {
           queryClient.invalidateQueries({ queryKey: ["conversations"] });
+          toast.info("you've been added to a new chat");
         }
       }
     );
 
     // Listen for contact actions and update the contacts query
-    socket.on(SocketEvent.CONTACT_ACTION_SENT, (reciever_id: string) => {
-      if (reciever_id === currentUser.id)
+    socket.on(
+      SocketEvent.CONTACT_ACTION_SENT,
+      (data: { user_id: string; contact_name: string; status: string }) => {
         queryClient.invalidateQueries({ queryKey: ["contacts"] });
-    });
+        if (data.user_id === currentUser.id) {
+          if (data.status === "requested")
+            toast.info(`${data.contact_name} sent you a friend request`);
+          else if (data.status === "accepted")
+            toast.success(`${data.contact_name} accepted your friend request`);
+        }
+      }
+    );
 
     return () => {
       socket.off(SocketEvent.MESSAGE_SENT);

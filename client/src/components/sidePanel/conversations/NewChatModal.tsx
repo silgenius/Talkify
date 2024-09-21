@@ -11,6 +11,8 @@ import { getUser } from "../../../utils/localStorage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { ContactType, ConversationType } from "../../../types";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
 
 interface SearchModalProps {
   isModalOpen: boolean;
@@ -81,11 +83,15 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return { id: res.id, new: true };
     },
     onSuccess: (data) => {
-      if (data.new) toast.success(`Chat created successfully!`);
-      else toast.info(`Chat already exists!`);
+      if (data.new) {
+        toast.success(`Chat created successfully!`);
+        socket.emit(SocketEvent.CREATE_CONVERSATION, {
+          conversation_id: data.id,
+        });
+      } else toast.info(`Chat already exists!`);
 
-      navigate(`/conversation/${data.id}`);
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      navigate(`/conversation/${data.id}`);
     },
     onError: (error) => {
       console.log(error);
@@ -141,6 +147,9 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return res;
     },
     onSuccess: (data) => {
+      socket.emit(SocketEvent.CREATE_CONVERSATION, {
+        conversation_id: data.id,
+      });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       toast.success(`Group "${data.name}" created successfully!`);
       navigate(`/conversation/${data.id}`);

@@ -5,6 +5,8 @@ import { FaCircle } from "react-icons/fa";
 import newRequest from "../../../utils/newRequest";
 import { getUser } from "../../../utils/localStorage";
 import { toast } from "react-toastify";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
 
 interface ContactCardProps {
   contact: ContactType;
@@ -23,8 +25,12 @@ const ContactCard = ({ contact }: ContactCardProps) => {
       console.log(res.data);
       return res.data;
     },
-    onSuccess: () => {
-      toast.success("Friend request accepted");
+    onSuccess: (_, variables) => {
+      socket.emit(SocketEvent.SEND_CONTACT_ACTION, {
+        sender_id: variables.sender_id,
+        receiver_id: variables.receiver_id,
+      });
+      toast.success(`You are now friends with ${contact.contact.username}!`);
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
     },
     onError: () => {

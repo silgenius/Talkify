@@ -11,6 +11,8 @@ import { Menu, MenuItem } from "@szhsin/react-menu";
 import { IoPaperPlane } from "react-icons/io5";
 import { ImBlocked } from "react-icons/im";
 import LoadingSpinner from "../../common/LoadingSpinner";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
 
 interface AddContactModalProps {
   isOpen: boolean;
@@ -46,10 +48,13 @@ const NewContactModal = ({ isOpen, onClose }: AddContactModalProps) => {
   const sendRequest = useMutation({
     mutationFn: async (data: ContactAction) => {
       const res = (await newRequest.post("/request", data)).data;
-      console.log(res);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      socket.emit(SocketEvent.SEND_CONTACT_ACTION, {
+        sender_id: variables.sender_id,
+        receiver_id: variables.receiver_id,
+      });
       toast.success("Friend request sent");
     },
     onError: () => {
