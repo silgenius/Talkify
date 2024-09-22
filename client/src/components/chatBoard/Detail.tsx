@@ -68,10 +68,12 @@ const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
         {/* Conversation Details */}
         <div className="w-full flex flex-col border-t pt-4">
           <p className="text-gray-600">
-            Created on: {new Date(conversation.created_at).toLocaleDateString()}
+            Created on:{" "}
+            {new Date(conversation.created_at + "Z").toLocaleDateString()}
           </p>
           <p className="text-gray-600">
-            Last active: {new Date(conversation.updated_at).toLocaleString()}
+            Last active:{" "}
+            {new Date(conversation.updated_at + "Z").toLocaleString()}
           </p>
         </div>
 

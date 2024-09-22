@@ -62,7 +62,7 @@ const CallMessage: React.FC<CallMessageProps> = ({
         <p className="text-xl font-semibold text-gray-700">{text}</p>
         <div className="flex space-x-1 justify-center items-center w-fit">
           <p className="text-gray-600 text-sm">
-            {new Date(createdAt).toLocaleString("en-us", {
+            {new Date(createdAt+"Z").toLocaleString("en-us", {
               hour: "2-digit",
               minute: "2-digit",
             })}

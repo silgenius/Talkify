@@ -200,7 +200,7 @@ const ConversationItem = ({
               ) : (
                 <span className={`text-sm ${"text-gray-500"}`}>
                   {lastMessage?.created_at
-                    ? new Date(lastMessage?.created_at).toLocaleTimeString(
+                    ? new Date(lastMessage?.created_at+"Z").toLocaleTimeString(
                         "US",
                         {
                           hour: "2-digit",

@@ -141,9 +141,9 @@ const Message = ({
             )}
             <span>
               {message.created_at &&
-                new Date(message.created_at).toLocaleString("en-UK", {
-                  hour: "2-digit",
-                  minute: "2-digit",
+                new Date(`${message.created_at}Z`).toLocaleString("en-UK", {
+                  hour: "numeric",
+                  minute: "numeric",
                 })}
             </span>
             {isSender && (
