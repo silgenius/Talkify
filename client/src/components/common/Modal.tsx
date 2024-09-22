@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({
           height === "full" ? "h-full" : "h-fit"
         } max-h-[90%] max-w-md p-6 relative transform transition-transform duration-300 ${
           animateModal ? "translate-y-0" : "translate-y-4"
-        }`}
+        } flex flex-col`}
       >
         {onClose && <button
           onClick={onClose}

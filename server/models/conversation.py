@@ -21,6 +21,7 @@ class Conversation(BaseModel, Base):
 
     name = Column(String(60), nullable=True)
     group = Column(Boolean, default=False)
+    created_by = Column(String(60), nullable=False)
     last_message_id = Column(String(60), nullable=True)
     messages = relationship('Message', backref='conversation', cascade='all, delete, delete-orphan')
     users = relationship('User', secondary=user_conversation, back_populates='conversations', viewonly=False)

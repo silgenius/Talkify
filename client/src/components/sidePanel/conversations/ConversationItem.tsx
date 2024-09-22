@@ -8,6 +8,7 @@ import socket from "../../../socket";
 import { SocketEvent } from "../../../utils/socketEvents";
 import { getUser } from "../../../utils/localStorage";
 import { toast } from "react-toastify";
+import GroupIcon from "../../common/GroupIcon";
 
 interface ChatListItemProps {
   name: string;
@@ -26,7 +27,7 @@ const ConversationItem = ({
   selected,
   isGroup = false,
   photoUrl,
-  contactId
+  contactId,
 }: ChatListItemProps) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -48,7 +49,7 @@ const ConversationItem = ({
     enabled: !!lastMessageId,
   });
 
-  const { data: lastMessageSender } = useQuery({
+  const { data: lastMessageSender, isLoading: lastMessageLoading } = useQuery({
     queryKey: ["user", lastMessage?.sender_id],
     queryFn: async () => {
       const res = (await newRequest(`user/id/${lastMessage?.sender_id}`)).data;
@@ -61,7 +62,10 @@ const ConversationItem = ({
   useEffect(() => {
     if (!error && lastMessage && currentUser.id !== lastMessage.sender_id) {
       setIsRead(lastMessage.status === "seen");
-      if (lastMessage.status === "sent" && currentConversationId !== conversationId) {
+      if (
+        lastMessage.status === "sent" &&
+        currentConversationId !== conversationId
+      ) {
         console.log("deliver message", lastMessage);
         socket.emit(SocketEvent.DELIVER_MESSAGE, {
           message_id: lastMessage.id,
@@ -72,50 +76,59 @@ const ConversationItem = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage, error]);
 
-
   const exitGroup = useMutation({
-    mutationFn: async (data: {conversation_id: string, user_id: string}) => {
+    mutationFn: async (data: { conversation_id: string; user_id: string }) => {
       const res = await newRequest.put(`/conversation/group/remove`, data);
       return res.data;
     },
     onSuccess: (data: MessageType) => {
-      queryClient.invalidateQueries({queryKey: ["conversations"]});
-      queryClient.invalidateQueries({queryKey: ["conversation", conversationId]});
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: data.id });
-      toast.success("You have left the group " + name);
+      toast.info("You have left the group " + name);
       navigate("/");
     },
     onError: (error) => {
       console.log("error", error);
       toast.error("Failed to leave the group");
-    }
-  })
+    },
+  });
 
   const blockUser = useMutation({
-    mutationFn: async (data: {sender_id: string, receiver_id: string}) => {
+    mutationFn: async (data: { sender_id: string; receiver_id: string }) => {
       const res = (await newRequest.post(`/block`, data)).data;
-      console.log(res); 
+      console.log(res);
       return res;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["conversation", conversationId]});
-      queryClient.invalidateQueries({queryKey: ["contacts"]});
-      toast.success("User blocked successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      toast.info("User blocked successfully");
     },
     onError: (error) => {
       console.log("error", error);
       toast.error("Failed to block user");
-    }
+    },
   });
 
   const handleExit = () => {
-    exitGroup.mutate({conversation_id: conversationId, user_id: currentUser.id});
-  }
+    exitGroup.mutate({
+      conversation_id: conversationId,
+      user_id: currentUser.id,
+    });
+  };
 
   const handleBlock = () => {
-    blockUser.mutate({sender_id: currentUser.id, receiver_id: contactId as string});
-  }
-
+    blockUser.mutate({
+      sender_id: currentUser.id,
+      receiver_id: contactId as string,
+    });
+  };
+  
   return (
     <div
       className="relative"
@@ -132,11 +145,15 @@ const ConversationItem = ({
           !isRead ? "font-medium  shadow-md" : ""
         }`}
       >
-        <img
-          src={photoUrl || "/user.png"}
-          alt="User Avatar"
-          className="w-12 h-12 rounded-full object-contain object-center"
-        />
+        {isGroup ? (
+          <GroupIcon className="!w-12 !h-12" />
+        ) : (
+          <img
+            src={photoUrl || "/user.png"}
+            alt="User Avatar"
+            className="w-12 h-12 rounded-full object-contain object-center"
+          />
+        )}
         <div className="flex flex-col w-full overflow-hidden">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center justify-center space-x-3">
@@ -165,14 +182,22 @@ const ConversationItem = ({
               ))}
           </div>
           <div className="flex justify-between items-center">
-            <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
-              {lastMessage?.sender_id === currentUser.id
-                ? "You: "
-                : isGroup &&
-                  lastMessageSender &&
-                  lastMessageSender?.username + ": "}
-              {lastMessage?.message_text || "No messages yet"}
-            </p>
+            {lastMessageLoading ? (
+              <div className="w-40 h-2 bg-gray-300 rounded animate-pulse" />
+            ) : !lastMessage? <></> : (
+              <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
+                {lastMessage?.sender_id === currentUser.id
+                  ? "You: "
+                  : isGroup &&
+                    lastMessage?.message_type !== "exited" &&
+                    lastMessageSender?.username + ": "}
+
+                {lastMessage?.message_type !== "text" &&
+                lastMessage?.message_type !== "exited"
+                  ? lastMessage?.message_type + " call"
+                  : lastMessage?.message_text || "No messages"}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -208,16 +233,17 @@ const ConversationItem = ({
               Mark as {isRead ? "unread" : "read"}
             </MenuItem>
             <MenuItem>Mute notifications</MenuItem>
-            {isGroup ?(
+            {isGroup ? (
               <>
                 <MenuDivider />
                 <MenuItem onClick={handleExit}>Exit group</MenuItem>
               </>
-            ):
-            <>
-              <MenuDivider />
-              <MenuItem onClick={handleBlock}>Block user</MenuItem>
-            </>}
+            ) : (
+              <>
+                <MenuDivider />
+                <MenuItem onClick={handleBlock}>Block user</MenuItem>
+              </>
+            )}
           </Menu>
         </div>
       )}

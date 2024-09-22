@@ -35,7 +35,7 @@ const ContactCard = ({ contact, isGroup, handleAdd }: ContactCardProps) => {
           <span className="text-gray-800 font-semibold">
             {contact.username}
           </span>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 text-sm text-start">
             {contact.last_login ? "Online" : "Offline"}
           </p>
         </div>

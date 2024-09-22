@@ -22,7 +22,7 @@ type ConversationType = {
   name: string;
   last_message_id: string;
   group: boolean;
-  create_at: string;
+  created_at: string;
   updated_at: string;
   others: {
     id: string;

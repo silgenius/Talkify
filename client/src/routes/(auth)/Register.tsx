@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { googleLogo } from "../../assets";
-import Button from "./components/Button";
+import Button from "../../components/common/Button";
 import Input from "./components/Input";
-import Logo from "./components/Logo";
+import Logo from "../../components/common/Logo";
 import SideBar from "./components/SideBar";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ const Register = () => {
     lastName: "",
     email: "",
   });
-  const { signUp } = useAuth();
+  const { signUp, handleGoogleAuth } = useAuth();
 
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -39,7 +39,7 @@ const Register = () => {
     e.preventDefault();
     signUp.mutate(formData);
   };
-
+  
   return (
     <div className="flex w-full h-screen">
       <SideBar
@@ -87,6 +87,7 @@ const Register = () => {
               text="Sign up with Google"
               type="outline"
               rounded
+              onClick={() => handleGoogleAuth("signup")}
             />
             <Button htmlType="submit" text="Sign Up" />
           </form>

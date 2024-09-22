@@ -34,13 +34,14 @@ class User(BaseModel, Base):
 
     username = Column(String(60), nullable=False)
     email = Column(String(60), nullable=False)
-    profile_url = Column(String(60), nullable=True)
+    profile_url = Column(String(200), nullable=True)
     last_login= Column(DateTime, nullable=False)
     bio = Column(String(300), nullable=True)
     conversations = relationship('Conversation', secondary=user_conversation, back_populates='users', viewonly=False)
     messages = relationship('Message', backref='user', cascade='all, delete, delete-orphan')
     contacts = relationship('Contact', backref='user', cascade='all, delete, delete-orphan')
     notifications = relationship('Notification', backref='user', cascade='all, delete, delete-orphan')
+    password = Column(String(60), nullable=True)
 
     def __init__(self, *args, **kwargs):
         """initializes city"""
@@ -50,7 +51,7 @@ class User(BaseModel, Base):
         """
         Updates the last_login attribute to the current date and time.
         """
-        self.last_login = datetime.now()
+        self.last_login = datetime.utcnow()
 
     def mini_data(self, bio=False):
         """

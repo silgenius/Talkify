@@ -1,0 +1,10 @@
+<script>
+    // Define the user details object from Jinja2
+    var user_details = {{ user_details|tojson|safe }};
+
+    // Send the data back to the main window
+    window.opener.postMessage(user_details, "https://talkify.semx.tech");
+
+   // Close the popup window
+   window.close();
+</script>
