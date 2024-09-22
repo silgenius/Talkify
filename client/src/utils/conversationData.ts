@@ -31,6 +31,6 @@ export const getChatOthers = (
   conversation: ConversationType | undefined,
   currentUser: UserType
 ) => {
-  if (!conversation) return;
+  if (!conversation) return [];
   return conversation.users.filter((user) => user.id !== currentUser.id);
 };

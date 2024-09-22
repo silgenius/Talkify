@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
-import { CallDataType, ConversationType, MessageType } from "../../types";
+import { CallDataType, ConversationType, MessageType, UserType } from "../../types";
 import { getUser } from "../../utils/localStorage";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
@@ -20,6 +20,7 @@ import Modal from "../../components/common/Modal";
 import { useCall } from "../../hooks/useCall";
 import { formatTime } from "../../utils/formatTime";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { getChatOthers } from "../../utils/conversationData";
 
 type typingSocketData = {
   user_id: string,
@@ -72,9 +73,17 @@ const ChatBoard = () => {
     },
     enabled: !!id,
   });
-  const other = conversation?.data?.users.filter(
-    (user) => user.id !== currentUser.id
-  )[0];
+
+  const other = getChatOthers(conversation.data, currentUser)[0];
+
+  const { data: contact } = useQuery<UserType>({
+    queryKey: ["user", other?.id],
+    queryFn: async () => {
+      const res = (await newRequest(`/user/id/${other?.id}`)).data;
+      return res;
+    },
+    enabled: !!conversation && !!other
+  });
 
   const messages = useQuery({
     queryKey: ["messages", id],
@@ -460,6 +469,7 @@ const ChatBoard = () => {
           <Detail
             conversation={conversation.data}
             onClose={() => setShowDetail(false)}
+            user={contact}
           />
         </div>
       )}

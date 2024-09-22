@@ -1,22 +1,19 @@
 import { MdDeleteOutline, MdVolumeOff, MdOutlineImage } from "react-icons/md";
-import { ConversationType } from "../../types";
+import { ConversationType, UserType } from "../../types";
 import React from "react";
 import { BiX } from "react-icons/bi";
-import { getChatName, getChatPhoto } from "../../utils/conversationData";
-import { getUser } from "../../utils/localStorage";
 import GroupIcon from "../common/GroupIcon";
 
 type DetailsProps = {
   conversation?: ConversationType;
+  user?: UserType;
   onClose: () => void;
 };
 
-const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
+const Details: React.FC<DetailsProps> = ({ conversation, user, onClose }) => {
   if (!conversation) {
     return;
   }
-  const currentUser = getUser();
-  const photo = getChatPhoto(conversation, currentUser);
   return (
     <div className="flex flex-col h-full w-full bg-white p-4 relative">
       <button
@@ -31,16 +28,23 @@ const Details: React.FC<DetailsProps> = ({ conversation, onClose }) => {
           <GroupIcon />
         ) : (
           <img
-            src={photo || "/user.png"}
+            src={user?.profile_url || "/user.png"}
             alt={`${conversation.name || "Conversation"} Avatar`}
             className="w-20 h-20 rounded-full object-contain"
           />
         )}
         <h1 className="text-lg font-semibold ml-4">
-          {getChatName(conversation, currentUser) || "Unnamed Conversation"}
+          {user?.username || "Unnamed Conversation"}
         </h1>
       </div>
 
+      {/* Bio Section */}
+      {user?.bio && !conversation.group && (
+        <div className="flex flex-col p-4">
+          <h2 className="text-md font-semibold border-t pt-4">Bio</h2>
+          <p className="text-gray-600 mt-2 text-start">{user.bio}</p>
+        </div>
+      )}
       {/* Conversation Info */}
       <div className="flex flex-col items-center p-4 space-y-4">
         {/* Participants */}
