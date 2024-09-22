@@ -142,7 +142,7 @@ const ContactCard = ({ contact }: ContactCardProps) => {
   return (
     <div
       key={contact.contact.id}
-      className="flex items-center gap-4 p-3 space-y-4 rounded-lg hover:bg-gray-100"
+      className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100"
     >
       <img
         src={contact.contact.profile_url || "/user.png"}

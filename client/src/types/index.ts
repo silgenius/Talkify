@@ -2,6 +2,7 @@ type UserType = {
   id: string;
   username: string;
   email: string;
+  bio: string;
   first_name: string;
   last_name: string;
   last_login: Date;
