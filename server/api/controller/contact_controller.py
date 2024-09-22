@@ -13,6 +13,9 @@ session = storage.get_session()
 @app_handler.route("/<string:user_id>/contacts")
 @required
 def get_user_contact(auth_email, sub, user_id):
+    """
+    This endpoint retrieves the contacts associated with a specified user
+    """
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if not user:
         abort(404)
