@@ -55,3 +55,34 @@ def search_by_username(auth_email, sub):
     result = [user.mini_data() for user in users]
 
     return jsonify(result), 200
+
+@app_handler.route("/user/update", methods=['PUT'])
+@required
+def update_user_data(auth_email, sub):
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({"error": "Not a JSON"}), 400
+
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user id missing"}), 400
+
+    if user_id != sub:
+        return jsonify({"error": "you cant access this page"}), 401
+
+    user = session.query(User).filter_by(id=user_id).one_or_none()
+    if not user:
+        return jsonify({"error": "user not found"}), 400
+
+    username = data.get("username")
+    if username:
+        user.username = username
+
+    bio = data.get("bio")
+    if bio:
+        user.bio = bio
+
+    user.save()
+
+    return jsonify({"success": "data updated"}), 200
