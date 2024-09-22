@@ -1,9 +1,12 @@
 import { IoLogOutOutline } from "react-icons/io5";
-import { getUser } from "../../../utils/localStorage";
+import { getUser, setUser } from "../../../utils/localStorage";
 import { FiEdit3 } from "react-icons/fi";
 import { useState } from "react";
 import { FaX } from "react-icons/fa6";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaSpinner } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import newRequest from "../../../utils/newRequest";
+import { toast } from "react-toastify";
 
 interface ProfileProps {
   handleLogout: () => void;
@@ -13,19 +16,49 @@ const Profile = ({ handleLogout }: ProfileProps) => {
   const currentUser = getUser();
 
   const [inputValue, setInputValue] = useState({
-    username: currentUser.username,
-    bio: currentUser.bio,
+    username: currentUser.username || "",
+    bio: currentUser.bio || "",
   });
   const [edit, setEdit] = useState({ username: false, bio: false });
 
+  const updateUser = useMutation({
+    mutationFn: async (data: {
+      user_id: string;
+      username?: string;
+      bio?: string;
+    }) => {
+      const res = (await newRequest.put("/user/update", data)).data;
+      return res;
+    },
+    onSuccess: (_, variables) => {
+      const updatedUser = {
+        ...currentUser,
+        ...(variables.bio && { bio: variables.bio }),
+        ...(variables.username && { username: variables.username }),
+      };
+      setUser(updatedUser);
+      if (variables.username) {
+        toast.success("Username updated successfully.");
+        setEdit((prev) => ({ ...prev, username: false }));
+      }
+      if (variables.bio) {
+        toast.success("Bio updated successfully.");
+        setEdit((prev) => ({ ...prev, bio: false }));
+      }
+    },
+    onError: () => {
+      toast.error("Failed to update user information. Please try again.");
+    },
+  });
   const handleEditUsername = () => {
-    // Update username
-    setEdit((prev) => ({ ...prev, username: false }));
+    updateUser.mutate({
+      user_id: currentUser.id,
+      username: inputValue.username,
+    });
   };
 
   const handleEditBio = () => {
-    // Update bio
-    setEdit((prev) => ({ ...prev, bio: false }));
+    updateUser.mutate({ user_id: currentUser.id, bio: inputValue.bio });
   };
 
   return (
@@ -72,12 +105,16 @@ const Profile = ({ handleLogout }: ProfileProps) => {
                 }}
               />
               <div className="absolute -top-6 right-4 flex items-center justify-center space-x-2.5 text-primary-purple">
-                <button
-                  onClick={handleEditUsername}
-                  className="text-gray-600 hover:text-gray-700"
-                >
-                  <FaCheck />
-                </button>
+                {updateUser.isPending && updateUser.variables.username ? (
+                  <FaSpinner className="animate-spin h-5 w-5" />
+                ) : (
+                  <button
+                    onClick={handleEditUsername}
+                    className="text-gray-600 hover:text-gray-700"
+                  >
+                    <FaCheck />
+                  </button>
+                )}
                 <button
                   className="text-gray-600 hover:text-gray-700"
                   onClick={() =>
@@ -119,13 +156,17 @@ const Profile = ({ handleLogout }: ProfileProps) => {
                 }}
               />
 
-              <div className="absolute -top-6 right-4 flex items-center justify-center space-x-2.5">
-                <button
-                  onClick={handleEditBio}
-                  className="text-gray-600 hover:text-gray-700"
-                >
-                  <FaCheck />
-                </button>
+              <div className="absolute -top-6 right-4 flex items-center justify-center space-x-2.5 text-primary-purple">
+                {updateUser.isPending && updateUser.variables.bio ? (
+                  <FaSpinner className="animate-spin h-5 w-5" />
+                ) : (
+                  <button
+                    onClick={handleEditBio}
+                    className="text-gray-600 hover:text-gray-700"
+                  >
+                    <FaCheck />
+                  </button>
+                )}
                 <button
                   className="text-gray-600 hover:text-gray-700"
                   onClick={() => setEdit((prev) => ({ ...prev, bio: false }))}
