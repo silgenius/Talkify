@@ -184,7 +184,7 @@ const Profile = ({ handleLogout }: ProfileProps) => {
       </div>
 
       <button
-        className="font-medium text-red-500 p-2 w-full space-x-2 hover:bg-red-100 rounded-lg transition flex items-center justify-center mt-4"
+        className="font-medium text-gray-700 bg-gray-200 p-2 w-full space-x-2 hover:bg-gray-300 rounded-lg transition flex items-center justify-center mt-4"
         onClick={handleLogout}
       >
         <IoLogOutOutline className="text-2xl" />
