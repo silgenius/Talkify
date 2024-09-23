@@ -139,7 +139,7 @@ const Message = ({
                 <GoDotFill size={5} />
               </>
             )}
-            <span>
+            <span className={message.status === "failed" ? "text-red-600" : ""}>
               {message.created_at &&
                 new Date(`${message.created_at}Z`).toLocaleString("en-UK", {
                   hour: "numeric",

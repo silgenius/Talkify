@@ -16,7 +16,7 @@ type Emoji = {
 };
 
 type MessageDataType = {
-  conversation_id?: string;
+  conversation_id: string;
   user_id: string;
   message_text: string;
 };
@@ -29,6 +29,7 @@ interface ChatFooterProps {
     React.SetStateAction<
       {
         messageId: number;
+        conversation_id: string;
         message_text: string;
         status: "sending" | "failed" | "sent";
         isFirst: boolean;
@@ -111,6 +112,7 @@ const ChatFooter = ({
   });
 
   const handleSendMessage = () => {
+    if (!id) return;
     if (text.trim() === "") return;
     const messageId = Math.random() * 1000000;
     const messageData: MessageDataType & { messageId: number } = {
