@@ -2,12 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import newRequest from "../../utils/newRequest";
-import { ContactType, MessageType } from "../../types";
+import { MessageType } from "../../types";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
 import { useParams } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
 import { BsPlus, BsCameraVideo, BsMic, BsSend } from "react-icons/bs";
+import useAppData from "../../hooks/useAppData";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 type Emoji = {
   emoji: string;
@@ -31,6 +33,7 @@ interface ChatFooterProps {
         status: "sending" | "failed" | "sent";
         isFirst: boolean;
         isLast: boolean;
+        created_at?: string;
       }[]
     >
   >;
@@ -67,16 +70,16 @@ const ChatFooter = ({
   const createMessage = useMutation({
     mutationFn: async (data: MessageDataType & { messageId: number }) => {
       const res = await newRequest.post(`/message/create`, data);
-      
+
       return { ...res.data, messageId: data.messageId };
     },
-    onSuccess: (message: MessageType & {messageId: number}) => {
+    onSuccess: (message: MessageType & { messageId: number }) => {
       socket.emit(SocketEvent.SEND_MESSAGE, { message_id: message.id });
       socket.emit(SocketEvent.STOP_TYPING, {
         conversation_id: id,
         sender_id: currentUser.id,
       });
-      
+
       setTmpMessages((prev) => {
         const lastMessage = prev.find(
           (msg) => msg.messageId === message.messageId
@@ -99,16 +102,17 @@ const ChatFooter = ({
         );
         if (lastMessage) {
           lastMessage!.status = "failed";
+          lastMessage.created_at = new Date().toISOString().replace("Z", "");
         }
         return [...prev];
-      })
+      });
       console.log(error);
     },
   });
 
   const handleSendMessage = () => {
     if (text.trim() === "") return;
-    const messageId = Math.random() * 1000000; 
+    const messageId = Math.random() * 1000000;
     const messageData: MessageDataType & { messageId: number } = {
       messageId: messageId,
       conversation_id: id,
@@ -145,18 +149,23 @@ const ChatFooter = ({
     setTmpText((prev) => ({ ...prev, [id as string]: e.target.value }));
     handleTyping(e);
   };
+
   const [isBlocked, setIsBlocked] = useState(false);
 
-  const contacts = queryClient.getQueryData<ContactType[]>(["contacts"]);
+  const { contacts } = useAppData();
+  const contact = contacts.data?.find(
+    (contact) => contact.contact.id === contactId
+  );
+
   useEffect(() => {
-    const contact = contacts?.find(
-      (contact) => contact.contact.id === contactId
-    );
     setIsBlocked(contact?.status === "blocked");
-  }, [contacts, contactId, queryClient]);
+  }, [contact]);
+
   return (
     <div className="w-full border-primary-purple/20 min-h-16 p-3 flex bg-whie items-center justify-between shadow-[7px_-1px_10px_rgba(0,0,0,0.1)] shadow-primary-purple/10 gap-4">
-      {isBlocked ? (
+      {contacts.isLoading ? (
+        <LoadingSpinner />
+      ) : isBlocked ? (
         <div className="text-gray-500 w-full text-center">
           this user is unavailable
         </div>

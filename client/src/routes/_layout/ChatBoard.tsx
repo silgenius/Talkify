@@ -412,7 +412,9 @@ const ChatBoard = () => {
             conversation.data && (
               <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-1 pl-16 items-start">
                 {messages.data?.length > 0 ? (
-                  [...messages.data, ...tmpMessages].map(
+                  [...messages.data, ...tmpMessages].sort((a, b) => {
+                    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+                  }).map(
                     (
                       message: MessageType & {
                         messageId: number;
@@ -449,7 +451,7 @@ const ChatBoard = () => {
                     </p>
                   </div>
                 )}
-                <TypingIndicator isTyping={isTyping} />
+                <TypingIndicator isTyping={isTyping} contactId={conversation.data?.group ? undefined : other?.id}/>
                 <div ref={lastMessageRef}></div>
               </div>
             )
