@@ -111,6 +111,7 @@ const ConversationItem = ({
         queryKey: ["conversation", conversationId],
       });
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["availableContacts"] });
       toast.info("User blocked successfully");
     },
     onError: (error) => {
@@ -130,6 +131,7 @@ const ConversationItem = ({
         queryKey: ["conversation", conversationId],
       });
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["availableContacts"] });
       toast.info("User unblocked successfully");
     },
     onError: (error) => {

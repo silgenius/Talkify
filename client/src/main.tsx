@@ -47,7 +47,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <CallProvider>
         <RouterProvider router={router} />
-        <ToastContainer />
+        <ToastContainer stacked autoClose={3000} closeOnClick/>
       </CallProvider>
     </QueryClientProvider>
   </StrictMode>
