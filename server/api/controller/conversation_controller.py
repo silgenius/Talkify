@@ -103,6 +103,7 @@ def get_user_conversations(auth_email, sub, user_id):
     user = session.query(User).filter_by(id=user_id).one_or_none()
     if user:
         user.update_last_login()
+        storage.save() # save user last login
         user_conversations = user.conversations
         convo_dict = {}
         convo_dict["conversations"] = []
