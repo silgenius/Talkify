@@ -11,6 +11,8 @@ import { getUser } from "../../../utils/localStorage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
 import { ContactType, ConversationType } from "../../../types";
+import socket from "../../../socket";
+import { SocketEvent } from "../../../utils/socketEvents";
 
 interface SearchModalProps {
   isModalOpen: boolean;
@@ -64,14 +66,14 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
   }, [searchQuery, addedMembers, contacts]);
 
   const createConversation = useMutation({
-    mutationFn: async (data: { users: [string, string] }) => {
+    mutationFn: async (data: { users: [string]; created_by: string }) => {
       const conversations = queryClient.getQueriesData({
         queryKey: ["conversations"],
       })[0][1] as ConversationType[];
       const existingConversation = conversations.find(
         (conversation) =>
           !conversation.group &&
-          conversation.others.find((user) => user.id === data.users[1])
+          conversation.others.find((user) => user.id === data.users[0])
       );
 
       if (existingConversation) {
@@ -81,11 +83,15 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return { id: res.id, new: true };
     },
     onSuccess: (data) => {
-      if (data.new) toast.success(`Chat created successfully!`);
-      else toast.info(`Chat already exists!`);
+      if (data.new) {
+        toast.success(`Chat created successfully!`);
+        socket.emit(SocketEvent.CREATE_CONVERSATION, {
+          conversation_id: data.id,
+        });
+      } else toast.info(`Chat already exists!`);
 
-      navigate(`/conversation/${data.id}`);
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      navigate(`/conversation/${data.id}`);
     },
     onError: (error) => {
       console.log(error);
@@ -110,7 +116,8 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       toast.success(`${contact.contact.username} added`);
     } else {
       createConversation.mutate({
-        users: [currentUser.id, contact.contact.id],
+        created_by: currentUser.id,
+        users: [contact.contact.id],
       });
       onClose();
     }
@@ -126,6 +133,7 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
 
   const createGroup = useMutation({
     mutationFn: async (data: {
+      created_by: string;
       name: string;
       photo?: string;
       users: string[];
@@ -139,6 +147,9 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       return res;
     },
     onSuccess: (data) => {
+      socket.emit(SocketEvent.CREATE_CONVERSATION, {
+        conversation_id: data.id,
+      });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       toast.success(`Group "${data.name}" created successfully!`);
       navigate(`/conversation/${data.id}`);
@@ -159,13 +170,20 @@ const NewChatModal = ({ isModalOpen, onClose }: SearchModalProps) => {
       toast.error("Please add at least one member to the group");
       return;
     }
+    if (!groupDetails.name || groupDetails.name.trim() === "") {
+      toast.warning("Please enter a valid group name");
+      return;
+    }
+    if (groupDetails.name.length > 60) {
+      toast.warning("Group name is too long");
+      return;
+    }
+
     createGroup.mutate({
+      created_by: currentUser.id,
       photo: groupDetails.photo,
       name: groupDetails.name,
-      users: [
-        currentUser.id,
-        ...addedMembers.map((member) => member.contact.id),
-      ],
+      users: [...addedMembers.map((member) => member.contact.id)],
     });
     onClose();
   };

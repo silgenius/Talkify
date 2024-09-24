@@ -22,7 +22,7 @@ export default function Root() {
     });
 
     socket.on(SocketEvent.USER_CONNECTED, (data: UserMiniDataType) => {
-      if (data.id === currentUser.id) return;
+      if (data?.id === currentUser.id) return;
       console.log(data.username, "is online");
     });
 

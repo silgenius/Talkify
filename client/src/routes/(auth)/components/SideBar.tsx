@@ -26,6 +26,7 @@ const SideBar = ({
       <h1 className="text-3xl font-semibold text-white">{title}</h1>
       <p className="text-white text-center">{description}</p>
       <Button
+        className=" border-white text-white focus:ring-white"
         onClick={handleClick}
         type="outline"
         rounded={true}

@@ -2,6 +2,7 @@ type UserType = {
   id: string;
   username: string;
   email: string;
+  bio: string;
   first_name: string;
   last_name: string;
   last_login: Date;
@@ -24,6 +25,7 @@ type ConversationType = {
   group: boolean;
   created_at: string;
   updated_at: string;
+  created_by: string;
   others: {
     id: string;
     username: string;

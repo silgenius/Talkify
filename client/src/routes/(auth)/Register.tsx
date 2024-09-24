@@ -8,6 +8,7 @@ import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ const Register = () => {
     lastName: "",
     email: "",
   });
-  const { signUp, handleGoogleAuth } = useAuth();
+  const { singIn, handleGoogleAuth } = useAuth();
 
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -37,12 +38,13 @@ const Register = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    signUp.mutate(formData);
+    alert("Please sign up with google :)");
   };
-  
+
   return (
     <div className="flex w-full h-screen">
       <SideBar
+        className="hidden md:flex"
         title="Welcome Back!"
         description={
           <>
@@ -54,7 +56,7 @@ const Register = () => {
         }
         buttonText="SIGN IN"
       />
-      <div className="w-2/3 px-10 py-5 flex flex-col items-center justify-center relative">
+      <div className="w-full md:w-2/3 px-10 py-5 flex flex-col items-center justify-center relative">
         <Logo />
         <div className="space-y-12 max-w-sm w-full">
           <h1 className="text-3xl font-semibold text-primary-purple text-center">
@@ -82,14 +84,21 @@ const Register = () => {
               />
             </div>
             <Button
-              className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto px-10"
+              className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto hover:!bg-gray-300 hover:!border-transparent"
               icon={googleLogo}
               text="Sign up with Google"
               type="outline"
               rounded
               onClick={() => handleGoogleAuth("signup")}
+              loading={singIn.isPending}
             />
             <Button htmlType="submit" text="Sign Up" />
+            <div className="flex md:hidden items-center">
+              <p className="p-2">Already have an account? </p>
+              <Link to="/login" className="text-primary-purple">
+                Sign in
+              </Link>
+            </div>
           </form>
         </div>
       </div>

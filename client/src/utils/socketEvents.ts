@@ -11,12 +11,16 @@ export enum SocketEvent {
   // Server confirms that the message was successfully sent
   MESSAGE_SENT = "message_sent",
 
+  // Server broadcasts the message to the recipient
   DELIVER_MESSAGE = "deliver_message",
 
+  // Client notifies the server that the message was delivered
   MESSAGE_DELIVERED = "message_delivered",
 
+  // Client notifies the server that the message was read
   READ_MESSAGE = "read_message",
 
+  // Server broadcasts to other clients that the message was
   MESSAGE_READ = "message_read",
 
   // Client notifies the server that the user has started typing
@@ -30,6 +34,18 @@ export enum SocketEvent {
 
   // Server broadcasts to other clients that the user has stopped typing
   TYPING_STOPPED = "typing_stopped",
+
+  // Client requests to create a new conversation
+  CREATE_CONVERSATION = "create_conversation",
+
+  // Server confirms that the conversation was successfully created
+  CONVERSATION_CREATED = "conversation_created",
+  
+  // Client requests to send a contact request
+  SEND_CONTACT_ACTION = "send_contact_action",
+  
+  // Server confirms that the contact request was successfully sent
+  CONTACT_ACTION_SENT = "contact_action_sent",
 
   // Client requests to connect the user
   CONNECT_USER = "connect_user",

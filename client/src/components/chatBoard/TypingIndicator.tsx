@@ -1,13 +1,24 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import useAppData from "../../hooks/useAppData";
 
 interface TypingIndicatorProps {
   isTyping: { username: string; conversationId: string }[];
+  contactId?: string;
 }
 
-const TypingIndicator: React.FC<TypingIndicatorProps> = ({ isTyping }) => {
+const TypingIndicator: React.FC<TypingIndicatorProps> = ({
+  isTyping,
+  contactId,
+}) => {
+  const { contacts } = useAppData();
+  const contact = contacts.data?.find(
+    (contact) => contact.contact.id === contactId
+  );
   const { id } = useParams();
+
   if (isTyping.length === 0) return null;
+  if (contact?.status === "blocked") return;
   const isTypingInCurrentConversation = isTyping.filter(
     (user) => user.conversationId === id
   );

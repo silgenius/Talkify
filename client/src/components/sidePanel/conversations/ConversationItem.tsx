@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../../utils/newRequest";
-import { MessageType } from "../../../types";
+import { ContactType, MessageType } from "../../../types";
 import { useEffect, useState } from "react";
 import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
 import socket from "../../../socket";
@@ -35,6 +35,10 @@ const ConversationItem = ({
   const currentUser = getUser();
   const { id: currentConversationId } = useParams();
   const queryClient = useQueryClient();
+
+  const contact = queryClient
+    .getQueryData<ContactType[]>(["contacts"])
+    ?.find((contact) => contact.contact.id === contactId);
 
   const {
     data: lastMessage,
@@ -107,11 +111,32 @@ const ConversationItem = ({
         queryKey: ["conversation", conversationId],
       });
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["availableContacts"] });
       toast.info("User blocked successfully");
     },
     onError: (error) => {
       console.log("error", error);
       toast.error("Failed to block user");
+    },
+  });
+
+  const unblockUser = useMutation({
+    mutationFn: async (data: { sender_id: string; receiver_id: string }) => {
+      const res = (await newRequest.post(`/unblock`, data)).data;
+      console.log(res);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["availableContacts"] });
+      toast.info("User unblocked successfully");
+    },
+    onError: (error) => {
+      console.log("error", error);
+      toast.error("Failed to unblock user");
     },
   });
 
@@ -128,7 +153,14 @@ const ConversationItem = ({
       receiver_id: contactId as string,
     });
   };
-  
+
+  const handleUnblock = () => {
+    unblockUser.mutate({
+      sender_id: currentUser.id,
+      receiver_id: contactId as string,
+    });
+  };
+
   return (
     <div
       className="relative"
@@ -170,7 +202,7 @@ const ConversationItem = ({
               ) : (
                 <span className={`text-sm ${"text-gray-500"}`}>
                   {lastMessage?.created_at
-                    ? new Date(lastMessage?.created_at).toLocaleTimeString(
+                    ? new Date(lastMessage?.created_at+"Z").toLocaleTimeString(
                         "US",
                         {
                           hour: "2-digit",
@@ -184,7 +216,9 @@ const ConversationItem = ({
           <div className="flex justify-between items-center">
             {lastMessageLoading ? (
               <div className="w-40 h-2 bg-gray-300 rounded animate-pulse" />
-            ) : !lastMessage? <></> : (
+            ) : !lastMessage ? (
+              <></>
+            ) : (
               <p className={`text-sm max-w-[95%] truncate ${"text-gray-600"}`}>
                 {lastMessage?.sender_id === currentUser.id
                   ? "You: "
@@ -241,7 +275,11 @@ const ConversationItem = ({
             ) : (
               <>
                 <MenuDivider />
-                <MenuItem onClick={handleBlock}>Block user</MenuItem>
+                {contact?.status !== "blocked" ? (
+                  <MenuItem onClick={handleBlock}>Block user</MenuItem>
+                ) : (
+                  <MenuItem onClick={handleUnblock}>Unblock user</MenuItem>
+                )}
               </>
             )}
           </Menu>

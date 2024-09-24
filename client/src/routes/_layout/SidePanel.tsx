@@ -5,8 +5,6 @@ import { MdContacts, MdOutlineContacts } from "react-icons/md";
 import {
   IoChatbox,
   IoChatboxOutline,
-  IoLogOut,
-  IoLogOutOutline,
   IoSettingsOutline,
   IoSettingsSharp,
 } from "react-icons/io5";
@@ -58,8 +56,8 @@ const SidePanel = () => {
     }
   }, [conversations.isError]);
 
-  // Listen for new messages and update the conversations and messages query
   useEffect(() => {
+    // Listen for new messages and update the conversations and messages query
     socket.on(SocketEvent.MESSAGE_SENT, (message: MessageType) => {
       const inConversation = conversations.data?.find(
         (conversation: ConversationType) =>
@@ -74,9 +72,38 @@ const SidePanel = () => {
       }
     });
 
+    // Listen for new conversations and update the conversations query
+    socket.on(
+      SocketEvent.CONVERSATION_CREATED,
+      (conversation: ConversationType) => {
+        if (conversation.users.find((user) => user.id === currentUser.id)) {
+          queryClient.invalidateQueries({ queryKey: ["conversations"] });
+          toast.info("you've been added to a new chat");
+        }
+      }
+    );
+
+    // Listen for contact actions and update the contacts query
+    socket.on(
+      SocketEvent.CONTACT_ACTION_SENT,
+      (data: { user_id: string; contact_name: string; status: string }) => {
+        queryClient.invalidateQueries({ queryKey: ["contacts"] });
+        if (data.user_id === currentUser.id) {
+          if (data.status === "requested")
+            toast.info(`${data.contact_name} sent you a friend request`);
+          else if (data.status === "accepted")
+            toast.success(`${data.contact_name} accepted your friend request`);
+        }
+      }
+    );
+
     return () => {
       socket.off(SocketEvent.MESSAGE_SENT);
+      socket.off(SocketEvent.CONVERSATION_CREATED);
+      socket.off(SocketEvent.CONTACT_ACTION_SENT);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, queryClient]);
 
   useEffect(() => {
@@ -85,7 +112,7 @@ const SidePanel = () => {
         setUnderlineWidth(contactsRef.current.offsetWidth);
         setUnderlinePosition(contactsRef.current.offsetLeft);
       }
-    } else if (hash.includes("#logout")) {
+    } else if (hash.includes("#settings")) {
       if (settingsRef.current) {
         setUnderlineWidth(settingsRef.current.offsetWidth);
         setUnderlinePosition(settingsRef.current.offsetLeft);
@@ -135,24 +162,14 @@ const SidePanel = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => navigate("/settings")}
+                  ref={settingsRef}
+                  onClick={() => navigate("#settings")}
                   className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
                 >
                   {hash.includes("#settings") ? (
                     <IoSettingsSharp className="inline-block text-3xl" />
                   ) : (
                     <IoSettingsOutline className="inline-block text-3xl" />
-                  )}
-                </button>
-                <button
-                  ref={settingsRef}
-                  onClick={() => navigate("#logout")}
-                  className={`py-2 px-4 rounded-lg transition duration-300 text-primary-purple hover:bg-primary-purple/10`}
-                >
-                  {hash.includes("#logout") ? (
-                    <IoLogOut className="inline-block text-3xl" />
-                  ) : (
-                    <IoLogOutOutline className="inline-block text-3xl" />
                   )}
                 </button>
               </div>
@@ -172,7 +189,7 @@ const SidePanel = () => {
       <div className="flex-1 overflow-y-auto">
         {hash.includes("#contacts") ? (
           <Contacts />
-        ) : hash.includes("#logout") ? (
+        ) : hash.includes("#settings") ? (
           <Settings />
         ) : (
           <Conversations conversations={conversations} />

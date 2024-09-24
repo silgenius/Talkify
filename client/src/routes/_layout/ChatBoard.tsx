@@ -3,7 +3,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate, useParams } from "react-router-dom";
-import { CallDataType, ConversationType, MessageType } from "../../types";
+import {
+  CallDataType,
+  ConversationType,
+  MessageType,
+  UserType,
+} from "../../types";
 import { getUser } from "../../utils/localStorage";
 import socket from "../../socket";
 import { SocketEvent } from "../../utils/socketEvents";
@@ -20,8 +25,10 @@ import Modal from "../../components/common/Modal";
 import { useCall } from "../../hooks/useCall";
 import { formatTime } from "../../utils/formatTime";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { getChatOthers } from "../../utils/conversationData";
 
 type typingSocketData = {
+  user_id: string;
   username: string;
   conversation_id: string;
 };
@@ -33,7 +40,14 @@ const ChatBoard = () => {
     { username: string; conversationId: string }[]
   >([]);
   const [tmpMessages, setTmpMessages] = useState<
-    { message_text: string; status: "sending" | "failed" }[]
+    {
+      messageId: number;
+      conversation_id: string;
+      message_text: string;
+      status: "sending" | "failed" | "sent";
+      isFirst: boolean;
+      isLast: boolean;
+    }[]
   >([]);
 
   const { id } = useParams();
@@ -65,9 +79,17 @@ const ChatBoard = () => {
     },
     enabled: !!id,
   });
-  const other = conversation?.data?.users.filter(
-    (user) => user.id !== currentUser.id
-  )[0];
+
+  const other = getChatOthers(conversation.data, currentUser)[0];
+
+  const { data: contact } = useQuery<UserType>({
+    queryKey: ["user", other?.id],
+    queryFn: async () => {
+      const res = (await newRequest(`/user/id/${other?.id}`)).data;
+      return res;
+    },
+    enabled: !!conversation && !!other,
+  });
 
   const messages = useQuery({
     queryKey: ["messages", id],
@@ -91,7 +113,15 @@ const ChatBoard = () => {
   }, [messages.data, tmpMessages, isTyping]);
 
   useEffect(() => {
-    setTmpMessages((prev) => [...prev.splice(0, 2)]);
+    setTmpMessages((prev) =>
+      prev.filter((message) => message.status !== "sent")
+    );
+  }, [messages.data]);
+
+  useEffect(() => {
+    setTmpMessages((prev) =>
+      prev.filter((message) => message.status !== "sent")
+    );
   }, [messages.data]);
 
   useEffect(() => {
@@ -101,7 +131,7 @@ const ChatBoard = () => {
   useEffect(() => {
     socket.on(
       SocketEvent.TYPING_STARTED,
-      ({ username, conversation_id }: typingSocketData) => {
+      ({ user_id, username, conversation_id }: typingSocketData) => {
         // Show typing indicator in other conversation members' screens
         const conversations = queryClient.getQueryData([
           "conversations",
@@ -110,7 +140,7 @@ const ChatBoard = () => {
           conversations.find(
             (conversation) => conversation.id === conversation_id
           ) &&
-          username !== currentUser.username
+          user_id !== currentUser.id
         ) {
           setIsTyping((prev) =>
             !prev.find(
@@ -127,7 +157,7 @@ const ChatBoard = () => {
     );
     socket.on(
       SocketEvent.TYPING_STOPPED,
-      ({ username, conversation_id }: typingSocketData) => {
+      ({ user_id, username, conversation_id }: typingSocketData) => {
         // Hide typing indicator
         const conversations = queryClient.getQueryData([
           "conversations",
@@ -136,7 +166,7 @@ const ChatBoard = () => {
           conversations.find(
             (conversation) => conversation.id === conversation_id
           ) &&
-          username !== currentUser.username
+          user_id !== currentUser.id
         ) {
           setIsTyping((prev) =>
             prev.filter(
@@ -388,31 +418,42 @@ const ChatBoard = () => {
             conversation.data && (
               <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-1 pl-16 items-start">
                 {messages.data?.length > 0 ? (
-                  [...messages.data, ...tmpMessages].map(
-                    (
-                      message: MessageType & {
-                        isFirst: boolean;
-                        isLast: boolean;
-                      }
-                    ) => (
-                      <Message
-                        key={message.id}
-                        message={message}
-                        isFirst={message.isFirst}
-                        isLast={message.isLast}
-                        username={
-                          conversation.data?.users.filter(
-                            (user) => user.id === message.sender_id
-                          )[0]?.username
+                  [
+                    ...messages.data,
+                    ...tmpMessages.filter((msg) => msg.conversation_id === id),
+                  ]
+                    .sort((a, b) => {
+                      return (
+                        new Date(a.created_at).getTime() -
+                        new Date(b.created_at).getTime()
+                      );
+                    })
+                    .map(
+                      (
+                        message: MessageType & {
+                          messageId: number;
+                          isFirst: boolean;
+                          isLast: boolean;
                         }
-                        photoUrl={
-                          conversation.data?.users.filter(
-                            (user) => user.id === message.sender_id
-                          )[0]?.profile_url
-                        }
-                      />
+                      ) => (
+                        <Message
+                          key={message.id || message.messageId}
+                          message={message}
+                          isFirst={message.isFirst}
+                          isLast={message.isLast}
+                          username={
+                            conversation.data?.users.filter(
+                              (user) => user.id === message.sender_id
+                            )[0]?.username
+                          }
+                          photoUrl={
+                            conversation.data?.users.filter(
+                              (user) => user.id === message.sender_id
+                            )[0]?.profile_url
+                          }
+                        />
+                      )
                     )
-                  )
                 ) : (
                   <div className="flex flex-col items-center justify-center self-center text-center p-6 h-full rounded-lg">
                     <IoChatbubbleEllipsesOutline className="text-gray-400 text-6xl mb-4" />
@@ -424,7 +465,10 @@ const ChatBoard = () => {
                     </p>
                   </div>
                 )}
-                <TypingIndicator isTyping={isTyping} />
+                <TypingIndicator
+                  isTyping={isTyping}
+                  contactId={conversation.data?.group ? undefined : other?.id}
+                />
                 <div ref={lastMessageRef}></div>
               </div>
             )
@@ -444,6 +488,7 @@ const ChatBoard = () => {
           <Detail
             conversation={conversation.data}
             onClose={() => setShowDetail(false)}
+            user={contact}
           />
         </div>
       )}

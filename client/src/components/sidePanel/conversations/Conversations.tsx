@@ -19,14 +19,21 @@ const Conversations = ({ conversations }: ConversationsProps) => {
   const { id } = useParams();
 
   // Filter conversations based on the search query
-  const filteredConversations = conversations.data?.filter(
-    (conversation: ConversationType) => {
+  const filteredConversations = conversations.data
+    ?.filter((conversation: ConversationType) => {
       const name = conversation.group
         ? conversation.name
         : conversation.others[0].username;
       return name.toLowerCase().includes(searchQuery.toLowerCase());
-    }
-  );
+    })
+    .sort((a, b) => {
+      if (a.updated_at && b.updated_at) {
+        return a.updated_at > b.updated_at ? -1 : 1;
+      }
+      if (a.updated_at) return -1;
+      if (b.updated_at) return 1;
+      return 0;
+    });
 
   return (
     <div className="flex flex-col h-full py-2">

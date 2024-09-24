@@ -8,10 +8,11 @@ import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/localStorage";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const { singIn , handleGoogleAuth} = useAuth();
+  const { singIn, handleGoogleAuth } = useAuth();
 
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -29,12 +30,12 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    singIn.mutate(email);
+    alert("Please sign in with google :)");
   };
 
   return (
     <div className="flex w-full h-screen">
-      <div className="w-2/3 px-10 py-5 flex flex-col items-center justify-center relative">
+      <div className="w-full md:w-2/3 px-10 py-5 flex flex-col items-center justify-center relative">
         <Logo />
         <div className="space-y-12 max-w-sm w-full">
           <h1 className="text-3xl font-semibold text-primary-purple text-center">
@@ -50,18 +51,26 @@ const Login = () => {
               />
             </div>
             <Button
-              className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto px-10"
+              className="mb-12 !text-gray-800 !border-gray-400 w-fit mx-auto px-10 hover:!bg-gray-300 hover:!border-transparent"
               icon={googleLogo}
               text="Sign in with Google"
               type="outline"
               rounded
               onClick={() => handleGoogleAuth("login")}
+              loading={singIn.isPending}
             />
             <Button htmlType="submit" text="Sign In" />
+            <div className="flex md:hidden items-center">
+              <p className="p-2">Don't have an accont? </p>
+              <Link to="/register" className="text-primary-purple">
+                Sign up
+              </Link>
+            </div>
           </form>
         </div>
       </div>
       <SideBar
+        className="hidden md:flex"
         title="Join Talkify!"
         description={
           <>
